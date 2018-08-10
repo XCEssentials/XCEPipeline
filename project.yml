@@ -1,0 +1,91 @@
+# https://github.com/lyptt/struct/wiki/Spec-format:-v2.0
+version: 2.1.0
+configurations:
+    Debug:
+        type: "debug"
+        overrides:
+            IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+            SWIFT_VERSION: "4.2"
+            VERSIONING_SYSTEM: "apple-generic"
+            CURRENT_PROJECT_VERSION: "0"
+            CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: "YES"
+            CLANG_WARN_COMMA: "YES"
+            CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: "YES"
+            CLANG_WARN_NON_LITERAL_NULL_CONVERSION: "YES"
+            CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: "YES"
+            CLANG_WARN_OBJC_LITERAL_CONVERSION: "YES"
+            CLANG_WARN_RANGE_LOOP_ANALYSIS: "YES"
+            CLANG_WARN_STRICT_PROTOTYPES: "YES"
+            SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+    Release:
+        type: "release"
+        overrides:
+            IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+            SWIFT_VERSION: "4.2"
+            VERSIONING_SYSTEM: "apple-generic"
+            CURRENT_PROJECT_VERSION: "0"
+            CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: "YES"
+            CLANG_WARN_COMMA: "YES"
+            CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: "YES"
+            CLANG_WARN_NON_LITERAL_NULL_CONVERSION: "YES"
+            CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: "YES"
+            CLANG_WARN_OBJC_LITERAL_CONVERSION: "YES"
+            CLANG_WARN_RANGE_LOOP_ANALYSIS: "YES"
+            CLANG_WARN_STRICT_PROTOTYPES: "YES"
+targets:
+    Pipeline:
+        platform: ios
+        type: ":framework"
+        sources:
+        - "Sources/Pipeline"
+        configurations:
+            Debug:
+                SWIFT_VERSION: "$(inherited)"
+                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.Pipeline"
+                INFOPLIST_FILE: "Info/Pipeline.plist"
+                SDKROOT: "iphoneos"
+                TARGETED_DEVICE_FAMILY: "1,2"
+                CODE_SIGN_IDENTITY: ""
+                PRODUCT_NAME: "Pipeline"
+                DEFINES_MODULE: "NO"
+                SKIP_INSTALL: "YES"
+                MTL_ENABLE_DEBUG_INFO: "YES"
+            Release:
+                SWIFT_VERSION: "$(inherited)"
+                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.Pipeline"
+                INFOPLIST_FILE: "Info/Pipeline.plist"
+                SDKROOT: "iphoneos"
+                TARGETED_DEVICE_FAMILY: "1,2"
+                CODE_SIGN_IDENTITY: ""
+                PRODUCT_NAME: "Pipeline"
+                DEFINES_MODULE: "NO"
+                SKIP_INSTALL: "YES"
+    PipelineTests:
+        platform: ios
+        type: ":bundle.unit-test"
+        references:
+        - "Pipeline"
+        sources:
+        - "Sources/PipelineTests"
+        configurations:
+            Debug:
+                SWIFT_VERSION: "$(inherited)"
+                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.PipelineTests"
+                INFOPLIST_FILE: "Info/PipelineTests.plist"
+                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                MTL_ENABLE_DEBUG_INFO: "YES"
+            Release:
+                SWIFT_VERSION: "$(inherited)"
+                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.PipelineTests"
+                INFOPLIST_FILE: "Info/PipelineTests.plist"
+                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+variants:
+    $base:
+        abstract: true
+    Pipeline:
