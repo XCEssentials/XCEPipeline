@@ -47,7 +47,7 @@ targets:
                 SDKROOT: "iphoneos"
                 TARGETED_DEVICE_FAMILY: "1,2"
                 CODE_SIGN_IDENTITY: ""
-                PRODUCT_NAME: "Pipeline"
+                PRODUCT_NAME: "XCE$(TARGET_NAME:c99extidentifier)"
                 DEFINES_MODULE: "NO"
                 SKIP_INSTALL: "YES"
                 MTL_ENABLE_DEBUG_INFO: "YES"
@@ -59,7 +59,7 @@ targets:
                 SDKROOT: "iphoneos"
                 TARGETED_DEVICE_FAMILY: "1,2"
                 CODE_SIGN_IDENTITY: ""
-                PRODUCT_NAME: "Pipeline"
+                PRODUCT_NAME: "XCE$(TARGET_NAME:c99extidentifier)"
                 DEFINES_MODULE: "NO"
                 SKIP_INSTALL: "YES"
     PipelineTests:
