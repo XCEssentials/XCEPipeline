@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		388C097B5F95AF28461BB5FF /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED4703AE8AAF8B18C4A65314 /* Errors.swift */; };
 		47CB5C0C082037B13246A395 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B8BEB9283A0A108E7B1F9A /* Foundation.framework */; };
-		67742D5926E5B053AF3E2B6C /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F4804BFC333AC9D709F595 /* Main.swift */; };
+		67742D5926E5B053AF3E2B6C /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F4804BFC333AC9D709F595 /* PipelineTests.swift */; };
 		99BB9E0B12966A21255D70E9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B8BEB9283A0A108E7B1F9A /* Foundation.framework */; };
-		9FD930B37B1298ED53F9EF51 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FC5A664001C82BFBC78825 /* Main.swift */; };
+		9FD930B37B1298ED53F9EF51 /* Pipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FC5A664001C82BFBC78825 /* Pipeline.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,10 +49,10 @@
 
 /* Begin PBXFileReference section */
 		37B8BEB9283A0A108E7B1F9A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		66FC5A664001C82BFBC78825 /* Main.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		66FC5A664001C82BFBC78825 /* Pipeline.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Pipeline.swift; sourceTree = "<group>"; };
 		D02A1A6270AE9119481837F3 /* Pipeline.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pipeline.framework; path = XCEPipeline.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEA5D6A205307DE31D316618 /* PipelineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PipelineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4F4804BFC333AC9D709F595 /* Main.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		E4F4804BFC333AC9D709F595 /* PipelineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
 		ED4703AE8AAF8B18C4A65314 /* Errors.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -130,7 +130,7 @@
 		7E5560B49D3695BE7A9B052A /* PipelineTests */ = {
 			isa = PBXGroup;
 			children = (
-				E4F4804BFC333AC9D709F595 /* Main.swift */,
+				E4F4804BFC333AC9D709F595 /* PipelineTests.swift */,
 			);
 			path = PipelineTests;
 			sourceTree = "<group>";
@@ -139,7 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				ED4703AE8AAF8B18C4A65314 /* Errors.swift */,
-				66FC5A664001C82BFBC78825 /* Main.swift */,
+				66FC5A664001C82BFBC78825 /* Pipeline.swift */,
 			);
 			path = Pipeline;
 			sourceTree = "<group>";
@@ -249,7 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				388C097B5F95AF28461BB5FF /* Errors.swift in Sources */,
-				9FD930B37B1298ED53F9EF51 /* Main.swift in Sources */,
+				9FD930B37B1298ED53F9EF51 /* Pipeline.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,7 +257,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				67742D5926E5B053AF3E2B6C /* Main.swift in Sources */,
+				67742D5926E5B053AF3E2B6C /* PipelineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
