@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
     s.name          = 'XCEPipeline'
     s.summary       = 'Custom pipeline operators for easy chaining in Swift.'
-    s.version       = '1.0.0'
+    s.version       = '1.0.1'
     s.homepage      = 'https://XCEssentials.github.io/Pipeline'
 
     s.source        = { :git => 'https://github.com/XCEssentials/Pipeline.git', :tag => s.version }
@@ -16,6 +16,6 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = '9.0'
 
-    s.source_files = 'Sources/**/*.swift'
+    s.source_files = 'Sources/Pipeline/**/*.swift'
 
 end
