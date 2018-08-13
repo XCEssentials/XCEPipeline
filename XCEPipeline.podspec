@@ -10,12 +10,19 @@ Pod::Spec.new do |s|
     s.requires_arc  = true
 
     s.license       = { :type => 'MIT', :file => 'LICENSE' }
-    s.author        = { 'Maxim Khatskevich' => 'maxim@khatskevi.ch' }
+
+    s.authors = {
+        'Maxim Khatskevich' => 'maxim@khatskevi.ch'
+    }
 
     s.swift_version = '4.2'
 
+    s.cocoapods_version = '>= 0.36'
+
+    # === iOS
+
     s.ios.deployment_target = '9.0'
 
-    s.source_files = 'Sources/Pipeline/**/*.swift'
+    s.ios.source_files = 'Sources/Pipeline/**/*.swift'
 
 end
