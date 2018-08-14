@@ -193,3 +193,55 @@ func ensure<T>(
         }
     }
 }
+
+public
+func extend<T0, X>(
+    with anotherValue: X
+    ) -> (T0) -> (T0, X)
+{
+    return { ($0, anotherValue) }
+}
+
+//swiftlint:disable large_tuple
+
+public
+func extend<T0, T1, X>(
+    with anotherValue: X
+    ) -> (T0, T1) -> (T0, T1, X)
+{
+    return { ($0, $1, anotherValue) }
+}
+
+public
+func extend<T0, T1, T2, X>(
+    with anotherValue: X
+    ) -> (T0, T1, T2) -> (T0, T1, T2, X)
+{
+    return { ($0, $1, $2, anotherValue) }
+}
+
+public
+func extend<T0, T1, T2, T3, X>(
+    with anotherValue: X
+    ) -> (T0, T1, T2, T3) -> (T0, T1, T2, T3, X)
+{
+    return { ($0, $1, $2, $3, anotherValue) }
+}
+
+public
+func extend<T0, T1, T2, T3, T4, X>(
+    with anotherValue: X
+    ) -> (T0, T1, T2, T3, T4) -> (T0, T1, T2, T3, T4, X)
+{
+    return { ($0, $1, $2, $3, $4, anotherValue) }
+}
+
+public
+func extend<T0, T1, T2, T3, T4, T5, X>(
+    with anotherValue: X
+    ) -> (T0, T1, T2, T3, T4, T5) -> (T0, T1, T2, T3, T4, T5, X)
+{
+    return { ($0, $1, $2, $3, $4, $5, anotherValue) }
+}
+
+//swiftlint:enable large_tuple
