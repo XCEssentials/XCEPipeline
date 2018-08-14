@@ -24,10 +24,6 @@
 
  */
 
-import Foundation
-
-//---
-
 public
 enum PipelineError: Error
 {
