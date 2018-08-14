@@ -3,7 +3,18 @@ import XCERepoConfigurator
 //---
 
 // one item for main target, and one - for unit tests
-typealias PerTarget<T> = (main: T, tst: T)
+typealias PerTarget<T> = (
+    main: T,
+    tst: T
+)
+
+typealias PerPlatform<T> = (
+    shared: T,
+    iOS: T,
+    watchOS: T,
+    tvOS: T,
+    macOS: T
+)
 
 //---
 
@@ -282,6 +293,18 @@ let podfile = CocoaPods
         targetFolder: repoFolder
     )
 
+//---
+
+let depTargets: PerPlatform<DeploymentTarget?> = (
+    shared: nil,
+    iOS: depTarget,
+    (.watchOS, "3.0"),
+    (.tvOS, "9.0"),
+    (.macOS, "10.11")
+)
+
+//---
+
 let podspec = CocoaPods
     .Podspec
     .Standard(
@@ -292,11 +315,27 @@ let podspec = CocoaPods
         swiftVersion: swiftVersion,
         otherSettings: [
             (
-                deploymentTarget: depTarget,
+                deploymentTarget: depTargets.shared,
                 settigns: [
 
                     "source_files = '\(sourcesPath.main)/**/*.swift'"
                 ]
+            ),
+            (
+                deploymentTarget: depTargets.iOS,
+                settigns: []
+            ),
+            (
+                deploymentTarget: depTargets.watchOS,
+                settigns: []
+            ),
+            (
+                deploymentTarget: depTargets.tvOS,
+                settigns: []
+            ),
+            (
+                deploymentTarget: depTargets.macOS,
+                settigns: []
             )
         ]
     )
