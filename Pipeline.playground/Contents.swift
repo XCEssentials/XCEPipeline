@@ -2,18 +2,30 @@ import XCERepoConfigurator
 
 //---
 
-// one item for main target, and one - for unit tests
-typealias PerTarget<T> = (
-    main: T,
-    tst: T
-)
-
 typealias PerPlatform<T> = (
-    shared: T,
     iOS: T,
     watchOS: T,
     tvOS: T,
     macOS: T
+)
+
+typealias CommonAndPerPlatform<T> = (
+    common: T,
+    iOS: T,
+    watchOS: T,
+    tvOS: T,
+    macOS: T
+)
+
+// one item for main target, and one - for unit tests
+typealias PerTarget<T> = (
+    main: PerPlatform<T>,
+    tst: PerPlatform<T>
+)
+
+typealias CommonAndPerTarget<T> = (
+    main: CommonAndPerPlatform<T>,
+    tst: CommonAndPerPlatform<T>
 )
 
 //---
@@ -74,9 +86,21 @@ let license = License
 
 let tstSuffix = Defaults.tstSuffix
 
-let targetName: PerTarget = (
-    product.name,
-    product.name + tstSuffix
+let targetName: CommonAndPerTarget = (
+    (
+        product.name,
+        OSIdentifier.iOS.rawValue + "-" + product.name,
+        OSIdentifier.watchOS.rawValue + "-" + product.name,
+        OSIdentifier.tvOS.rawValue + "-" + product.name,
+        OSIdentifier.macOS.rawValue + "-" + product.name
+    ),
+    (
+        product.name + tstSuffix,
+        OSIdentifier.iOS.rawValue + "-" + product.name + tstSuffix,
+        OSIdentifier.watchOS.rawValue + "-" + product.name + tstSuffix,
+        OSIdentifier.tvOS.rawValue + "-" + product.name + tstSuffix,
+        OSIdentifier.macOS.rawValue + "-" + product.name + tstSuffix
+    )
 )
 
 let commonInfoPlistsPath = Defaults
@@ -90,74 +114,258 @@ let infoPlistsFolder = repoFolder
 //---
 
 let info: PerTarget = (
-    Xcode
-        .Target
-        .InfoPlist
-        .iOSFramework()
-        .prepare(
-            name: targetName.main + ".plist",
-            targetFolder: infoPlistsFolder
-        ),
-    Xcode
-        .Target
-        .InfoPlist
-        .unitTests()
-        .prepare(
-            name: targetName.tst + ".plist",
-            targetFolder: infoPlistsFolder
-        )
+    (
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .framework
+            )
+            .prepare(
+                name: targetName.main.iOS + ".plist",
+                targetFolder: infoPlistsFolder
+            ),
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .framework
+            )
+            .prepare(
+                name: targetName.main.watchOS + ".plist",
+                targetFolder: infoPlistsFolder
+            ),
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .framework
+            )
+            .prepare(
+                name: targetName.main.tvOS + ".plist",
+                targetFolder: infoPlistsFolder
+            ),
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .framework
+            )
+            .prepare(
+                name: targetName.main.macOS + ".plist",
+                targetFolder: infoPlistsFolder
+            )
+    ),
+    (
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .tests
+            )
+            .prepare(
+                name: targetName.tst.iOS + ".plist",
+                targetFolder: infoPlistsFolder
+            ),
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .tests
+            )
+            .prepare(
+                name: targetName.tst.watchOS + ".plist",
+                targetFolder: infoPlistsFolder
+            ),
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .tests
+            )
+            .prepare(
+                name: targetName.tst.tvOS + ".plist",
+                targetFolder: infoPlistsFolder
+            ),
+        Xcode
+            .Target
+            .InfoPlist(
+                for: .tests
+            )
+            .prepare(
+                name: targetName.tst.macOS + ".plist",
+                targetFolder: infoPlistsFolder
+            )
+    )
 )
 
 //---
 
-let depTarget: DeploymentTarget = (.iOS, "9.0")
+let depTargets: PerPlatform<DeploymentTarget> = (
+    (.iOS, "9.0"),
+    (.watchOS, "3.0"),
+    (.tvOS, "9.0"),
+    (.macOS, "10.11")
+)
 
 let swiftVersion: VersionString = "4.2"
 
-let commonSourcesPath = Defaults
+let baseSourcesPath = Defaults
     .pathToSourcesFolder
 
-let sourcesPath: PerTarget = (
-    commonSourcesPath + "/" + targetName.main,
-    commonSourcesPath + "/" + targetName.tst
+let sourcesPath: CommonAndPerTarget = (
+    (
+        baseSourcesPath + "/" + product.name + "/Common",
+        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.iOS.rawValue,
+        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.watchOS.rawValue,
+        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.tvOS.rawValue,
+        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.macOS.rawValue
+    ),
+    (
+        baseSourcesPath + "/" + product.name + tstSuffix + "/Common",
+        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.iOS.rawValue,
+        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.watchOS.rawValue,
+        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.tvOS.rawValue,
+        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.macOS.rawValue
+    )
 )
 
-let sourcesFolder: PerTarget = (
-    repoFolder
-        .appendingPathComponent(
-            sourcesPath.main
+let sourcesFolder: CommonAndPerTarget = (
+    (
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.main.common
+            ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.main.iOS
+            ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.main.watchOS
+            ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.main.tvOS
+            ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.main.macOS
+            )
+    ),
+    (
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.tst.common
         ),
-    repoFolder
-        .appendingPathComponent(
-            sourcesPath.tst
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.tst.iOS
+        ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.tst.watchOS
+        ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.tst.tvOS
+        ),
+        repoFolder
+            .appendingPathComponent(
+                sourcesPath.tst.macOS
         )
+    )
 )
 
 let bundleId: PerTarget = (
-    company.identifier + "." + targetName.main,
-    company.identifier + "." + targetName.tst
-)
+    (
+        company.identifier + "." + targetName.main.iOS,
+        company.identifier + "." + targetName.main.watchOS,
+        company.identifier + "." + targetName.main.tvOS,
+        company.identifier + "." + targetName.main.macOS
+    ),
+    (
+        company.identifier + "." + targetName.tst.iOS,
+        company.identifier + "." + targetName.tst.watchOS,
+        company.identifier + "." + targetName.tst.tvOS,
+        company.identifier + "." + targetName.tst.macOS
+    )
 
 let infoPlistsPath: PerTarget = (
-    commonInfoPlistsPath + "/" + info.main.name,
-    commonInfoPlistsPath + "/" + info.tst.name
+    (
+        commonInfoPlistsPath + "/" + info.main.iOS.name,
+        commonInfoPlistsPath + "/" + info.main.watchOS.name,
+        commonInfoPlistsPath + "/" + info.main.tvOS.name,
+        commonInfoPlistsPath + "/" + info.main.macOS.name
+    ),
+    (
+        commonInfoPlistsPath + "/" + info.tst.iOS.name,
+        commonInfoPlistsPath + "/" + info.tst.watchOS.name,
+        commonInfoPlistsPath + "/" + info.tst.tvOS.name,
+        commonInfoPlistsPath + "/" + info.tst.macOS.name
+    )
 )
 
 //---
 
-let dummyFile: PerTarget = (
-    CustomTextFile
-        .init()
-        .prepare(
-            name: targetName.main + ".swift",
-            targetFolder: sourcesFolder.main
+let dummyFile: CommonAndPerTarget = (
+    (
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.main.common + ".swift",
+                targetFolder: sourcesFolder.main.common
+            ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.main.iOS + ".swift",
+                targetFolder: sourcesFolder.main.iOS
+            ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.main.watchOS + ".swift",
+                targetFolder: sourcesFolder.main.watchOS
+            ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.main.tvOS + ".swift",
+                targetFolder: sourcesFolder.main.tvOS
+            ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.main.macOS + ".swift",
+                targetFolder: sourcesFolder.main.macOS
+            )
+    ),
+    (
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.tst.common + ".swift",
+                targetFolder: sourcesFolder.tst.iOS
         ),
-    CustomTextFile
-        .init()
-        .prepare(
-            name: targetName.tst + ".swift",
-            targetFolder: sourcesFolder.tst
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.tst.iOS + ".swift",
+                targetFolder: sourcesFolder.tst.iOS
+        ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.tst.watchOS + ".swift",
+                targetFolder: sourcesFolder.tst.watchOS
+        ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.tst.tvOS + ".swift",
+                targetFolder: sourcesFolder.tst.tvOS
+        ),
+        CustomTextFile
+            .init()
+            .prepare(
+                name: targetName.tst.macOS + ".swift",
+                targetFolder: sourcesFolder.tst.macOS
         )
+    )
 )
 
 let project = Xcode
@@ -169,7 +377,6 @@ let project = Xcode
 
         project.configurations.all.override(
 
-            "IPHONEOS_DEPLOYMENT_TARGET" <<< depTarget.minimumVersion,
             "SWIFT_VERSION" <<< swiftVersion,
             "VERSIONING_SYSTEM" <<< "apple-generic",
 
@@ -192,13 +399,14 @@ let project = Xcode
 
         //---
 
-        project.target(targetName.main, .iOS, .framework) {
+        project.target(targetName.main.iOS, .iOS, .framework) {
 
             fwk in
 
             //---
 
-            fwk.include(sourcesPath.main)
+            fwk.include(sourcesPath.main.common)
+            fwk.include(sourcesPath.main.iOS)
 
             //---
 
@@ -206,9 +414,9 @@ let project = Xcode
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
-                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTarget.minimumVersion,
-                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main,
-                "INFOPLIST_FILE" <<< infoPlistsPath.main,
+                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
+                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
+                "INFOPLIST_FILE" <<< infoPlistsPath.main.iOS,
 
                 //--- iOS related:
 
@@ -217,27 +425,30 @@ let project = Xcode
 
                 //--- Framework related:
 
-                "CODE_SIGN_IDENTITY" <<< "",
+                "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
+                "CODE_SIGN_STYLE" <<< "Automatic",
 
                 "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
-                "DEFINES_MODULE" <<< NO,
-                "SKIP_INSTALL" <<< YES
+                "DEFINES_MODULE" <<< YES,
+                "SKIP_INSTALL" <<< YES,
+                "MTL_ENABLE_DEBUG_INFO" <<< YES
             )
 
             fwk.configurations.debug.override(
 
-                "MTL_ENABLE_DEBUG_INFO" <<< YES
+                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
             )
 
             //---
 
-            fwk.unitTests(targetName.tst) {
+            fwk.unitTests(targetName.tst.iOS) {
 
                 fwkTests in
 
                 //---
 
-                fwkTests.include(sourcesPath.tst)
+                fwkTests.include(sourcesPath.tst.common)
+                fwkTests.include(sourcesPath.tst.iOS)
 
                 //---
 
@@ -250,10 +461,244 @@ let project = Xcode
                     "LD_RUNPATH_SEARCH_PATHS" <<<
                     "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
 
-                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTarget.minimumVersion,
+                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
 
-                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst,
-                    "INFOPLIST_FILE" <<< infoPlistsPath.tst,
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.iOS,
+                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.iOS,
+                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                )
+
+                fwkTests.configurations.debug.override(
+
+                    "MTL_ENABLE_DEBUG_INFO" <<< YES
+                )
+            }
+        }
+
+        //---
+
+        project.target(targetName.main.watchOS, .watchOS, .framework) {
+
+            fwk in
+
+            //---
+
+            fwk.include(sourcesPath.main.common)
+            fwk.include(sourcesPath.main.watchOS)
+
+            //---
+
+            fwk.configurations.all.override(
+
+                "SWIFT_VERSION" <<< "$(inherited)",
+
+                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
+                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
+                "INFOPLIST_FILE" <<< infoPlistsPath.main.watchOS,
+
+                //--- iOS related:
+
+                "SDKROOT" <<< "iphoneos",
+//                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
+
+                //--- Framework related:
+
+                "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
+                "CODE_SIGN_STYLE" <<< "Automatic",
+
+                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "DEFINES_MODULE" <<< YES,
+                "SKIP_INSTALL" <<< YES,
+                "MTL_ENABLE_DEBUG_INFO" <<< YES
+            )
+
+            fwk.configurations.debug.override(
+
+                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
+            )
+
+            //---
+
+            fwk.unitTests(targetName.tst.watchOS) {
+
+                fwkTests in
+
+                //---
+
+                fwkTests.include(sourcesPath.tst.common)
+                fwkTests.include(sourcesPath.tst.watchOS)
+
+                //---
+
+                fwkTests.configurations.all.override(
+
+                    "SWIFT_VERSION" <<< "$(inherited)",
+
+                    // very important for unit tests,
+                    // prevents the error when unit test do not start at all
+                    "LD_RUNPATH_SEARCH_PATHS" <<<
+                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
+
+                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
+
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.watchOS,
+                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.watchOS,
+                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                )
+
+                fwkTests.configurations.debug.override(
+
+                    "MTL_ENABLE_DEBUG_INFO" <<< YES
+                )
+            }
+        }
+
+        //---
+
+        project.target(targetName.main.tvOS, .tvOS, .framework) {
+
+            fwk in
+
+            //---
+
+            fwk.include(sourcesPath.main.common)
+            fwk.include(sourcesPath.main.tvOS)
+
+            //---
+
+            fwk.configurations.all.override(
+
+                "SWIFT_VERSION" <<< "$(inherited)",
+
+                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
+                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
+                "INFOPLIST_FILE" <<< infoPlistsPath.main.tvOS,
+
+                //--- iOS related:
+
+                "SDKROOT" <<< "iphoneos",
+//                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
+
+                //--- Framework related:
+
+                "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
+                "CODE_SIGN_STYLE" <<< "Automatic",
+
+                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "DEFINES_MODULE" <<< YES,
+                "SKIP_INSTALL" <<< YES,
+                "MTL_ENABLE_DEBUG_INFO" <<< YES
+            )
+
+            fwk.configurations.debug.override(
+
+                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
+            )
+
+            //---
+
+            fwk.unitTests(targetName.tst.tvOS) {
+
+                fwkTests in
+
+                //---
+
+                fwkTests.include(sourcesPath.tst.common)
+                fwkTests.include(sourcesPath.tst.tvOS)
+
+                //---
+
+                fwkTests.configurations.all.override(
+
+                    "SWIFT_VERSION" <<< "$(inherited)",
+
+                    // very important for unit tests,
+                    // prevents the error when unit test do not start at all
+                    "LD_RUNPATH_SEARCH_PATHS" <<<
+                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
+
+                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
+
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.tvOS,
+                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.tvOS,
+                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                )
+
+                fwkTests.configurations.debug.override(
+
+                    "MTL_ENABLE_DEBUG_INFO" <<< YES
+                )
+            }
+        }
+
+        //---
+
+        project.target(targetName.main.macOS, .macOS, .framework) {
+
+            fwk in
+
+            //---
+
+            fwk.include(sourcesPath.main.common)
+            fwk.include(sourcesPath.main.macOS)
+
+            //---
+
+            fwk.configurations.all.override(
+
+                "SWIFT_VERSION" <<< "$(inherited)",
+
+                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion,
+                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
+                "INFOPLIST_FILE" <<< infoPlistsPath.main.macOS,
+
+                //--- macOS related:
+
+                "SDKROOT" <<< "macosx",
+
+                //--- Framework related:
+
+                "CODE_SIGN_IDENTITY" <<< "Mac Developer",
+                "CODE_SIGN_STYLE" <<< "Automatic",
+
+                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "DEFINES_MODULE" <<< YES,
+                "SKIP_INSTALL" <<< YES,
+                "MTL_ENABLE_DEBUG_INFO" <<< YES
+            )
+
+            fwk.configurations.debug.override(
+
+                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
+            )
+
+            //---
+
+            fwk.unitTests(targetName.tst.macOS) {
+
+                fwkTests in
+
+                //---
+
+                fwkTests.include(sourcesPath.tst.common)
+                fwkTests.include(sourcesPath.tst.macOS)
+
+
+                //---
+
+                fwkTests.configurations.all.override(
+
+                    "SWIFT_VERSION" <<< "$(inherited)",
+
+                    // very important for unit tests,
+                    // prevents the error when unit test do not start at all
+                    "LD_RUNPATH_SEARCH_PATHS" <<<
+                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
+
+                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion,
+
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.macOS,
+                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.macOS,
                     "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
                 )
 
@@ -279,8 +724,35 @@ let podfile = CocoaPods
         workspaceName: product.name,
         targets: [
             .init(
-                targetName: targetName.main,
-                deploymentTarget: depTarget,
+                targetName: targetName.main.iOS,
+                deploymentTarget: depTargets.iOS,
+                includePodsFromPodspec: true,
+                pods: [
+
+                    // add pods here...
+                ]
+            ),
+            .init(
+                targetName: targetName.main.watchOS,
+                deploymentTarget: depTargets.watchOS,
+                includePodsFromPodspec: true,
+                pods: [
+
+                    // add pods here...
+                ]
+            ),
+            .init(
+                targetName: targetName.main.tvOS,
+                deploymentTarget: depTargets.tvOS,
+                includePodsFromPodspec: true,
+                pods: [
+
+                    // add pods here...
+                ]
+            ),
+            .init(
+                targetName: targetName.main.macOS,
+                deploymentTarget: depTargets.macOS,
                 includePodsFromPodspec: true,
                 pods: [
 
@@ -295,16 +767,6 @@ let podfile = CocoaPods
 
 //---
 
-let depTargets: PerPlatform<DeploymentTarget?> = (
-    shared: nil,
-    iOS: depTarget,
-    (.watchOS, "3.0"),
-    (.tvOS, "9.0"),
-    (.macOS, "10.11")
-)
-
-//---
-
 let podspec = CocoaPods
     .Podspec
     .Standard(
@@ -315,27 +777,39 @@ let podspec = CocoaPods
         swiftVersion: swiftVersion,
         otherSettings: [
             (
-                deploymentTarget: depTargets.shared,
+                deploymentTarget: nil,
                 settigns: [
 
-                    "source_files = '\(sourcesPath.main)/**/*.swift'"
+                    "source_files = '\(sourcesPath.main.common)/**/*.swift'"
                 ]
             ),
             (
                 deploymentTarget: depTargets.iOS,
-                settigns: []
+                settigns: [
+
+                    "source_files = '\(sourcesPath.main.iOS)/**/*.swift'"
+                ]
             ),
             (
                 deploymentTarget: depTargets.watchOS,
-                settigns: []
+                settigns: [
+
+                    "source_files = '\(sourcesPath.main.watchOS)/**/*.swift'"
+                ]
             ),
             (
                 deploymentTarget: depTargets.tvOS,
-                settigns: []
+                settigns: [
+
+                    "source_files = '\(sourcesPath.main.tvOS)/**/*.swift'"
+                ]
             ),
             (
                 deploymentTarget: depTargets.macOS,
-                settigns: []
+                settigns: [
+
+                    "source_files = '\(sourcesPath.main.macOS)/**/*.swift'"
+                ]
             )
         ]
     )
@@ -390,19 +864,83 @@ try? license
 
 try? info
     .main
+    .iOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? info
+    .main
+    .watchOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? info
+    .main
+    .tvOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? info
+    .main
+    .macOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
 try? info
     .tst
+    .iOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
-//try? dummyFile
-//    .main
-//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-//
-//try? dummyFile
-//    .tst
-//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+try? info
+    .tst
+    .watchOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? info
+    .tst
+    .tvOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? info
+    .tst
+    .macOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .main
+    .iOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .main
+    .watchOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .main
+    .tvOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .main
+    .macOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .tst
+    .iOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .tst
+    .watchOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .tst
+    .tvOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .tst
+    .macOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
 try? project
     .writeToFileSystem()
