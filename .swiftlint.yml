@@ -1,7 +1,4 @@
-
-# see more at https://github.com/realm/SwiftLint
-
-# ===
+# see docs at https://github.com/realm/SwiftLint
 
 disabled_rules:
 

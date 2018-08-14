@@ -3,7 +3,18 @@ import XCERepoConfigurator
 //---
 
 // one item for main target, and one - for unit tests
-typealias PerTarget<T> = (main: T, tst: T)
+typealias PerTarget<T> = (
+    main: T,
+    tst: T
+)
+
+typealias PerPlatform<T> = (
+    shared: T,
+    iOS: T,
+    watchOS: T,
+    tvOS: T,
+    macOS: T
+)
 
 //---
 
@@ -39,13 +50,13 @@ let repoFolder = PathPrefix
 
 let gitignore = Git
     .RepoIgnore
-    .framework
+    .framework()
     .prepare(
         targetFolder: repoFolder
     )
 
 let swiftLint = SwiftLint
-    .defaultXCE()
+    .init()
     .prepare(
         targetFolder: repoFolder
     )
@@ -80,7 +91,6 @@ let infoPlistsFolder = repoFolder
 
 let info: PerTarget = (
     Xcode
-        .Project
         .Target
         .InfoPlist
         .iOSFramework()
@@ -89,7 +99,6 @@ let info: PerTarget = (
             targetFolder: infoPlistsFolder
         ),
     Xcode
-        .Project
         .Target
         .InfoPlist
         .unitTests()
@@ -137,18 +146,16 @@ let infoPlistsPath: PerTarget = (
 //---
 
 let dummyFile: PerTarget = (
-    Xcode
-        .Project
-        .Target
-        .DummyFile()
+    CustomTextFile
+        .init()
         .prepare(
+            name: targetName.main + ".swift",
             targetFolder: sourcesFolder.main
         ),
-    Xcode
-        .Project
-        .Target
-        .DummyFile()
+    CustomTextFile
+        .init()
         .prepare(
+            name: targetName.tst + ".swift",
             targetFolder: sourcesFolder.tst
         )
 )
@@ -268,25 +275,69 @@ let cocoaPodsModuleName = company.prefix + product.name
 //---
 
 let podfile = CocoaPods
-    .Podfile
-    .standard(
-        productName: product.name,
-        deploymentTarget: depTarget,
-        pods: [Defaults.podsFromSpec]
+    .Podfile(
+        workspaceName: product.name,
+        targets: [
+            .init(
+                targetName: targetName.main,
+                deploymentTarget: depTarget,
+                includePodsFromPodspec: true,
+                pods: [
+
+                    // add pods here...
+                ]
+            )
+        ]
     )
     .prepare(
         targetFolder: repoFolder
     )
 
+//---
+
+let depTargets: PerPlatform<DeploymentTarget?> = (
+    shared: nil,
+    iOS: depTarget,
+    (.watchOS, "3.0"),
+    (.tvOS, "9.0"),
+    (.macOS, "10.11")
+)
+
+//---
+
 let podspec = CocoaPods
     .Podspec
-    .standard(
+    .Standard(
         product: product,
         company: company,
         license: license.model.cocoaPodsLicenseSummary,
-        author: author,
+        authors: [author],
         swiftVersion: swiftVersion,
-        deploymentTarget: depTarget
+        otherSettings: [
+            (
+                deploymentTarget: depTargets.shared,
+                settigns: [
+
+                    "source_files = '\(sourcesPath.main)/**/*.swift'"
+                ]
+            ),
+            (
+                deploymentTarget: depTargets.iOS,
+                settigns: []
+            ),
+            (
+                deploymentTarget: depTargets.watchOS,
+                settigns: []
+            ),
+            (
+                deploymentTarget: depTargets.tvOS,
+                settigns: []
+            ),
+            (
+                deploymentTarget: depTargets.macOS,
+                settigns: []
+            )
+        ]
     )
     .prepare(
         name: cocoaPodsModuleName + ".podspec",
@@ -313,18 +364,15 @@ let fastlaneFolder = repoFolder
 let fastfile = Fastlane
     .Fastfile
     .framework(
-        projectName: project.model.name,
-        cocoaPodsModuleName: cocoaPodsModuleName,
-        usesCocoapods: false, // default 'true'!
-        usesSwiftLint: .global // default '.global'!
+        productName: product.name,
+        cocoaPodsModuleName: cocoaPodsModuleName
     )
     .prepare(
         targetFolder: fastlaneFolder
     )
 
 let gitHubPagesConfig = GitHub
-    .Pages
-    .openSourceFramework()
+    .PagesConfig()
     .prepare(
         targetFolder: repoFolder
     )
