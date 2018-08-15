@@ -108,7 +108,8 @@ lane :REgenerateProject do
     # === Remember current version and build numbers
 
     versionNumber = get_version_number(
-        xcodeproj: 'Pipeline.xcodeproj'
+        xcodeproj: 'Pipeline.xcodeproj',
+        target: 'macOS-Pipeline'
     )
 
     buildNumber = get_build_number(

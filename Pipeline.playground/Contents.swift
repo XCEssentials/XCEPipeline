@@ -35,6 +35,8 @@ let product: CocoaPods.Podspec.Product = (
     summary: "Custom pipeline operators for easy chaining in Swift."
 )
 
+let projectName = product.name
+
 let company: CocoaPods.Podspec.Company = (
     name: "XCEssentials",
     identifier: "com.XCEssentials",
@@ -103,6 +105,8 @@ let targetName: CommonAndPerTarget = (
     )
 )
 
+let defaultTargetName = targetName.main.macOS
+
 let commonInfoPlistsPath = Defaults
     .pathToInfoPlistsFolder
 
@@ -118,7 +122,8 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .framework
+                for: .framework,
+                preset: .iOS
             )
             .prepare(
                 name: targetName.main.iOS + ".plist",
@@ -127,7 +132,8 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .framework
+                for: .framework,
+                preset: nil
             )
             .prepare(
                 name: targetName.main.watchOS + ".plist",
@@ -136,7 +142,8 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .framework
+                for: .framework,
+                preset: nil
             )
             .prepare(
                 name: targetName.main.tvOS + ".plist",
@@ -145,7 +152,11 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .framework
+                for: .framework,
+                preset: .macOS(
+                    copyrightYear: 2018,
+                    copyrightEntity: author.name
+                    )
             )
             .prepare(
                 name: targetName.main.macOS + ".plist",
@@ -156,7 +167,8 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .tests
+                for: .tests,
+                preset: .iOS
             )
             .prepare(
                 name: targetName.tst.iOS + ".plist",
@@ -165,7 +177,8 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .tests
+                for: .tests,
+                preset: nil
             )
             .prepare(
                 name: targetName.tst.watchOS + ".plist",
@@ -174,7 +187,8 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .tests
+                for: .tests,
+                preset: nil
             )
             .prepare(
                 name: targetName.tst.tvOS + ".plist",
@@ -183,7 +197,11 @@ let info: PerTarget = (
         Xcode
             .Target
             .InfoPlist(
-                for: .tests
+                for: .tests,
+                preset: .macOS(
+                    copyrightYear: 2018,
+                    copyrightEntity: author.name
+                    )
             )
             .prepare(
                 name: targetName.tst.macOS + ".plist",
@@ -283,6 +301,7 @@ let bundleId: PerTarget = (
         company.identifier + "." + targetName.tst.tvOS,
         company.identifier + "." + targetName.tst.macOS
     )
+)
 
 let infoPlistsPath: PerTarget = (
     (
@@ -339,7 +358,7 @@ let dummyFile: CommonAndPerTarget = (
             .init()
             .prepare(
                 name: targetName.tst.common + ".swift",
-                targetFolder: sourcesFolder.tst.iOS
+                targetFolder: sourcesFolder.tst.common
         ),
         CustomTextFile
             .init()
@@ -389,7 +408,14 @@ let project = Xcode
             "CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF" <<< YES,
             "CLANG_WARN_OBJC_LITERAL_CONVERSION" <<< YES,
             "CLANG_WARN_RANGE_LOOP_ANALYSIS" <<< YES,
-            "CLANG_WARN_STRICT_PROTOTYPES" <<< YES
+            "CLANG_WARN_STRICT_PROTOTYPES" <<< YES,
+
+            "PRODUCT_NAME" <<< "\(company.prefix)\(product.name)",
+            
+            "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
+            "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
+            "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
+            "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
         )
 
         project.configurations.debug.override(
@@ -414,13 +440,13 @@ let project = Xcode
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
-                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
                 "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
                 "INFOPLIST_FILE" <<< infoPlistsPath.main.iOS,
 
-                //--- iOS related:
+                //--- platform specific:
 
                 "SDKROOT" <<< "iphoneos",
+                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
                 "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
 
                 //--- Framework related:
@@ -428,7 +454,7 @@ let project = Xcode
                 "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
                 "CODE_SIGN_STYLE" <<< "Automatic",
 
-                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "PRODUCT_NAME" <<< "$(inherited)",
                 "DEFINES_MODULE" <<< YES,
                 "SKIP_INSTALL" <<< YES,
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
@@ -461,11 +487,13 @@ let project = Xcode
                     "LD_RUNPATH_SEARCH_PATHS" <<<
                     "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
 
-                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
-
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.iOS,
                     "INFOPLIST_FILE" <<< infoPlistsPath.tst.iOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+
+                    //--- platform specific:
+
+                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion
                 )
 
                 fwkTests.configurations.debug.override(
@@ -492,13 +520,13 @@ let project = Xcode
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
-                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
                 "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
                 "INFOPLIST_FILE" <<< infoPlistsPath.main.watchOS,
 
-                //--- iOS related:
+                //--- platform specific:
 
-                "SDKROOT" <<< "iphoneos",
+//                "SDKROOT" <<< "iphoneos",
+                "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
 //                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
 
                 //--- Framework related:
@@ -506,7 +534,7 @@ let project = Xcode
                 "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
                 "CODE_SIGN_STYLE" <<< "Automatic",
 
-                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "PRODUCT_NAME" <<< "$(inherited)",
                 "DEFINES_MODULE" <<< YES,
                 "SKIP_INSTALL" <<< YES,
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
@@ -519,38 +547,41 @@ let project = Xcode
 
             //---
 
-            fwk.unitTests(targetName.tst.watchOS) {
-
-                fwkTests in
-
-                //---
-
-                fwkTests.include(sourcesPath.tst.common)
-                fwkTests.include(sourcesPath.tst.watchOS)
-
-                //---
-
-                fwkTests.configurations.all.override(
-
-                    "SWIFT_VERSION" <<< "$(inherited)",
-
-                    // very important for unit tests,
-                    // prevents the error when unit test do not start at all
-                    "LD_RUNPATH_SEARCH_PATHS" <<<
-                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
-
-                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
-
-                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.watchOS,
-                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.watchOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                )
-
-                fwkTests.configurations.debug.override(
-
-                    "MTL_ENABLE_DEBUG_INFO" <<< YES
-                )
-            }
+//            fwk.unitTests(targetName.tst.watchOS) {
+//
+//                fwkTests in
+//
+//                //---
+//
+//                fwkTests.include(sourcesPath.tst.common)
+//                fwkTests.include(sourcesPath.tst.watchOS)
+//
+//                //---
+//
+//                fwkTests.configurations.all.override(
+//
+//                    "SWIFT_VERSION" <<< "$(inherited)",
+//
+//                    // very important for unit tests,
+//                    // prevents the error when unit test do not start at all
+//                    "LD_RUNPATH_SEARCH_PATHS" <<<
+//                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
+//
+//                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.watchOS,
+//                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.watchOS,
+//                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+//
+//                    //--- platform specific:
+//
+//                    "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
+//
+//                )
+//
+//                fwkTests.configurations.debug.override(
+//
+//                    "MTL_ENABLE_DEBUG_INFO" <<< YES
+//                )
+//            }
         }
 
         //---
@@ -570,13 +601,14 @@ let project = Xcode
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
-                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
+
                 "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
                 "INFOPLIST_FILE" <<< infoPlistsPath.main.tvOS,
 
-                //--- iOS related:
+                //--- platform specific:
 
-                "SDKROOT" <<< "iphoneos",
+//                "SDKROOT" <<< "iphoneos",
+                "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
 //                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
 
                 //--- Framework related:
@@ -584,7 +616,7 @@ let project = Xcode
                 "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
                 "CODE_SIGN_STYLE" <<< "Automatic",
 
-                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "PRODUCT_NAME" <<< "$(inherited)",
                 "DEFINES_MODULE" <<< YES,
                 "SKIP_INSTALL" <<< YES,
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
@@ -617,11 +649,13 @@ let project = Xcode
                     "LD_RUNPATH_SEARCH_PATHS" <<<
                     "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
 
-                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
-
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.tvOS,
                     "INFOPLIST_FILE" <<< infoPlistsPath.tst.tvOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+
+                    //--- platform specific:
+
+                    "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion
                 )
 
                 fwkTests.configurations.debug.override(
@@ -648,20 +682,20 @@ let project = Xcode
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
-                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion,
                 "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
                 "INFOPLIST_FILE" <<< infoPlistsPath.main.macOS,
 
-                //--- macOS related:
+                //--- platform specific:
 
                 "SDKROOT" <<< "macosx",
+                "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion,
 
                 //--- Framework related:
 
                 "CODE_SIGN_IDENTITY" <<< "Mac Developer",
                 "CODE_SIGN_STYLE" <<< "Automatic",
 
-                "PRODUCT_NAME" <<< "\(company.prefix)$(TARGET_NAME:c99extidentifier)",
+                "PRODUCT_NAME" <<< "$(inherited)",
                 "DEFINES_MODULE" <<< YES,
                 "SKIP_INSTALL" <<< YES,
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
@@ -695,11 +729,13 @@ let project = Xcode
                     "LD_RUNPATH_SEARCH_PATHS" <<<
                     "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
 
-                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion,
-
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.macOS,
                     "INFOPLIST_FILE" <<< infoPlistsPath.tst.macOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)"
+                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+
+                    //--- platform specific:
+
+                    "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
                 )
 
                 fwkTests.configurations.debug.override(
@@ -725,6 +761,7 @@ let podfile = CocoaPods
         targets: [
             .init(
                 targetName: targetName.main.iOS,
+                projectName: projectName,
                 deploymentTarget: depTargets.iOS,
                 includePodsFromPodspec: true,
                 pods: [
@@ -734,6 +771,7 @@ let podfile = CocoaPods
             ),
             .init(
                 targetName: targetName.main.watchOS,
+                projectName: projectName,
                 deploymentTarget: depTargets.watchOS,
                 includePodsFromPodspec: true,
                 pods: [
@@ -743,6 +781,7 @@ let podfile = CocoaPods
             ),
             .init(
                 targetName: targetName.main.tvOS,
+                projectName: projectName,
                 deploymentTarget: depTargets.tvOS,
                 includePodsFromPodspec: true,
                 pods: [
@@ -752,6 +791,7 @@ let podfile = CocoaPods
             ),
             .init(
                 targetName: targetName.main.macOS,
+                projectName: projectName,
                 deploymentTarget: depTargets.macOS,
                 includePodsFromPodspec: true,
                 pods: [
@@ -839,6 +879,7 @@ let fastfile = Fastlane
     .Fastfile
     .framework(
         productName: product.name,
+        getCurrentVersionFromTarget: defaultTargetName,
         cocoaPodsModuleName: cocoaPodsModuleName
     )
     .prepare(
@@ -904,6 +945,11 @@ try? info
 
 try? dummyFile
     .main
+    .common
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .main
     .iOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
@@ -920,6 +966,11 @@ try? dummyFile
 try? dummyFile
     .main
     .macOS
+    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+
+try? dummyFile
+    .tst
+    .common
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
 try? dummyFile
