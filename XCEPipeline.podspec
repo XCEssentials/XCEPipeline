@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
 
     s.authors = {
         'Maxim Khatskevich' => 'maxim@khatskevi.ch'
-    }
+    } # authors
 
     s.swift_version = '4.2'
 
@@ -47,4 +47,4 @@ Pod::Spec.new do |s|
 
     s.osx.source_files = 'Sources/Pipeline/macOS/**/*.swift'
 
-end
+end # spec

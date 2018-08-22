@@ -103,7 +103,7 @@ lane :beforeRelease do
 
 end # lane :beforeRelease
 
-lane :REgenerateProject do
+lane :regenerateProject do
 
     # === Remember current version and build numbers
 
@@ -176,7 +176,7 @@ lane :REgenerateProject do
 
     project.save()
 
-end # lane :REgenerateProject
+end # lane :regenerateProject
 
 lane :generateProject do
 

@@ -387,14 +387,14 @@ let dummyFile: CommonAndPerTarget = (
     )
 )
 
-let project = Xcode
-    .Project(product.name, specFormat: .v2_1_0){
+let project = Struct
+    .Spec(product.name){
 
         project in
 
         //---
 
-        project.configurations.all.override(
+        project.buildSettings.base.override(
 
             "SWIFT_VERSION" <<< swiftVersion,
             "VERSIONING_SYSTEM" <<< "apple-generic",
@@ -418,7 +418,7 @@ let project = Xcode
             "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
         )
 
-        project.configurations.debug.override(
+        project.buildSettings[.debug].override(
 
             "SWIFT_OPTIMIZATION_LEVEL" <<< "-Onone"
         )
@@ -436,7 +436,7 @@ let project = Xcode
 
             //---
 
-            fwk.configurations.all.override(
+            fwk.buildSettings.base.override(
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -460,7 +460,7 @@ let project = Xcode
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
             )
 
-            fwk.configurations.debug.override(
+            fwk.buildSettings[.debug].override(
 
                 "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
             )
@@ -478,7 +478,7 @@ let project = Xcode
 
                 //---
 
-                fwkTests.configurations.all.override(
+                fwkTests.buildSettings.base.override(
 
                     "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -496,7 +496,7 @@ let project = Xcode
                     "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion
                 )
 
-                fwkTests.configurations.debug.override(
+                fwkTests.buildSettings[.debug].override(
 
                     "MTL_ENABLE_DEBUG_INFO" <<< YES
                 )
@@ -516,7 +516,7 @@ let project = Xcode
 
             //---
 
-            fwk.configurations.all.override(
+            fwk.buildSettings.base.override(
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -540,7 +540,7 @@ let project = Xcode
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
             )
 
-            fwk.configurations.debug.override(
+            fwk.buildSettings[.debug].override(
 
                 "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
             )
@@ -558,7 +558,7 @@ let project = Xcode
 //
 //                //---
 //
-//                fwkTests.configurations.all.override(
+//                fwkTests.buildSettings.base.override(
 //
 //                    "SWIFT_VERSION" <<< "$(inherited)",
 //
@@ -577,7 +577,7 @@ let project = Xcode
 //
 //                )
 //
-//                fwkTests.configurations.debug.override(
+//                fwkTests.buildSettings[.debug].override(
 //
 //                    "MTL_ENABLE_DEBUG_INFO" <<< YES
 //                )
@@ -597,7 +597,7 @@ let project = Xcode
 
             //---
 
-            fwk.configurations.all.override(
+            fwk.buildSettings.base.override(
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -622,7 +622,7 @@ let project = Xcode
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
             )
 
-            fwk.configurations.debug.override(
+            fwk.buildSettings[.debug].override(
 
                 "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
             )
@@ -640,7 +640,7 @@ let project = Xcode
 
                 //---
 
-                fwkTests.configurations.all.override(
+                fwkTests.buildSettings.base.override(
 
                     "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -658,7 +658,7 @@ let project = Xcode
                     "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion
                 )
 
-                fwkTests.configurations.debug.override(
+                fwkTests.buildSettings[.debug].override(
 
                     "MTL_ENABLE_DEBUG_INFO" <<< YES
                 )
@@ -678,7 +678,7 @@ let project = Xcode
 
             //---
 
-            fwk.configurations.all.override(
+            fwk.buildSettings.base.override(
 
                 "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -701,7 +701,7 @@ let project = Xcode
                 "MTL_ENABLE_DEBUG_INFO" <<< YES
             )
 
-            fwk.configurations.debug.override(
+            fwk.buildSettings[.debug].override(
 
                 "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
             )
@@ -720,7 +720,7 @@ let project = Xcode
 
                 //---
 
-                fwkTests.configurations.all.override(
+                fwkTests.buildSettings.base.override(
 
                     "SWIFT_VERSION" <<< "$(inherited)",
 
@@ -738,7 +738,7 @@ let project = Xcode
                     "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
                 )
 
-                fwkTests.configurations.debug.override(
+                fwkTests.buildSettings[.debug].override(
 
                     "MTL_ENABLE_DEBUG_INFO" <<< YES
                 )
@@ -759,8 +759,8 @@ let podfile = CocoaPods
     .Podfile(
         workspaceName: product.name,
         targets: [
-            .init(
-                targetName: targetName.main.iOS,
+            .target(
+                targetName.main.iOS,
                 projectName: projectName,
                 deploymentTarget: depTargets.iOS,
                 includePodsFromPodspec: true,
@@ -769,8 +769,8 @@ let podfile = CocoaPods
                     // add pods here...
                 ]
             ),
-            .init(
-                targetName: targetName.main.watchOS,
+            .target(
+                targetName.main.watchOS,
                 projectName: projectName,
                 deploymentTarget: depTargets.watchOS,
                 includePodsFromPodspec: true,
@@ -779,8 +779,8 @@ let podfile = CocoaPods
                     // add pods here...
                 ]
             ),
-            .init(
-                targetName: targetName.main.tvOS,
+            .target(
+                targetName.main.tvOS,
                 projectName: projectName,
                 deploymentTarget: depTargets.tvOS,
                 includePodsFromPodspec: true,
@@ -789,8 +789,8 @@ let podfile = CocoaPods
                     // add pods here...
                 ]
             ),
-            .init(
-                targetName: targetName.main.macOS,
+            .target(
+                targetName.main.macOS,
                 projectName: projectName,
                 deploymentTarget: depTargets.macOS,
                 includePodsFromPodspec: true,
@@ -809,7 +809,7 @@ let podfile = CocoaPods
 
 let podspec = CocoaPods
     .Podspec
-    .Standard(
+    .standard(
         product: product,
         company: company,
         license: license.model.cocoaPodsLicenseSummary,

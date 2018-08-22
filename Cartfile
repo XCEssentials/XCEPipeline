@@ -1,2 +1,2 @@
-github "XCEssentials/RepoConfigurator" ~> 1.3.0
-# git "file:///Users/maxim/Library/Mobile Documents/com~apple~CloudDocs/Dev/XCEssentials/RepoConfigurator" "release/XXX"
+github "XCEssentials/RepoConfigurator" ~> 1.4.0
+# "file:///Users/maxim/Library/Mobile Documents/com~apple~CloudDocs/Dev/XCEssentials/RepoConfigurator" "release/1.4.0"

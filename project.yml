@@ -1,245 +1,247 @@
 # https://github.com/lyptt/struct/wiki/Spec-format:-v2.0
+
 version: 2.1.0
 configurations:
-    Debug:
-        type: "debug"
-        overrides:
-            SWIFT_VERSION: "4.2"
-            VERSIONING_SYSTEM: "apple-generic"
-            CURRENT_PROJECT_VERSION: "0"
-            CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: "YES"
-            CLANG_WARN_COMMA: "YES"
-            CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: "YES"
-            CLANG_WARN_NON_LITERAL_NULL_CONVERSION: "YES"
-            CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: "YES"
-            CLANG_WARN_OBJC_LITERAL_CONVERSION: "YES"
-            CLANG_WARN_RANGE_LOOP_ANALYSIS: "YES"
-            CLANG_WARN_STRICT_PROTOTYPES: "YES"
-            PRODUCT_NAME: "XCEPipeline"
-            IPHONEOS_DEPLOYMENT_TARGET: "9.0"
-            WATCHOS_DEPLOYMENT_TARGET: "3.0"
-            TVOS_DEPLOYMENT_TARGET: "9.0"
-            MACOSX_DEPLOYMENT_TARGET: "10.11"
-            SWIFT_OPTIMIZATION_LEVEL: "-Onone"
-    Release:
-        type: "release"
-        overrides:
-            SWIFT_VERSION: "4.2"
-            VERSIONING_SYSTEM: "apple-generic"
-            CURRENT_PROJECT_VERSION: "0"
-            CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: "YES"
-            CLANG_WARN_COMMA: "YES"
-            CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: "YES"
-            CLANG_WARN_NON_LITERAL_NULL_CONVERSION: "YES"
-            CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: "YES"
-            CLANG_WARN_OBJC_LITERAL_CONVERSION: "YES"
-            CLANG_WARN_RANGE_LOOP_ANALYSIS: "YES"
-            CLANG_WARN_STRICT_PROTOTYPES: "YES"
-            PRODUCT_NAME: "XCEPipeline"
-            IPHONEOS_DEPLOYMENT_TARGET: "9.0"
-            WATCHOS_DEPLOYMENT_TARGET: "3.0"
-            TVOS_DEPLOYMENT_TARGET: "9.0"
-            MACOSX_DEPLOYMENT_TARGET: "10.11"
+  debug:
+    overrides:
+      WATCHOS_DEPLOYMENT_TARGET: '3.0'
+      CURRENT_PROJECT_VERSION: '0'
+      CLANG_WARN_COMMA: 'YES'
+      SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+      CLANG_WARN_STRICT_PROTOTYPES: 'YES'
+      IPHONEOS_DEPLOYMENT_TARGET: '9.0'
+      CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: 'YES'
+      SWIFT_VERSION: '4.2'
+      MACOSX_DEPLOYMENT_TARGET: '10.11'
+      CLANG_WARN_NON_LITERAL_NULL_CONVERSION: 'YES'
+      CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: 'YES'
+      CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: 'YES'
+      PRODUCT_NAME: 'XCEPipeline'
+      CLANG_WARN_OBJC_LITERAL_CONVERSION: 'YES'
+      VERSIONING_SYSTEM: 'apple-generic'
+      TVOS_DEPLOYMENT_TARGET: '9.0'
+      CLANG_WARN_RANGE_LOOP_ANALYSIS: 'YES'
+  release:
+    overrides:
+      WATCHOS_DEPLOYMENT_TARGET: '3.0'
+      CURRENT_PROJECT_VERSION: '0'
+      CLANG_WARN_COMMA: 'YES'
+      CLANG_WARN_STRICT_PROTOTYPES: 'YES'
+      IPHONEOS_DEPLOYMENT_TARGET: '9.0'
+      CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: 'YES'
+      SWIFT_VERSION: '4.2'
+      MACOSX_DEPLOYMENT_TARGET: '10.11'
+      CLANG_WARN_NON_LITERAL_NULL_CONVERSION: 'YES'
+      CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: 'YES'
+      CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: 'YES'
+      PRODUCT_NAME: 'XCEPipeline'
+      CLANG_WARN_OBJC_LITERAL_CONVERSION: 'YES'
+      VERSIONING_SYSTEM: 'apple-generic'
+      TVOS_DEPLOYMENT_TARGET: '9.0'
+      CLANG_WARN_RANGE_LOOP_ANALYSIS: 'YES'
 targets:
-    iOS-Pipeline:
-        platform: ios
-        type: ":framework"
-        sources:
-        - "Sources/Pipeline/Common"
-        - "Sources/Pipeline/iOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-Pipeline"
-                INFOPLIST_FILE: "Info/iOS-Pipeline.plist"
-                SDKROOT: "iphoneos"
-                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
-                TARGETED_DEVICE_FAMILY: "1,2"
-                CODE_SIGN_IDENTITY: "iPhone Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-                MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-Pipeline"
-                INFOPLIST_FILE: "Info/iOS-Pipeline.plist"
-                SDKROOT: "iphoneos"
-                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
-                TARGETED_DEVICE_FAMILY: "1,2"
-                CODE_SIGN_IDENTITY: "iPhone Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-    iOS-PipelineTests:
-        platform: ios
-        type: ":bundle.unit-test"
-        references:
-        - "iOS-Pipeline"
-        sources:
-        - "Sources/PipelineTests/Common"
-        - "Sources/PipelineTests/iOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-PipelineTests"
-                INFOPLIST_FILE: "Info/iOS-PipelineTests.plist"
-                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-PipelineTests"
-                INFOPLIST_FILE: "Info/iOS-PipelineTests.plist"
-                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                IPHONEOS_DEPLOYMENT_TARGET: "9.0"
-    watchOS-Pipeline:
-        platform: watch
-        type: ":framework"
-        sources:
-        - "Sources/Pipeline/Common"
-        - "Sources/Pipeline/watchOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.watchOS-Pipeline"
-                INFOPLIST_FILE: "Info/watchOS-Pipeline.plist"
-                WATCHOS_DEPLOYMENT_TARGET: "3.0"
-                CODE_SIGN_IDENTITY: "iPhone Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-                MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.watchOS-Pipeline"
-                INFOPLIST_FILE: "Info/watchOS-Pipeline.plist"
-                WATCHOS_DEPLOYMENT_TARGET: "3.0"
-                CODE_SIGN_IDENTITY: "iPhone Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-    tvOS-Pipeline:
-        platform: tv
-        type: ":framework"
-        sources:
-        - "Sources/Pipeline/Common"
-        - "Sources/Pipeline/tvOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-Pipeline"
-                INFOPLIST_FILE: "Info/tvOS-Pipeline.plist"
-                TVOS_DEPLOYMENT_TARGET: "9.0"
-                CODE_SIGN_IDENTITY: "iPhone Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-                MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-Pipeline"
-                INFOPLIST_FILE: "Info/tvOS-Pipeline.plist"
-                TVOS_DEPLOYMENT_TARGET: "9.0"
-                CODE_SIGN_IDENTITY: "iPhone Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-    tvOS-PipelineTests:
-        platform: tv
-        type: ":bundle.unit-test"
-        references:
-        - "tvOS-Pipeline"
-        sources:
-        - "Sources/PipelineTests/Common"
-        - "Sources/PipelineTests/tvOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-PipelineTests"
-                INFOPLIST_FILE: "Info/tvOS-PipelineTests.plist"
-                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                TVOS_DEPLOYMENT_TARGET: "9.0"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-PipelineTests"
-                INFOPLIST_FILE: "Info/tvOS-PipelineTests.plist"
-                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                TVOS_DEPLOYMENT_TARGET: "9.0"
-    macOS-Pipeline:
-        platform: mac
-        type: ":framework"
-        sources:
-        - "Sources/Pipeline/Common"
-        - "Sources/Pipeline/macOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-Pipeline"
-                INFOPLIST_FILE: "Info/macOS-Pipeline.plist"
-                SDKROOT: "macosx"
-                MACOSX_DEPLOYMENT_TARGET: "10.11"
-                CODE_SIGN_IDENTITY: "Mac Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-                MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-Pipeline"
-                INFOPLIST_FILE: "Info/macOS-Pipeline.plist"
-                SDKROOT: "macosx"
-                MACOSX_DEPLOYMENT_TARGET: "10.11"
-                CODE_SIGN_IDENTITY: "Mac Developer"
-                CODE_SIGN_STYLE: "Automatic"
-                PRODUCT_NAME: "$(inherited)"
-                DEFINES_MODULE: "YES"
-                SKIP_INSTALL: "YES"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-    macOS-PipelineTests:
-        platform: mac
-        type: ":bundle.unit-test"
-        references:
-        - "macOS-Pipeline"
-        sources:
-        - "Sources/PipelineTests/Common"
-        - "Sources/PipelineTests/macOS"
-        configurations:
-            Debug:
-                SWIFT_VERSION: "$(inherited)"
-                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-PipelineTests"
-                INFOPLIST_FILE: "Info/macOS-PipelineTests.plist"
-                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                MACOSX_DEPLOYMENT_TARGET: "10.11"
-                MTL_ENABLE_DEBUG_INFO: "YES"
-            Release:
-                SWIFT_VERSION: "$(inherited)"
-                LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
-                PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-PipelineTests"
-                INFOPLIST_FILE: "Info/macOS-PipelineTests.plist"
-                FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
-                MACOSX_DEPLOYMENT_TARGET: "10.11"
+  tvOS-Pipeline:
+    platform: tv
+    type: ":framework"
+    sources:
+    - Sources/Pipeline/Common
+    - Sources/Pipeline/tvOS
+    source_options:
+    configurations:
+      debug:
+        SKIP_INSTALL: "YES"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        SWIFT_VERSION: "$(inherited)"
+        TVOS_DEPLOYMENT_TARGET: "9.0"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-Pipeline"
+        MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
+        INFOPLIST_FILE: "Info/tvOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+      release:
+        SKIP_INSTALL: "YES"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        SWIFT_VERSION: "$(inherited)"
+        TVOS_DEPLOYMENT_TARGET: "9.0"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-Pipeline"
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        INFOPLIST_FILE: "Info/tvOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+  tvOS-PipelineTests:
+    platform: tv
+    type: ":bundle.unit-test"
+    references:
+    - location: tvOS-Pipeline
+    sources:
+    - Sources/PipelineTests/Common
+    - Sources/PipelineTests/tvOS
+    source_options:
+    configurations:
+      debug:
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+        SWIFT_VERSION: "$(inherited)"
+        TVOS_DEPLOYMENT_TARGET: "9.0"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-PipelineTests"
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        INFOPLIST_FILE: "Info/tvOS-PipelineTests.plist"
+      release:
+        SWIFT_VERSION: "$(inherited)"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.tvOS-PipelineTests"
+        INFOPLIST_FILE: "Info/tvOS-PipelineTests.plist"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+        TVOS_DEPLOYMENT_TARGET: "9.0"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+  macOS-Pipeline:
+    platform: mac
+    type: ":framework"
+    sources:
+    - Sources/Pipeline/Common
+    - Sources/Pipeline/macOS
+    source_options:
+    configurations:
+      debug:
+        SKIP_INSTALL: "YES"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "Mac Developer"
+        SWIFT_VERSION: "$(inherited)"
+        SDKROOT: "macosx"
+        MACOSX_DEPLOYMENT_TARGET: "10.11"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-Pipeline"
+        MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
+        INFOPLIST_FILE: "Info/macOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+      release:
+        SKIP_INSTALL: "YES"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "Mac Developer"
+        SWIFT_VERSION: "$(inherited)"
+        SDKROOT: "macosx"
+        MACOSX_DEPLOYMENT_TARGET: "10.11"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-Pipeline"
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        INFOPLIST_FILE: "Info/macOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+  macOS-PipelineTests:
+    platform: mac
+    type: ":bundle.unit-test"
+    references:
+    - location: macOS-Pipeline
+    sources:
+    - Sources/PipelineTests/Common
+    - Sources/PipelineTests/macOS
+    source_options:
+    configurations:
+      debug:
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+        SWIFT_VERSION: "$(inherited)"
+        MACOSX_DEPLOYMENT_TARGET: "10.11"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-PipelineTests"
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        INFOPLIST_FILE: "Info/macOS-PipelineTests.plist"
+      release:
+        SWIFT_VERSION: "$(inherited)"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.macOS-PipelineTests"
+        INFOPLIST_FILE: "Info/macOS-PipelineTests.plist"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+        MACOSX_DEPLOYMENT_TARGET: "10.11"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+  watchOS-Pipeline:
+    platform: watch
+    type: ":framework"
+    sources:
+    - Sources/Pipeline/Common
+    - Sources/Pipeline/watchOS
+    source_options:
+    configurations:
+      debug:
+        SKIP_INSTALL: "YES"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        SWIFT_VERSION: "$(inherited)"
+        WATCHOS_DEPLOYMENT_TARGET: "3.0"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.watchOS-Pipeline"
+        MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
+        INFOPLIST_FILE: "Info/watchOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+      release:
+        SKIP_INSTALL: "YES"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        SWIFT_VERSION: "$(inherited)"
+        WATCHOS_DEPLOYMENT_TARGET: "3.0"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.watchOS-Pipeline"
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        INFOPLIST_FILE: "Info/watchOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+  iOS-Pipeline:
+    platform: ios
+    type: ":framework"
+    sources:
+    - Sources/Pipeline/Common
+    - Sources/Pipeline/iOS
+    source_options:
+    configurations:
+      debug:
+        MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
+        IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        SKIP_INSTALL: "YES"
+        SWIFT_VERSION: "$(inherited)"
+        SDKROOT: "iphoneos"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-Pipeline"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_FILE: "Info/iOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+      release:
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+        PRODUCT_NAME: "$(inherited)"
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        SKIP_INSTALL: "YES"
+        SWIFT_VERSION: "$(inherited)"
+        SDKROOT: "iphoneos"
+        DEFINES_MODULE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-Pipeline"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_FILE: "Info/iOS-Pipeline.plist"
+        CODE_SIGN_STYLE: "Automatic"
+  iOS-PipelineTests:
+    platform: ios
+    type: ":bundle.unit-test"
+    references:
+    - location: iOS-Pipeline
+    sources:
+    - Sources/PipelineTests/Common
+    - Sources/PipelineTests/iOS
+    source_options:
+    configurations:
+      debug:
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+        IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+        SWIFT_VERSION: "$(inherited)"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-PipelineTests"
+        MTL_ENABLE_DEBUG_INFO: "YES"
+        INFOPLIST_FILE: "Info/iOS-PipelineTests.plist"
+      release:
+        SWIFT_VERSION: "$(inherited)"
+        PRODUCT_BUNDLE_IDENTIFIER: "com.XCEssentials.iOS-PipelineTests"
+        INFOPLIST_FILE: "Info/iOS-PipelineTests.plist"
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(BUILT_PRODUCTS_DIR)"
+        IPHONEOS_DEPLOYMENT_TARGET: "9.0"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
 variants:
-    $base:
-        abstract: true
-    Pipeline:
+  $base:
+    abstract: true
+  Pipeline:
