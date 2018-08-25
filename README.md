@@ -1,9 +1,10 @@
-[![GitHub license](https://img.shields.io/github/license/XCEssentials/Pipeline.svg)](https://github.com/XCEssentials/Pipeline/blob/master/LICENSE)
-[![GitHub tag](https://img.shields.io/github/tag/XCEssentials/Pipeline.svg)](https://github.com/XCEssentials/Pipeline/tags)
-[![CocoaPods Version](https://img.shields.io/cocoapods/v/XCEPipeline.svg)](https://cocoapods.org/pods/XCEPipeline)
-[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-brightgreen.svg)](https://github.com/Carthage/Carthage)
-[![CocoaPods Platform](https://img.shields.io/cocoapods/p/XCEPipeline.svg)](https://github.com/XCEssentials/Pipeline/blob/master/XCEPipeline.podspec)
-[![Written in Swift](https://img.shields.io/badge/Swift-4-orange.svg)](https://developer.apple.com/swift/)
+[![GitHub License](https://img.shields.io/github/license/XCEssentials/Pipeline.svg?longCache=true)](https://github.com/XCEssentials/Pipeline/blob/master/LICENSE)
+[![GitHub Tag](https://img.shields.io/github/tag/XCEssentials/Pipeline.svg?longCache=true)](https://github.com/XCEssentials/Pipeline/tags)
+[![CocoaPods Version](https://img.shields.io/cocoapods/v/XCEPipeline.svg?longCache=true)](https://cocoapods.org/pods/XCEPipeline)
+[![CocoaPods Platforms](https://img.shields.io/cocoapods/p/XCEPipeline.svg?longCache=true)](https://cocoapods.org/pods/XCEPipeline)
+[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-brightgreen.svg?longCache=true)](https://github.com/Carthage/Carthage)
+[![Written in Swift](https://img.shields.io/badge/Swift-4.2-orange.svg?longCache=true)](https://developer.apple.com/swift/)
+
 
 # Pipeline
 
