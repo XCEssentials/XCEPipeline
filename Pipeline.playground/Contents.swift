@@ -30,6 +30,8 @@ typealias CommonAndPerTarget<T> = (
 
 //---
 
+let swiftVersion: VersionString = "4.2"
+
 let product: CocoaPods.Podspec.Product = (
     name: "Pipeline",
     summary: "Custom pipeline operators for easy chaining in Swift."
@@ -42,6 +44,8 @@ let company: CocoaPods.Podspec.Company = (
     identifier: "com.XCEssentials",
     prefix: "XCE"
 )
+
+let cocoaPodsModuleName = company.prefix + product.name
 
 let author: CocoaPods.Podspec.Author = (
     name: "Maxim Khatskevich",
@@ -61,6 +65,49 @@ let repoFolder = PathPrefix
     )
 
 //---
+
+let readme = try ReadMe
+    .openSourceProduct(
+        header: [
+            .gitHubLicenseBadge(
+                account: company.name,
+                repo: product.name
+            ),
+            .gitHubTagBadge(
+                account: company.name,
+                repo: product.name
+            ),
+            .cocoaPodsVersionBadge(
+                podName: cocoaPodsModuleName
+            ),
+            .cocoaPodsPlatformsBadge(
+                podName: cocoaPodsModuleName
+            ),
+            .carthageCompatibleBadge(),
+            .writtenInSwiftBadge(
+                version: swiftVersion
+            )
+        ],
+
+        """
+
+
+        # Pipeline
+
+        Custom pipeline operators for easy chaining in Swift.
+
+        ```swift
+        22 ./ { "\\($0)" } ./ { print($0) }
+        ```
+
+        See more examples of usage in unit tests.
+
+        """
+    )
+    .prepare(
+        targetFolder: repoFolder,
+        removeRepeatingEmptyLines: false
+    )
 
 let gitignore = Git
     .RepoIgnore
@@ -218,8 +265,6 @@ let depTargets: PerPlatform<DeploymentTarget> = (
     (.tvOS, "9.0"),
     (.macOS, "10.11")
 )
-
-let swiftVersion: VersionString = "4.2"
 
 let baseSourcesPath = Defaults
     .pathToSourcesFolder
@@ -397,361 +442,204 @@ let project = Struct
         project.buildSettings.base.override(
 
             "SWIFT_VERSION" <<< swiftVersion,
-            "VERSIONING_SYSTEM" <<< "apple-generic",
-
-            "CURRENT_PROJECT_VERSION" <<< "0", // just a default non-empty value
-
-            "CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING" <<< YES,
-            "CLANG_WARN_COMMA" <<< YES,
-            "CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS" <<< YES,
-            "CLANG_WARN_NON_LITERAL_NULL_CONVERSION" <<< YES,
-            "CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF" <<< YES,
-            "CLANG_WARN_OBJC_LITERAL_CONVERSION" <<< YES,
-            "CLANG_WARN_RANGE_LOOP_ANALYSIS" <<< YES,
-            "CLANG_WARN_STRICT_PROTOTYPES" <<< YES,
 
             "PRODUCT_NAME" <<< "\(company.prefix)\(product.name)",
-            
+
             "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
             "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
             "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
             "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
         )
 
-        project.buildSettings[.debug].override(
-
-            "SWIFT_OPTIMIZATION_LEVEL" <<< "-Onone"
-        )
-
         //---
 
-        project.target(targetName.main.iOS, .iOS, .framework) {
+        project.targets(
 
-            fwk in
+            Mobile.Framework(targetName.main.iOS) {
 
-            //---
-
-            fwk.include(sourcesPath.main.common)
-            fwk.include(sourcesPath.main.iOS)
-
-            //---
-
-            fwk.buildSettings.base.override(
-
-                "SWIFT_VERSION" <<< "$(inherited)",
-
-                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
-                "INFOPLIST_FILE" <<< infoPlistsPath.main.iOS,
-
-                //--- platform specific:
-
-                "SDKROOT" <<< "iphoneos",
-                "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
-                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
-
-                //--- Framework related:
-
-                "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
-                "CODE_SIGN_STYLE" <<< "Automatic",
-
-                "PRODUCT_NAME" <<< "$(inherited)",
-                "DEFINES_MODULE" <<< YES,
-                "SKIP_INSTALL" <<< YES,
-                "MTL_ENABLE_DEBUG_INFO" <<< YES
-            )
-
-            fwk.buildSettings[.debug].override(
-
-                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
-            )
-
-            //---
-
-            fwk.unitTests(targetName.tst.iOS) {
-
-                fwkTests in
+                fwk in
 
                 //---
 
-                fwkTests.include(sourcesPath.tst.common)
-                fwkTests.include(sourcesPath.tst.iOS)
+                fwk.include(sourcesPath.main.common)
+                fwk.include(sourcesPath.main.iOS)
 
                 //---
 
-                fwkTests.buildSettings.base.override(
+                fwk.buildSettings.base.override(
 
-                    "SWIFT_VERSION" <<< "$(inherited)",
+                    "PRODUCT_NAME" <<< "$(inherited)",
 
-                    // very important for unit tests,
-                    // prevents the error when unit test do not start at all
-                    "LD_RUNPATH_SEARCH_PATHS" <<<
-                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
-
-                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.iOS,
-                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.iOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+                    "INFOPLIST_FILE" <<< infoPlistsPath.main.iOS,
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
 
                     //--- platform specific:
 
-                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion
+                    "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
+                    "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal
                 )
-
-                fwkTests.buildSettings[.debug].override(
-
-                    "MTL_ENABLE_DEBUG_INFO" <<< YES
-                )
-            }
-        }
-
-        //---
-
-        project.target(targetName.main.watchOS, .watchOS, .framework) {
-
-            fwk in
-
-            //---
-
-            fwk.include(sourcesPath.main.common)
-            fwk.include(sourcesPath.main.watchOS)
-
-            //---
-
-            fwk.buildSettings.base.override(
-
-                "SWIFT_VERSION" <<< "$(inherited)",
-
-                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
-                "INFOPLIST_FILE" <<< infoPlistsPath.main.watchOS,
-
-                //--- platform specific:
-
-//                "SDKROOT" <<< "iphoneos",
-                "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
-//                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
-
-                //--- Framework related:
-
-                "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
-                "CODE_SIGN_STYLE" <<< "Automatic",
-
-                "PRODUCT_NAME" <<< "$(inherited)",
-                "DEFINES_MODULE" <<< YES,
-                "SKIP_INSTALL" <<< YES,
-                "MTL_ENABLE_DEBUG_INFO" <<< YES
-            )
-
-            fwk.buildSettings[.debug].override(
-
-                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
-            )
-
-            //---
-
-//            fwk.unitTests(targetName.tst.watchOS) {
-//
-//                fwkTests in
-//
-//                //---
-//
-//                fwkTests.include(sourcesPath.tst.common)
-//                fwkTests.include(sourcesPath.tst.watchOS)
-//
-//                //---
-//
-//                fwkTests.buildSettings.base.override(
-//
-//                    "SWIFT_VERSION" <<< "$(inherited)",
-//
-//                    // very important for unit tests,
-//                    // prevents the error when unit test do not start at all
-//                    "LD_RUNPATH_SEARCH_PATHS" <<<
-//                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
-//
-//                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.watchOS,
-//                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.watchOS,
-//                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
-//
-//                    //--- platform specific:
-//
-//                    "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
-//
-//                )
-//
-//                fwkTests.buildSettings[.debug].override(
-//
-//                    "MTL_ENABLE_DEBUG_INFO" <<< YES
-//                )
-//            }
-        }
-
-        //---
-
-        project.target(targetName.main.tvOS, .tvOS, .framework) {
-
-            fwk in
-
-            //---
-
-            fwk.include(sourcesPath.main.common)
-            fwk.include(sourcesPath.main.tvOS)
-
-            //---
-
-            fwk.buildSettings.base.override(
-
-                "SWIFT_VERSION" <<< "$(inherited)",
-
-
-                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
-                "INFOPLIST_FILE" <<< infoPlistsPath.main.tvOS,
-
-                //--- platform specific:
-
-//                "SDKROOT" <<< "iphoneos",
-                "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
-//                "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal,
-
-                //--- Framework related:
-
-                "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
-                "CODE_SIGN_STYLE" <<< "Automatic",
-
-                "PRODUCT_NAME" <<< "$(inherited)",
-                "DEFINES_MODULE" <<< YES,
-                "SKIP_INSTALL" <<< YES,
-                "MTL_ENABLE_DEBUG_INFO" <<< YES
-            )
-
-            fwk.buildSettings[.debug].override(
-
-                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
-            )
-
-            //---
-
-            fwk.unitTests(targetName.tst.tvOS) {
-
-                fwkTests in
 
                 //---
 
-                fwkTests.include(sourcesPath.tst.common)
-                fwkTests.include(sourcesPath.tst.tvOS)
+                fwk.addUnitTests(targetName.tst.iOS) {
+
+                    fwkTests in
+
+                    //---
+
+                    fwkTests.include(sourcesPath.tst.common)
+                    fwkTests.include(sourcesPath.tst.iOS)
+
+                    //---
+
+                    fwkTests.buildSettings.base.override(
+
+                        "INFOPLIST_FILE" <<< infoPlistsPath.tst.iOS,
+                        "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.iOS,
+
+                        //--- platform specific:
+
+                        "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion
+                    )
+                }
+            },
+
+            //---
+
+            Watch.Framework(targetName.main.watchOS){
+
+                fwk in
 
                 //---
 
-                fwkTests.buildSettings.base.override(
+                fwk.include(sourcesPath.main.common)
+                fwk.include(sourcesPath.main.watchOS)
 
-                    "SWIFT_VERSION" <<< "$(inherited)",
+                //---
 
-                    // very important for unit tests,
-                    // prevents the error when unit test do not start at all
-                    "LD_RUNPATH_SEARCH_PATHS" <<<
-                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
+                fwk.buildSettings.base.override(
 
-                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.tvOS,
-                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.tvOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+                    "PRODUCT_NAME" <<< "$(inherited)",
+
+                    "INFOPLIST_FILE" <<< infoPlistsPath.main.watchOS,
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
+
+                    //--- platform specific:
+
+                    "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
+
+                    //--- Framework related:
+
+                    "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
+                    "CODE_SIGN_STYLE" <<< "Automatic"
+                )
+            },
+
+            //---
+
+            TV.Framework(targetName.main.tvOS){
+
+                fwk in
+
+                //---
+
+                fwk.include(sourcesPath.main.common)
+                fwk.include(sourcesPath.main.tvOS)
+
+                //---
+
+                fwk.buildSettings.base.override(
+
+                    "PRODUCT_NAME" <<< "$(inherited)",
+
+                    "INFOPLIST_FILE" <<< infoPlistsPath.main.tvOS,
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
 
                     //--- platform specific:
 
                     "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion
                 )
 
-                fwkTests.buildSettings[.debug].override(
+                //---
 
-                    "MTL_ENABLE_DEBUG_INFO" <<< YES
-                )
-            }
-        }
+                fwk.addUnitTests(targetName.tst.tvOS){
 
-        //---
+                    fwkTests in
 
-        project.target(targetName.main.macOS, .macOS, .framework) {
+                    //---
 
-            fwk in
+                    fwkTests.include(sourcesPath.tst.common)
+                    fwkTests.include(sourcesPath.tst.tvOS)
 
-            //---
+                    //---
 
-            fwk.include(sourcesPath.main.common)
-            fwk.include(sourcesPath.main.macOS)
+                    fwkTests.buildSettings.base.override(
 
-            //---
+                        "INFOPLIST_FILE" <<< infoPlistsPath.tst.tvOS,
+                        "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.tvOS,
 
-            fwk.buildSettings.base.override(
+                        //--- platform specific:
 
-                "SWIFT_VERSION" <<< "$(inherited)",
-
-                "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
-                "INFOPLIST_FILE" <<< infoPlistsPath.main.macOS,
-
-                //--- platform specific:
-
-                "SDKROOT" <<< "macosx",
-                "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion,
-
-                //--- Framework related:
-
-                "CODE_SIGN_IDENTITY" <<< "Mac Developer",
-                "CODE_SIGN_STYLE" <<< "Automatic",
-
-                "PRODUCT_NAME" <<< "$(inherited)",
-                "DEFINES_MODULE" <<< YES,
-                "SKIP_INSTALL" <<< YES,
-                "MTL_ENABLE_DEBUG_INFO" <<< YES
-            )
-
-            fwk.buildSettings[.debug].override(
-
-                "MTL_ENABLE_DEBUG_INFO" <<< "INCLUDE_SOURCE"
-            )
+                        "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion
+                    )
+                }
+            },
 
             //---
 
-            fwk.unitTests(targetName.tst.macOS) {
+            Desktop.Framework(targetName.main.macOS){
 
-                fwkTests in
+                fwk in
 
                 //---
 
-                fwkTests.include(sourcesPath.tst.common)
-                fwkTests.include(sourcesPath.tst.macOS)
-
+                fwk.include(sourcesPath.main.common)
+                fwk.include(sourcesPath.main.macOS)
 
                 //---
 
-                fwkTests.buildSettings.base.override(
+                fwk.buildSettings.base.override(
 
-                    "SWIFT_VERSION" <<< "$(inherited)",
+                    "PRODUCT_NAME" <<< "$(inherited)",
 
-                    // very important for unit tests,
-                    // prevents the error when unit test do not start at all
-                    "LD_RUNPATH_SEARCH_PATHS" <<<
-                    "$(inherited) @executable_path/Frameworks @loader_path/Frameworks",
-
-                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.macOS,
-                    "INFOPLIST_FILE" <<< infoPlistsPath.tst.macOS,
-                    "FRAMEWORK_SEARCH_PATHS" <<< "$(inherited) $(BUILT_PRODUCTS_DIR)",
+                    "INFOPLIST_FILE" <<< infoPlistsPath.main.macOS,
+                    "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
 
                     //--- platform specific:
 
                     "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
                 )
 
-                fwkTests.buildSettings[.debug].override(
+                //---
 
-                    "MTL_ENABLE_DEBUG_INFO" <<< YES
-                )
+                fwk.addUnitTests(targetName.tst.macOS) {
+
+                    fwkTests in
+
+                    //---
+
+                    fwkTests.include(sourcesPath.tst.common)
+                    fwkTests.include(sourcesPath.tst.macOS)
+
+
+                    //---
+
+                    fwkTests.buildSettings.base.override(
+
+                        "INFOPLIST_FILE" <<< infoPlistsPath.tst.macOS,
+                        "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.macOS,
+
+                        //--- platform specific:
+
+                        "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
+                    )
+                }
             }
-        }
+        )
     }
     .prepare(
         targetFolder: repoFolder
     )
-
-//---
-
-let cocoaPodsModuleName = company.prefix + product.name
 
 //---
 
@@ -893,6 +781,9 @@ let gitHubPagesConfig = GitHub
     )
 
 // MARK: - Actually write repo configuration files
+
+try? readme
+    .writeToFileSystem()
 
 try? gitignore
     .writeToFileSystem()
