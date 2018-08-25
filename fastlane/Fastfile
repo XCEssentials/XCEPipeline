@@ -36,10 +36,11 @@ lane :beforeRelease do
         quick: true
     )
 
-    # ===
+    # === Remember current version number
 
     versionNumber = get_version_number(
-        xcodeproj: 'Pipeline.xcodeproj'
+        xcodeproj: 'Pipeline.xcodeproj',
+        target: 'macOS-Pipeline'
     )
 
     puts 'Current VERSION number: ' + versionNumber
