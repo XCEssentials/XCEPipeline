@@ -158,7 +158,7 @@ lane :regenerateProject do
 
     project
         .targets
-        .select{ |t| ['Pipeline'].include?(t.name) }
+        .select{ |t| ['iOS-Pipeline', 'watchOS-Pipeline', 'tvOS-Pipeline', 'macOS-Pipeline', 'iOS-PipelineTests', '', 'tvOS-PipelineTests', 'macOS-PipelineTests'].include?(t.name) }
         .each{ |t|
 
             thePhase = t.new_shell_script_build_phase('SwiftLintGlobal')
@@ -216,7 +216,7 @@ lane :generateProject do
 
     project
         .targets
-        .select{ |t| ['Pipeline'].include?(t.name) }
+        .select{ |t| ['iOS-Pipeline', 'watchOS-Pipeline', 'tvOS-Pipeline', 'macOS-Pipeline', 'iOS-PipelineTests', '', 'tvOS-PipelineTests', 'macOS-PipelineTests'].include?(t.name) }
         .each{ |t|
 
             thePhase = t.new_shell_script_build_phase('SwiftLintGlobal')

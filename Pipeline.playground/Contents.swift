@@ -45,6 +45,9 @@ let company: CocoaPods.Podspec.Company = (
     prefix: "XCE"
 )
 
+// necessary for signing FWK on macOS:
+let developmentTeamId = "UJA88X59XP" // "Maxim Khatskevich"
+
 let cocoaPodsModuleName = company.prefix + product.name
 
 let author: CocoaPods.Podspec.Author = (
@@ -146,7 +149,7 @@ let targetName: CommonAndPerTarget = (
     (
         product.name + tstSuffix,
         OSIdentifier.iOS.rawValue + "-" + product.name + tstSuffix,
-        OSIdentifier.watchOS.rawValue + "-" + product.name + tstSuffix,
+        "", // no unit testing for watchOS yet!
         OSIdentifier.tvOS.rawValue + "-" + product.name + tstSuffix,
         OSIdentifier.macOS.rawValue + "-" + product.name + tstSuffix
     )
@@ -432,7 +435,27 @@ let dummyFile: CommonAndPerTarget = (
     )
 )
 
-let project = Struct
+//---
+
+let scriptsPath = "Scripts"
+
+let scriptsFolder = repoFolder
+    .appendingPathComponent(
+        scriptsPath
+    )
+
+//---
+
+let structPostGenScript = Struct
+    .Spec
+    .PostGenerateScript(
+        .inheritedModuleName()
+    )
+    .prepareWithDefaultName(
+        targetFolder: scriptsFolder
+    )
+
+let structSpec = Struct
     .Spec(product.name){
 
         project in
@@ -444,6 +467,8 @@ let project = Struct
             "SWIFT_VERSION" <<< swiftVersion,
 
             "PRODUCT_NAME" <<< "\(company.prefix)\(product.name)",
+
+            "DEVELOPMENT_TEAM" <<< developmentTeamId, // needed for macOS tests
 
             "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
             "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
@@ -467,8 +492,6 @@ let project = Struct
                 //---
 
                 fwk.buildSettings.base.override(
-
-                    "PRODUCT_NAME" <<< "$(inherited)",
 
                     "INFOPLIST_FILE" <<< infoPlistsPath.main.iOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
@@ -519,8 +542,6 @@ let project = Struct
 
                 fwk.buildSettings.base.override(
 
-                    "PRODUCT_NAME" <<< "$(inherited)",
-
                     "INFOPLIST_FILE" <<< infoPlistsPath.main.watchOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
 
@@ -549,8 +570,6 @@ let project = Struct
                 //---
 
                 fwk.buildSettings.base.override(
-
-                    "PRODUCT_NAME" <<< "$(inherited)",
 
                     "INFOPLIST_FILE" <<< infoPlistsPath.main.tvOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
@@ -600,8 +619,6 @@ let project = Struct
 
                 fwk.buildSettings.base.override(
 
-                    "PRODUCT_NAME" <<< "$(inherited)",
-
                     "INFOPLIST_FILE" <<< infoPlistsPath.main.macOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
 
@@ -636,6 +653,86 @@ let project = Struct
                 }
             }
         )
+
+        //---
+
+        project.schemes(
+            .scheme(
+                named: targetName.main.iOS,
+                .build(
+                    targets: [
+                        targetName.main.iOS: (
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+                    ]
+                ),
+                .test(
+                    targets: [
+                        targetName.tst.iOS
+                    ]
+                )
+            ),
+            .scheme(
+                named: targetName.main.watchOS,
+                .build(
+                    targets: [
+                        targetName.main.watchOS: (
+                            true,
+                            true,
+                            true,
+                            testing: false, // no unit testing for watchOS yet!
+                            true
+                        )
+                    ]
+                )
+            ),
+            .scheme(
+                named: targetName.main.tvOS,
+                .build(
+                    targets: [
+                        targetName.main.tvOS: (
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+                    ]
+                ),
+                .test(
+                    targets: [
+                        targetName.tst.tvOS
+                    ]
+                )
+            ),
+            .scheme(
+                named: targetName.main.macOS,
+                .build(
+                    targets: [
+                        targetName.main.macOS: (
+                            true,
+                            true,
+                            true,
+                            true,
+                            true
+                        )
+                    ]
+                ),
+                .test(
+                    targets: [
+                        targetName.tst.macOS
+                    ]
+                )
+            )
+        )
+
+        //---
+
+        project.lifecycleHooks.post = scriptsPath + "/" + structPostGenScript.name
     }
     .prepare(
         targetFolder: repoFolder
@@ -768,7 +865,19 @@ let fastfile = Fastlane
     .framework(
         productName: product.name,
         getCurrentVersionFromTarget: defaultTargetName,
-        cocoaPodsModuleName: cocoaPodsModuleName
+        cocoaPodsModuleName: cocoaPodsModuleName,
+        swiftLintGlobalTargets: [
+
+            targetName.main.iOS,
+            targetName.main.watchOS,
+            targetName.main.tvOS,
+            targetName.main.macOS,
+
+            targetName.tst.iOS,
+            targetName.tst.watchOS,
+            targetName.tst.tvOS,
+            targetName.tst.macOS
+        ]
     )
     .prepare(
         targetFolder: fastlaneFolder
@@ -819,10 +928,7 @@ try? info
     .iOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
-try? info
-    .tst
-    .watchOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+// NO unit testing for wtachOS yet!
 
 try? info
     .tst
@@ -869,10 +975,7 @@ try? dummyFile
     .iOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
-try? dummyFile
-    .tst
-    .watchOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+// NO unit testing for wtachOS yet!
 
 try? dummyFile
     .tst
@@ -884,7 +987,10 @@ try? dummyFile
     .macOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
-try? project
+try? structPostGenScript
+    .writeToFileSystem()
+
+try? structSpec
     .writeToFileSystem()
 
 try? podfile
