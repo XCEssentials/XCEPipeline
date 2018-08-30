@@ -449,7 +449,9 @@ let scriptsFolder = repoFolder
 let structPostGenScript = Struct
     .Spec
     .PostGenerateScript(
-        .inheritedModuleName()
+        .inheritedModuleName(
+            productTypes: [.framework]
+        )
     )
     .prepareWithDefaultName(
         targetFolder: scriptsFolder
