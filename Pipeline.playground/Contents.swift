@@ -368,72 +368,72 @@ let infoPlistsPath: PerTarget = (
 
 //---
 
-let dummyFile: CommonAndPerTarget = (
-    (
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.main.common + ".swift",
-                targetFolder: sourcesFolder.main.common
-            ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.main.iOS + ".swift",
-                targetFolder: sourcesFolder.main.iOS
-            ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.main.watchOS + ".swift",
-                targetFolder: sourcesFolder.main.watchOS
-            ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.main.tvOS + ".swift",
-                targetFolder: sourcesFolder.main.tvOS
-            ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.main.macOS + ".swift",
-                targetFolder: sourcesFolder.main.macOS
-            )
-    ),
-    (
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.tst.common + ".swift",
-                targetFolder: sourcesFolder.tst.common
-        ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.tst.iOS + ".swift",
-                targetFolder: sourcesFolder.tst.iOS
-        ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.tst.watchOS + ".swift",
-                targetFolder: sourcesFolder.tst.watchOS
-        ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.tst.tvOS + ".swift",
-                targetFolder: sourcesFolder.tst.tvOS
-        ),
-        CustomTextFile
-            .init()
-            .prepare(
-                name: targetName.tst.macOS + ".swift",
-                targetFolder: sourcesFolder.tst.macOS
-        )
-    )
-)
+//let dummyFile: CommonAndPerTarget = (
+//    (
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.main.common + ".swift",
+//                targetFolder: sourcesFolder.main.common
+//            ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.main.iOS + ".swift",
+//                targetFolder: sourcesFolder.main.iOS
+//            ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.main.watchOS + ".swift",
+//                targetFolder: sourcesFolder.main.watchOS
+//            ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.main.tvOS + ".swift",
+//                targetFolder: sourcesFolder.main.tvOS
+//            ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.main.macOS + ".swift",
+//                targetFolder: sourcesFolder.main.macOS
+//            )
+//    ),
+//    (
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.tst.common + ".swift",
+//                targetFolder: sourcesFolder.tst.common
+//        ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.tst.iOS + ".swift",
+//                targetFolder: sourcesFolder.tst.iOS
+//        ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.tst.watchOS + ".swift",
+//                targetFolder: sourcesFolder.tst.watchOS
+//        ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.tst.tvOS + ".swift",
+//                targetFolder: sourcesFolder.tst.tvOS
+//        ),
+//        CustomTextFile
+//            .init()
+//            .prepare(
+//                name: targetName.tst.macOS + ".swift",
+//                targetFolder: sourcesFolder.tst.macOS
+//        )
+//    )
+//)
 
 //---
 
@@ -940,52 +940,52 @@ try? info
     .macOS
     .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
-try? dummyFile
-    .main
-    .common
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .main
-    .iOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .main
-    .watchOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .main
-    .tvOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .main
-    .macOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .tst
-    .common
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .tst
-    .iOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-// NO unit testing for wtachOS yet!
-
-try? dummyFile
-    .tst
-    .tvOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
-
-try? dummyFile
-    .tst
-    .macOS
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//try? dummyFile
+//    .main
+//    .common
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .main
+//    .iOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .main
+//    .watchOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .main
+//    .tvOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .main
+//    .macOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .tst
+//    .common
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .tst
+//    .iOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//// NO unit testing for wtachOS yet!
+//
+//try? dummyFile
+//    .tst
+//    .tvOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+//
+//try? dummyFile
+//    .tst
+//    .macOS
+//    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
 
 try? structPostGenScript
     .writeToFileSystem()
