@@ -638,7 +638,6 @@ let structSpec = Struct
                     fwkTests.include(sourcesPath.tst.common)
                     fwkTests.include(sourcesPath.tst.macOS)
 
-
                     //---
 
                     fwkTests.buildSettings.base.override(

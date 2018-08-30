@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E2B4F1C4C548F2306386E8B8"
+               BlueprintIdentifier = "D3D54750700389DE4E4F9CC0"
                BuildableName = "XCEPipeline.framework"
                BlueprintName = "iOS-Pipeline"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5DAEEA08A0A1E51CE221020B"
+               BlueprintIdentifier = "C6CBBE197F3B178BCC6CB3FF"
                BuildableName = "iOS-PipelineTests.xctest"
                BlueprintName = "iOS-PipelineTests"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E2B4F1C4C548F2306386E8B8"
+            BlueprintIdentifier = "D3D54750700389DE4E4F9CC0"
             BuildableName = "XCEPipeline.framework"
             BlueprintName = "iOS-Pipeline"
             ReferencedContainer = "container:Pipeline.xcodeproj">

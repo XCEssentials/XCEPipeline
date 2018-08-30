@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "12606DDBCF93214827DB6AAA"
+               BlueprintIdentifier = "6DC8DC05DA858AD933D99C0A"
                BuildableName = "XCEPipeline.framework"
                BlueprintName = "watchOS-Pipeline"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "12606DDBCF93214827DB6AAA"
+            BlueprintIdentifier = "6DC8DC05DA858AD933D99C0A"
             BuildableName = "XCEPipeline.framework"
             BlueprintName = "watchOS-Pipeline"
             ReferencedContainer = "container:Pipeline.xcodeproj">

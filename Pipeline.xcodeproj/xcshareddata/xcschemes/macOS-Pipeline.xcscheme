@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F23FB14F85B68A3C82EC6254"
+               BlueprintIdentifier = "EEDA75D085E1D7901AE3E073"
                BuildableName = "XCEPipeline.framework"
                BlueprintName = "macOS-Pipeline"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "338299B4E55A93454762FBAF"
+               BlueprintIdentifier = "6BF341D4A831340C08A6F779"
                BuildableName = "macOS-PipelineTests.xctest"
                BlueprintName = "macOS-PipelineTests"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F23FB14F85B68A3C82EC6254"
+            BlueprintIdentifier = "EEDA75D085E1D7901AE3E073"
             BuildableName = "XCEPipeline.framework"
             BlueprintName = "macOS-Pipeline"
             ReferencedContainer = "container:Pipeline.xcodeproj">
