@@ -1,4 +1,5 @@
 import RepoConfigurator // marathon:https://github.com/XCEssentials/RepoConfigurator.git
+import ShellOut // marathon:https://github.com/JohnSundell/ShellOut.git
 
 //---
 
@@ -795,7 +796,28 @@ let podfile = CocoaPods
 
 let podspecFileName = cocoaPodsModuleName + ".podspec"
 
-var currentPodVersion: String? = nil
+let currentPodVersion: String
+
+do
+{
+    // NOTE: depends on https://github.com/sindresorhus/find-versions-cli
+    // NOTE: run "npm install --global find-versions-cli" before first time usage!
+
+    currentPodVersion = try shellOut(
+        to: """
+            fastlane run version_get_podspec path:"\(repoFolder.appendingPathComponent(podspecFileName).path)" \
+            | grep "Result:" \
+            | find-versions
+            """
+    )
+
+    print("Detected current pod version: \(currentPodVersion).")
+}
+catch
+{
+    print(error)
+    currentPodVersion = Defaults.initialVersionString
+}
 
 //let output = run(bash: """
 //    fastlane run version_get_podspec path:"\(repoFolder.appendingPathComponent(podspecFileName).path)"
@@ -813,11 +835,6 @@ var currentPodVersion: String? = nil
 //    print(output.stderror)
 //}
 
-
-//\
-//| grep "Result:" \
-//| awk -F'Result: ' '{print $2}'
-
 //---
 
 let podspec = CocoaPods
@@ -825,7 +842,7 @@ let podspec = CocoaPods
     .standard(
         product: product,
         company: company,
-        version: currentPodVersion ?? Defaults.initialVersionString,
+        version: currentPodVersion,
         license: license.model.cocoaPodsLicenseSummary,
         authors: [author],
         swiftVersion: swiftVersion,
