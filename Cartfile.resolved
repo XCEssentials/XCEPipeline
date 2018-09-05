@@ -1,1 +1,3 @@
-git "file:///Users/maxim/Library/Mobile Documents/com~apple~CloudDocs/Dev/XCEssentials/RepoConfigurator" "8713343550937369f3a688fb27b78e4b1f3dfa0c"
+github "JohnSundell/ShellOut" "2.1.0"
+github "XCEssentials/RepoConfigurator" "1.6.3"
+github "tuist/SwiftShell" "4.0.0"

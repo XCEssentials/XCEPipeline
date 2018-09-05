@@ -120,7 +120,7 @@ let gitignore = Git
     )
 
 let swiftLint = SwiftLint
-    .init()
+    .standard()
     .prepare(
         targetFolder: repoFolder
     )
@@ -793,11 +793,39 @@ let podfile = CocoaPods
 
 //---
 
+let podspecFileName = cocoaPodsModuleName + ".podspec"
+
+var currentPodVersion: String? = nil
+
+//let output = run(bash: """
+//    fastlane run version_get_podspec path:"\(repoFolder.appendingPathComponent(podspecFileName).path)"
+//    """
+//)
+//
+//if
+//    output.succeeded
+//{
+//    currentPodVersion = output.stdout
+//    print(currentPodVersion)
+//}
+//else
+//{
+//    print(output.stderror)
+//}
+
+
+//\
+//| grep "Result:" \
+//| awk -F'Result: ' '{print $2}'
+
+//---
+
 let podspec = CocoaPods
     .Podspec
     .standard(
         product: product,
         company: company,
+        version: currentPodVersion ?? Defaults.initialVersionString,
         license: license.model.cocoaPodsLicenseSummary,
         authors: [author],
         swiftVersion: swiftVersion,
@@ -840,7 +868,7 @@ let podspec = CocoaPods
         ]
     )
     .prepare(
-        name: cocoaPodsModuleName + ".podspec",
+        name: podspecFileName,
         targetFolder: repoFolder
     )
 
