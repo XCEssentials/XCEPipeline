@@ -48,7 +48,7 @@ func ./ <T, U>(
     body: (T) throws -> U
     ) rethrows -> U
 {
-    return try Pipeline.continue(input, body)
+    return try Pipeline.next(input, body)
 }
 
 public
@@ -58,7 +58,7 @@ func ?/ <T, U>(
     body: (T) throws -> U
     ) rethrows -> U?
 {
-    return try Pipeline.continue(input, body)
+    return try Pipeline.next(input, body)
 }
 
 public
@@ -68,7 +68,7 @@ func .| <T>(
     body: (T) throws -> Void
     ) rethrows
 {
-    try Pipeline.finalize(input, body)
+    try Pipeline.end(input, body)
 }
 
 public
@@ -78,5 +78,5 @@ func ?| <T>(
     body: (T) throws -> Void
     ) rethrows
 {
-    try Pipeline.finalize(input, body)
+    try Pipeline.end(input, body)
 }
