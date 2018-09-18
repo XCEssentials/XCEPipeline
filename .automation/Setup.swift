@@ -269,6 +269,11 @@ catch
     )
 }
 
+let commonPodDependencies = [
+
+    "pod 'SwiftLint'"
+]
+
 let fastlaneFolder = try repoFolder
     .createSubfolderIfNeeded(
         withName: Defaults.pathToFastlaneFolder
@@ -836,40 +841,28 @@ try CocoaPods
         projectName: projectName,
         deploymentTarget: depTargets.iOS,
         includePodsFromPodspec: true,
-        pods: [
-            
-            // add pods here...
-        ]
+        pods: commonPodDependencies
     )
     .target(
         targetName.main.watchOS,
         projectName: projectName,
         deploymentTarget: depTargets.watchOS,
         includePodsFromPodspec: true,
-        pods: [
-            
-            // add pods here...
-        ]
+        pods: commonPodDependencies
     )
     .target(
         targetName.main.tvOS,
         projectName: projectName,
         deploymentTarget: depTargets.tvOS,
         includePodsFromPodspec: true,
-        pods: [
-            
-            // add pods here...
-        ]
+        pods: commonPodDependencies
     )
     .target(
         targetName.main.macOS,
         projectName: projectName,
         deploymentTarget: depTargets.macOS,
         includePodsFromPodspec: true,
-        pods: [
-            
-            // add pods here...
-        ]
+        pods: commonPodDependencies
     )
     .prepare(
         targetFolder: repoFolder.path
@@ -939,7 +932,7 @@ try Fastlane
         productName: product.name,
         getCurrentVersionFromTarget: defaultTargetName,
         cocoaPodsModuleName: cocoaPodsModuleName,
-        swiftLintGlobalTargets: [
+        swiftLintTargets: [
             
             targetName.main.iOS,
             targetName.main.watchOS,

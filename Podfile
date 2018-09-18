@@ -11,6 +11,8 @@ target 'iOS-Pipeline' do
 
     podspec
 
+    pod 'SwiftLint'
+
 end
 
 target 'watchOS-Pipeline' do
@@ -23,6 +25,8 @@ target 'watchOS-Pipeline' do
     use_frameworks!
 
     podspec
+
+    pod 'SwiftLint'
 
 end
 
@@ -37,6 +41,8 @@ target 'tvOS-Pipeline' do
 
     podspec
 
+    pod 'SwiftLint'
+
 end
 
 target 'macOS-Pipeline' do
@@ -49,5 +55,7 @@ target 'macOS-Pipeline' do
     use_frameworks!
 
     podspec
+
+    pod 'SwiftLint'
 
 end

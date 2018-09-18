@@ -21,6 +21,10 @@
 # Update this, if you use features of a newer version
 fastlane_version '2.100.0'
 
+fastlane_require 'cocoapods'
+fastlane_require 'struct'
+fastlane_require 'xcodeproj'
+
 lane :beforeRelease do
 
     ensure_git_branch(
@@ -150,7 +154,7 @@ lane :regenerateProject do
 
     sh 'cd ./.. && xcodeproj sort "Pipeline.xcodeproj"'
 
-    # === Add BUILD PHASE script 'SwiftLintGlobal'
+    # === Add BUILD PHASE script 'SwiftLintPods'
 
     # remember, we are in ./fastlane/ folder now...
     fullProjFilePath = Dir.pwd + '/../Pipeline.xcodeproj'
@@ -162,12 +166,8 @@ lane :regenerateProject do
         .select{ |t| ['iOS-Pipeline', 'watchOS-Pipeline', 'tvOS-Pipeline', 'macOS-Pipeline', 'iOS-PipelineTests', 'tvOS-PipelineTests', 'macOS-PipelineTests'].include?(t.name) }
         .each{ |t|
 
-            thePhase = t.new_shell_script_build_phase('SwiftLintGlobal')
-            thePhase.shell_script = 'if which swiftlint >/dev/null; then
-                swiftlint
-            else
-                echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
-            fi'
+            thePhase = t.new_shell_script_build_phase('SwiftLintPods')
+            thePhase.shell_script = '"${PODS_ROOT}/SwiftLint/swiftlint"'
             # thePhase.run_only_for_deployment_postprocessing = '1'
 
             t.build_phases.delete(thePhase)
@@ -208,7 +208,7 @@ lane :generateProject do
 
     sh 'cd ./.. && xcodeproj sort "Pipeline.xcodeproj"'
 
-    # === Add BUILD PHASE script 'SwiftLintGlobal'
+    # === Add BUILD PHASE script 'SwiftLintPods'
 
     # remember, we are in ./fastlane/ folder now...
     fullProjFilePath = Dir.pwd + '/../Pipeline.xcodeproj'
@@ -220,12 +220,8 @@ lane :generateProject do
         .select{ |t| ['iOS-Pipeline', 'watchOS-Pipeline', 'tvOS-Pipeline', 'macOS-Pipeline', 'iOS-PipelineTests', 'tvOS-PipelineTests', 'macOS-PipelineTests'].include?(t.name) }
         .each{ |t|
 
-            thePhase = t.new_shell_script_build_phase('SwiftLintGlobal')
-            thePhase.shell_script = 'if which swiftlint >/dev/null; then
-                swiftlint
-            else
-                echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
-            fi'
+            thePhase = t.new_shell_script_build_phase('SwiftLintPods')
+            thePhase.shell_script = '"${PODS_ROOT}/SwiftLint/swiftlint"'
             # thePhase.run_only_for_deployment_postprocessing = '1'
 
             t.build_phases.delete(thePhase)
