@@ -47,4 +47,4 @@ Pod::Spec.new do |s|
 
     s.osx.source_files = 'Sources/Pipeline/macOS/**/*.swift'
 
-end # spec
+end # spec s

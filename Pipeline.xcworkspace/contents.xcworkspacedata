@@ -5,15 +5,6 @@
       location = "group:Pipeline.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Pipeline.playground">
-   </FileRef>
-   <FileRef
-      location = "group:Carthage/Checkouts/SwiftShell/SwiftShell.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Carthage/Checkouts/RepoConfigurator/RepoConfigurator.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>

@@ -5,7 +5,6 @@
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-brightgreen.svg?longCache=true)](https://github.com/Carthage/Carthage)
 [![Written in Swift](https://img.shields.io/badge/Swift-4.2-orange.svg?longCache=true)](https://swift.org)
 
-
 # Pipeline
 
 Custom pipeline operators for easy chaining in Swift.
