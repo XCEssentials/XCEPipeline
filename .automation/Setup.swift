@@ -836,6 +836,11 @@ try CocoaPods
     .Podfile(
         workspaceName: product.name
     )
+    .custom("""
+        # https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
+        install! 'cocoapods', :deterministic_uuids => false
+        """
+    )
     .target(
         targetName.main.iOS,
         projectName: projectName,
@@ -917,12 +922,17 @@ try CocoaPods
 // MARK: Write - Bundler - Gemfile
 
 // https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
-//let gemfile = Fastlane
-//    .Gemfile
-//    .fastlaneSupportOnly()
-//    .prepare(
-//        targetFolder: repoFolder.path
-//    )
+try Bundler
+    .Gemfile("""
+        gem 'xcodeproj'
+        gem 'cocoapods'
+        gem 'struct'
+        """
+    )
+    .prepare(
+        targetFolder: repoFolder.path
+    )
+    .writeToFileSystem()
 
 // MARK: Write - Fastlane - Fastfile
 

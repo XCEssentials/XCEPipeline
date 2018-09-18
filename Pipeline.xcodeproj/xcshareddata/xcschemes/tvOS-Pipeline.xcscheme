@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9E16A6C11BF3C1C5B636C15E"
+               BlueprintIdentifier = "9A2F7BC7C4F2A0C4A664DD11"
                BuildableName = "XCEPipeline.framework"
                BlueprintName = "tvOS-Pipeline"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6934C4F8068B63070674BDAE"
+               BlueprintIdentifier = "39D3C4C3E20CBF5FFD02AFEE"
                BuildableName = "tvOS-PipelineTests.xctest"
                BlueprintName = "tvOS-PipelineTests"
                ReferencedContainer = "container:Pipeline.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9E16A6C11BF3C1C5B636C15E"
+            BlueprintIdentifier = "9A2F7BC7C4F2A0C4A664DD11"
             BuildableName = "XCEPipeline.framework"
             BlueprintName = "tvOS-Pipeline"
             ReferencedContainer = "container:Pipeline.xcodeproj">

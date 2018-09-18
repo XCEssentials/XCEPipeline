@@ -1,4 +1,6 @@
 workspace 'Pipeline'
+# https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
+install! 'cocoapods', :deterministic_uuids => false
 
 target 'iOS-Pipeline' do
 
