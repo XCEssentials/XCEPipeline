@@ -69,14 +69,20 @@ xcuserdata/
 timeline.xctimeline
 playground.xcworkspace
 
-# Swift Package Manager
+### Cocoa ###
+# ==========
 #
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
+#
+#
+
+# ==========
+### Swift Package Manager ###
+#
+Packages/
+Package.pins
 .build/
 
-### Cocoa ###
+### Swift Package Manager ###
 # ==========
 #
 #

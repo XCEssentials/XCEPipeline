@@ -1,4 +1,6 @@
 workspace 'Pipeline'
+# https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
+install! 'cocoapods', :deterministic_uuids => false
 
 target 'iOS-Pipeline' do
 
@@ -10,6 +12,8 @@ target 'iOS-Pipeline' do
     use_frameworks!
 
     podspec
+
+    pod 'SwiftLint'
 
 end
 
@@ -24,6 +28,8 @@ target 'watchOS-Pipeline' do
 
     podspec
 
+    pod 'SwiftLint'
+
 end
 
 target 'tvOS-Pipeline' do
@@ -37,6 +43,8 @@ target 'tvOS-Pipeline' do
 
     podspec
 
+    pod 'SwiftLint'
+
 end
 
 target 'macOS-Pipeline' do
@@ -49,5 +57,7 @@ target 'macOS-Pipeline' do
     use_frameworks!
 
     podspec
+
+    pod 'SwiftLint'
 
 end

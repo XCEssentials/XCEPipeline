@@ -3,8 +3,11 @@
 
 run do |spec, xcodeproj|
 
+    # === Targets to inherit module name from project ===
+
     # https://www.rubydoc.info/github/CocoaPods/Xcodeproj/Xcodeproj/Project
     # https://github.com/CocoaPods/Xcodeproj/blob/master/spec/project/object/native_target_spec.rb
+    # https://github.com/CocoaPods/Xcodeproj/blob/c6c1c86459720e5dfbe406eb613a2d2de1607ee2/lib/xcodeproj/constants.rb#L125
 
     xcodeproj
         .targets
