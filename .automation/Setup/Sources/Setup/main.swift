@@ -1,6 +1,6 @@
-import XCERepoConfigurator // marathon:https://github.com/XCEssentials/RepoConfigurator.git
-import ShellOut // marathon:https://github.com/JohnSundell/ShellOut.git
-import Files // marathon:https://github.com/JohnSundell/Files.git
+import XCERepoConfigurator
+import ShellOut
+import Files
 
 //---
 
@@ -60,7 +60,7 @@ print("✅ Repo folder: \(repoFolder.path)")
 
 guard
     let companyName = repoFolder.parent?.name
-else
+    else
 {
     preconditionFailure("❌ Expected to be one level deep from a company-named folder!")
 }
@@ -270,7 +270,7 @@ catch
 }
 
 let commonPodDependencies = [
-
+    
     "pod 'SwiftLint'"
 ]
 
