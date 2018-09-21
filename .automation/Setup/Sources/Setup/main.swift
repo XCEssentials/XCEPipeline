@@ -1,6 +1,7 @@
-import XCERepoConfigurator
-import ShellOut
 import Files
+import ShellOut
+
+import XCERepoConfigurator
 
 //---
 
