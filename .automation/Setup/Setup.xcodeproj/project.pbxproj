@@ -329,7 +329,7 @@
             "OBJ_26",
             "OBJ_40"
          );
-         name = "XCERepoConfigurator 1.8.4";
+         name = "XCERepoConfigurator 1.8.5";
          path = ".build/checkouts/RepoConfigurator-7208467403482865070/Sources/RepoConfigurator";
          sourceTree = "SOURCE_ROOT";
       };
@@ -1711,9 +1711,9 @@
          isa = "PBXGroup";
          children = (
             "ShellOut::ShellOut::Product",
+            "Files::Files::Product",
             "XCERepoConfigurator::XCERepoConfigurator::Product",
-            "Setup::Setup::Product",
-            "Files::Files::Product"
+            "Setup::Setup::Product"
          );
          name = "Products";
          path = "";

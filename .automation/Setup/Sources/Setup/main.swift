@@ -52,7 +52,12 @@ typealias CommonAndPerTarget<T> = (
 
 // MARK: - Parameters
 
-let repoFolder = Folder.current
+guard
+    let repoFolder = Folder.currentRepoRoot
+else
+{
+    preconditionFailure("❌ Expected to be inside a git repo folder!")
+}
 
 print("✅ Repo folder: \(repoFolder.path)")
 
@@ -60,7 +65,7 @@ print("✅ Repo folder: \(repoFolder.path)")
 
 guard
     let companyName = repoFolder.parent?.name
-    else
+else
 {
     preconditionFailure("❌ Expected to be one level deep from a company-named folder!")
 }
@@ -247,7 +252,7 @@ do
     // NOTE: depends on https://github.com/sindresorhus/find-versions-cli
     // run before first time usage:
     // try shellOut(to: "npm install --global find-versions-cli")
-    
+
     currentPodVersion = try shellOut(
         to: """
         fastlane run version_get_podspec \
@@ -256,13 +261,13 @@ do
         | find-versions
         """
     )
-    
+
     print("✅ Detected current pod version: \(currentPodVersion).")
 }
 catch
 {
     currentPodVersion = Defaults.initialVersionString
-    
+
     print("""
         ⓘ NOTE: failed to auto-detect current Pod version: \(error).
         """
@@ -270,7 +275,7 @@ catch
 }
 
 let commonPodDependencies = [
-    
+
     "pod 'SwiftLint'"
 ]
 
@@ -522,7 +527,7 @@ try CustomTextFile()
 try Struct
     .Spec
     .PostGenerateScript{
-        
+
         $0.inheritedModuleName(
             productTypes: [.framework]
         )
@@ -537,208 +542,208 @@ try Struct
 
 try Struct
     .Spec(product.name){
-        
+
         project in
-        
+
         // MARK: Write - Struct - Spec - Project Build Settings
-        
+
         project.buildSettings.base.override(
-            
+
             "SWIFT_VERSION" <<< swiftVersion,
-            
+
             "PRODUCT_NAME" <<< "\(company.prefix)\(product.name)",
-            
+
             "DEVELOPMENT_TEAM" <<< developmentTeamId, // needed for macOS tests
-            
+
             "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
             "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
             "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion,
             "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
         )
-        
+
         // MARK: Write - Struct - Spec - Targets
-        
+
         project.targets(
-            
+
             // MARK: Write - Struct - Spec - Targets - iOS
-            
+
             Mobile.Framework(targetName.main.iOS) {
-                
+
                 fwk in
-                
+
                 //---
-                
+
                 fwk.include(sourcesPath.main.common)
                 fwk.include(sourcesPath.main.iOS)
-                
+
                 //---
-                
+
                 fwk.buildSettings.base.override(
-                    
+
                     "INFOPLIST_FILE" <<< infoPlistPaths.main.iOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
-                    
+
                     //--- platform specific:
-                    
+
                     "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion,
                     "TARGETED_DEVICE_FAMILY" <<< DeviceFamily.iOS.universal
                 )
-                
+
                 //---
-                
+
                 fwk.addUnitTests(targetName.tst.iOS) {
-                    
+
                     fwkTests in
-                    
+
                     //---
-                    
+
                     fwkTests.include(sourcesPath.tst.common)
                     fwkTests.include(sourcesPath.tst.iOS)
-                    
+
                     //---
-                    
+
                     fwkTests.buildSettings.base.override(
-                        
+
                         "INFOPLIST_FILE" <<< infoPlistPaths.tst.iOS,
                         "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.iOS,
-                        
+
                         //--- platform specific:
-                        
+
                         "IPHONEOS_DEPLOYMENT_TARGET" <<< depTargets.iOS.minimumVersion
                     )
                 }
             },
-            
+
             // MARK: Write - Struct - Spec - Targets - watchOS
-            
+
             Watch.Framework(targetName.main.watchOS){
-                
+
                 fwk in
-                
+
                 //---
-                
+
                 fwk.include(sourcesPath.main.common)
                 fwk.include(sourcesPath.main.watchOS)
-                
+
                 //---
-                
+
                 fwk.buildSettings.base.override(
-                    
+
                     "INFOPLIST_FILE" <<< infoPlistPaths.main.watchOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
-                    
+
                     //--- platform specific:
-                    
+
                     "WATCHOS_DEPLOYMENT_TARGET" <<< depTargets.watchOS.minimumVersion,
-                    
+
                     //--- Framework related:
-                    
+
                     "CODE_SIGN_IDENTITY" <<< "iPhone Developer",
                     "CODE_SIGN_STYLE" <<< "Automatic"
                 )
             },
-            
+
             // MARK: Write - Struct - Spec - Targets - tvOS
-            
+
             TV.Framework(targetName.main.tvOS){
-                
+
                 fwk in
-                
+
                 //---
-                
+
                 fwk.include(sourcesPath.main.common)
                 fwk.include(sourcesPath.main.tvOS)
-                
+
                 //---
-                
+
                 fwk.buildSettings.base.override(
-                    
+
                     "INFOPLIST_FILE" <<< infoPlistPaths.main.tvOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
-                    
+
                     //--- platform specific:
-                    
+
                     "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion
                 )
-                
+
                 //---
-                
+
                 fwk.addUnitTests(targetName.tst.tvOS){
-                    
+
                     fwkTests in
-                    
+
                     //---
-                    
+
                     fwkTests.include(sourcesPath.tst.common)
                     fwkTests.include(sourcesPath.tst.tvOS)
-                    
+
                     //---
-                    
+
                     fwkTests.buildSettings.base.override(
-                        
+
                         "INFOPLIST_FILE" <<< infoPlistPaths.tst.tvOS,
                         "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.tvOS,
-                        
+
                         //--- platform specific:
-                        
+
                         "TVOS_DEPLOYMENT_TARGET" <<< depTargets.tvOS.minimumVersion
                     )
                 }
             },
-            
+
             // MARK: Write - Struct - Spec - Targets - macOS
-            
+
             Desktop.Framework(targetName.main.macOS){
-                
+
                 fwk in
-                
+
                 //---
-                
+
                 fwk.include(sourcesPath.main.common)
                 fwk.include(sourcesPath.main.macOS)
-                
+
                 //---
-                
+
                 fwk.buildSettings.base.override(
-                    
+
                     "INFOPLIST_FILE" <<< infoPlistPaths.main.macOS,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
-                    
+
                     //--- platform specific:
-                    
+
                     "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
                 )
-                
+
                 //---
-                
+
                 fwk.addUnitTests(targetName.tst.macOS) {
-                    
+
                     fwkTests in
-                    
+
                     //---
-                    
+
                     fwkTests.include(sourcesPath.tst.common)
                     fwkTests.include(sourcesPath.tst.macOS)
-                    
+
                     //---
-                    
+
                     fwkTests.buildSettings.base.override(
-                        
+
                         "INFOPLIST_FILE" <<< infoPlistPaths.tst.macOS,
                         "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.macOS,
-                        
+
                         //--- platform specific:
-                        
+
                         "MACOSX_DEPLOYMENT_TARGET" <<< depTargets.macOS.minimumVersion
                     )
                 }
             }
         )
-        
+
         // MARK: Write - Struct - Spec - Schemes - iOS
-        
+
         project.scheme(named: targetName.main.iOS){
-            
+
             $0.build(
                 targets: [
                     targetName.main.iOS: (
@@ -750,18 +755,18 @@ try Struct
                     )
                 ]
             )
-            
+
             $0.test(
                 targets: [
                     targetName.tst.iOS
                 ]
             )
         }
-        
+
         // MARK: Write - Struct - Spec - Schemes - watchOS
-        
+
         project.scheme(named: targetName.main.watchOS){
-            
+
             $0.build(
                 targets: [
                     targetName.main.watchOS: (
@@ -774,11 +779,11 @@ try Struct
                 ]
             )
         }
-        
+
         // MARK: Write - Struct - Spec - Schemes - tvOS
-        
+
         project.scheme(named: targetName.main.tvOS){
-            
+
             $0.build(
                 targets: [
                     targetName.main.tvOS: (
@@ -790,18 +795,18 @@ try Struct
                     )
                 ]
             )
-            
+
             $0.test(
                 targets: [
                     targetName.tst.tvOS
                 ]
             )
         }
-        
+
         // MARK: Write - Struct - Spec - Schemes - macOS
-        
+
         project.scheme(named: targetName.main.macOS){
-            
+
             $0.build(
                 targets: [
                     targetName.main.macOS: (
@@ -813,16 +818,16 @@ try Struct
                     )
                 ]
             )
-            
+
             $0.test(
                 targets: [
                     targetName.tst.macOS
                 ]
             )
         }
-        
+
         // MARK: Write - Struct - Spec - Life Cycle Hooks
-        
+
         project.lifecycleHooks.post = scriptName.structPostGen
     }
     .prepare(
@@ -886,27 +891,27 @@ try CocoaPods
         authors: [author],
         swiftVersion: swiftVersion,
         perPlatformSettings: {
-            
+
             $0.settings(
                 for: nil,
                 "source_files = '\(sourcesPath.main.common)/**/*.swift'"
             )
-            
+
             $0.settings(
                 for: depTargets.iOS,
                 "source_files = '\(sourcesPath.main.iOS)/**/*.swift'"
             )
-            
+
             $0.settings(
                 for: depTargets.watchOS,
                 "source_files = '\(sourcesPath.main.watchOS)/**/*.swift'"
             )
-            
+
             $0.settings(
                 for: depTargets.tvOS,
                 "source_files = '\(sourcesPath.main.tvOS)/**/*.swift'"
             )
-            
+
             $0.settings(
                 for: depTargets.macOS,
                 "source_files = '\(sourcesPath.main.macOS)/**/*.swift'"
@@ -943,12 +948,12 @@ try Fastlane
         getCurrentVersionFromTarget: defaultTargetName,
         cocoaPodsModuleName: cocoaPodsModuleName,
         swiftLintTargets: [
-            
+
             targetName.main.iOS,
             targetName.main.watchOS,
             targetName.main.tvOS,
             targetName.main.macOS,
-            
+
             targetName.tst.iOS,
             // NO tests for .watchOS,
             targetName.tst.tvOS,
