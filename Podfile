@@ -2,7 +2,7 @@ workspace 'Pipeline'
 # https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
 install! 'cocoapods', :deterministic_uuids => false
 
-target 'iOS-Pipeline' do
+target 'Pipeline-iOS' do
 
     project 'Pipeline'
     platform :ios, '9.0'
@@ -17,7 +17,7 @@ target 'iOS-Pipeline' do
 
 end
 
-target 'watchOS-Pipeline' do
+target 'Pipeline-watchOS' do
 
     project 'Pipeline'
     platform :watchos, '3.0'
@@ -32,7 +32,7 @@ target 'watchOS-Pipeline' do
 
 end
 
-target 'tvOS-Pipeline' do
+target 'Pipeline-tvOS' do
 
     project 'Pipeline'
     platform :tvos, '9.0'
@@ -47,7 +47,7 @@ target 'tvOS-Pipeline' do
 
 end
 
-target 'macOS-Pipeline' do
+target 'Pipeline-macOS' do
 
     project 'Pipeline'
     platform :osx, '10.11'

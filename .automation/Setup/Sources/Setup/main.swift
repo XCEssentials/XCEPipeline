@@ -117,17 +117,17 @@ let tstSuffix = Defaults.tstSuffix
 let targetName: CommonAndPerTarget = (
     (
         product.name,
-        OSIdentifier.iOS.rawValue + "-" + product.name,
-        OSIdentifier.watchOS.rawValue + "-" + product.name,
-        OSIdentifier.tvOS.rawValue + "-" + product.name,
-        OSIdentifier.macOS.rawValue + "-" + product.name
+        product.name + "-" + OSIdentifier.iOS.rawValue,
+        product.name + "-" + OSIdentifier.watchOS.rawValue,
+        product.name + "-" + OSIdentifier.tvOS.rawValue,
+        product.name + "-" + OSIdentifier.macOS.rawValue
     ),
     (
         product.name + tstSuffix,
-        OSIdentifier.iOS.rawValue + "-" + product.name + tstSuffix,
+        product.name + tstSuffix + "-" + OSIdentifier.iOS.rawValue,
         // NO tests for .watchOS
-        OSIdentifier.tvOS.rawValue + "-" + product.name + tstSuffix,
-        OSIdentifier.macOS.rawValue + "-" + product.name + tstSuffix
+        product.name + tstSuffix + "-" + OSIdentifier.tvOS.rawValue,
+        product.name + tstSuffix + "-" + OSIdentifier.macOS.rawValue
     )
 )
 

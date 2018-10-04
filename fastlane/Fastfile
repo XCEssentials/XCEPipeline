@@ -40,7 +40,7 @@ lane :beforeRelease do
 
     versionNumber = get_version_number(
         xcodeproj: 'Pipeline.xcodeproj',
-        target: 'macOS-Pipeline'
+        target: 'Pipeline-macOS'
     )
 
     puts 'Current VERSION number: ' + versionNumber
@@ -110,7 +110,7 @@ lane :regenerateProject do
 
     versionNumber = get_version_number(
         xcodeproj: 'Pipeline.xcodeproj',
-        target: 'macOS-Pipeline'
+        target: 'Pipeline-macOS'
     )
 
     buildNumber = get_build_number(
@@ -159,7 +159,7 @@ lane :regenerateProject do
 
     project
         .targets
-        .select{ |t| ['iOS-Pipeline', 'watchOS-Pipeline', 'tvOS-Pipeline', 'macOS-Pipeline', 'iOS-PipelineTests', 'tvOS-PipelineTests', 'macOS-PipelineTests'].include?(t.name) }
+        .select{ |t| ['Pipeline-iOS', 'Pipeline-watchOS', 'Pipeline-tvOS', 'Pipeline-macOS', 'PipelineTests-iOS', 'PipelineTests-tvOS', 'PipelineTests-macOS'].include?(t.name) }
         .each{ |t|
 
             thePhase = t.new_shell_script_build_phase('SwiftLintPods')
@@ -213,7 +213,7 @@ lane :generateProject do
 
     project
         .targets
-        .select{ |t| ['iOS-Pipeline', 'watchOS-Pipeline', 'tvOS-Pipeline', 'macOS-Pipeline', 'iOS-PipelineTests', 'tvOS-PipelineTests', 'macOS-PipelineTests'].include?(t.name) }
+        .select{ |t| ['Pipeline-iOS', 'Pipeline-watchOS', 'Pipeline-tvOS', 'Pipeline-macOS', 'PipelineTests-iOS', 'PipelineTests-tvOS', 'PipelineTests-macOS'].include?(t.name) }
         .each{ |t|
 
             thePhase = t.new_shell_script_build_phase('SwiftLintPods')
