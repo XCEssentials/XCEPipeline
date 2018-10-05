@@ -309,7 +309,38 @@ let scriptName = (
 
 let podspecFileName = cocoaPodsModuleName + ".podspec"
 
-let currentPodVersion: VersionString
+let currentPodVersion: VersionString // will be defined later
+
+let commonPodDependencies = [
+
+    "pod 'SwiftLint'"
+]
+
+let fastlaneFolder = try repoFolder
+    .createSubfolderIfNeeded(
+        withName: Defaults.pathToFastlaneFolder
+    )
+
+// MARK: -
+
+// MARK: Write - Bundler - Gemfile
+
+// https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
+try Bundler
+    .Gemfile(
+        basicFastlane: true,
+        """
+        gem 'xcodeproj'
+        gem 'cocoapods'
+        gem 'struct'
+        """
+    )
+    .prepare(
+        targetFolder: repoFolder.path
+    )
+    .writeToFileSystem()
+
+// MARK: Read - currentPodVersion
 
 do
 {
@@ -319,7 +350,7 @@ do
 
     currentPodVersion = try shellOut(
         to: """
-        fastlane run version_get_podspec \
+        bundle exec fastlane run version_get_podspec \
             path:"\(repoFolder.path + "/" + podspecFileName)" \
         | grep "Result:" \
         | find-versions
@@ -337,18 +368,6 @@ catch
         """
     )
 }
-
-let commonPodDependencies = [
-
-    "pod 'SwiftLint'"
-]
-
-let fastlaneFolder = try repoFolder
-    .createSubfolderIfNeeded(
-        withName: Defaults.pathToFastlaneFolder
-    )
-
-// MARK: -
 
 // MARK: Write - ReadMe
 
@@ -986,21 +1005,6 @@ try CocoaPods
     )
     .prepare(
         name: podspecFileName,
-        targetFolder: repoFolder.path
-    )
-    .writeToFileSystem()
-
-// MARK: Write - Bundler - Gemfile
-
-// https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
-try Bundler
-    .Gemfile("""
-        gem 'xcodeproj'
-        gem 'cocoapods'
-        gem 'struct'
-        """
-    )
-    .prepare(
         targetFolder: repoFolder.path
     )
     .writeToFileSystem()
