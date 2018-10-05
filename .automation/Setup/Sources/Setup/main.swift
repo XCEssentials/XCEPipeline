@@ -1,7 +1,65 @@
+import FileKit
 import Files
 import ShellOut
 
 import XCERepoConfigurator
+
+//---
+
+public
+extension Path
+{
+    var isGitRepoRoot: Bool
+    {
+        return children().contains{
+            
+            $0.isDirectory && ($0.components.last == ".git")
+        }
+    }
+    
+    static
+    var currentRepoRoot: Path?
+    {
+        var maybeResult: Path? = .current
+        
+        //---
+        
+        repeat
+        {
+            switch maybeResult
+            {
+            case let .some(path) where path.isGitRepoRoot:
+                return path
+                
+            case let .some(path) where !path.isGitRepoRoot:
+                let nextMaybeResult = path.parent
+                
+                if
+                    nextMaybeResult ~= path
+                {
+                    return nil // already at the root and nothing found
+                }
+                else
+                {
+                    maybeResult = nextMaybeResult
+                }
+                
+            default:
+                return nil
+            }
+        }
+            while true
+    }
+}
+
+extension Path: ExpressibleByArrayLiteral
+{
+    public
+    init(arrayLiteral elements: String...)
+    {
+        self.init(elements.joined(separator: Path.separator))
+    }
+}
 
 //---
 
@@ -114,20 +172,23 @@ typealias LicenseMIT = License.MIT
 
 let tstSuffix = Defaults.tstSuffix
 
-let targetName: CommonAndPerTarget = (
+let baseTargetName = product.name
+let baseTstTargetName = product.name + tstSuffix
+
+let targetName: CommonAndPerTarget<String> = (
     (
-        product.name,
-        product.name + "-" + OSIdentifier.iOS.rawValue,
-        product.name + "-" + OSIdentifier.watchOS.rawValue,
-        product.name + "-" + OSIdentifier.tvOS.rawValue,
-        product.name + "-" + OSIdentifier.macOS.rawValue
+        baseTargetName,
+        baseTargetName + "-" + OSIdentifier.iOS.rawValue,
+        baseTargetName + "-" + OSIdentifier.watchOS.rawValue,
+        baseTargetName + "-" + OSIdentifier.tvOS.rawValue,
+        baseTargetName + "-" + OSIdentifier.macOS.rawValue
     ),
     (
-        product.name + tstSuffix,
-        product.name + tstSuffix + "-" + OSIdentifier.iOS.rawValue,
+        baseTstTargetName,
+        baseTstTargetName + "-" + OSIdentifier.iOS.rawValue,
         // NO tests for .watchOS
-        product.name + tstSuffix + "-" + OSIdentifier.tvOS.rawValue,
-        product.name + tstSuffix + "-" + OSIdentifier.macOS.rawValue
+        baseTstTargetName + "-" + OSIdentifier.tvOS.rawValue,
+        baseTstTargetName + "-" + OSIdentifier.macOS.rawValue
     )
 )
 
@@ -140,41 +201,43 @@ let depTargets: PerPlatform<DeploymentTarget> = (
     (.macOS, "10.11")
 )
 
-let commonInfoPlistsPath = Defaults
+let baseInfoPlistsPathStr = Defaults
     .pathToInfoPlistsFolder
 
-let infoPlistPaths: PerTarget<String> = (
+let infoPlistPaths: PerTarget<Path> = (
     (
-        commonInfoPlistsPath + "/" + targetName.main.iOS + ".plist",
-        commonInfoPlistsPath + "/" + targetName.main.watchOS + ".plist",
-        commonInfoPlistsPath + "/" + targetName.main.tvOS + ".plist",
-        commonInfoPlistsPath + "/" + targetName.main.macOS + ".plist"
+        [baseInfoPlistsPathStr, "\(targetName.main.iOS).plist"],
+        [baseInfoPlistsPathStr, "\(targetName.main.watchOS).plist"],
+        [baseInfoPlistsPathStr, "\(targetName.main.tvOS).plist"],
+        [baseInfoPlistsPathStr, "\(targetName.main.macOS).plist"]
     ),
     (
-        commonInfoPlistsPath + "/" + targetName.tst.iOS + ".plist",
+        [baseInfoPlistsPathStr, "\(targetName.tst.iOS).plist"],
         // NO tests for .watchOS
-        commonInfoPlistsPath + "/" + targetName.tst.tvOS + ".plist",
-        commonInfoPlistsPath + "/" + targetName.tst.macOS + ".plist"
+        [baseInfoPlistsPathStr, "\(targetName.tst.tvOS).plist"],
+        [baseInfoPlistsPathStr, "\(targetName.tst.macOS).plist"]
     )
 )
 
-let baseSourcesPath = Defaults
+let baseSourcesPathStr = Defaults
     .pathToSourcesFolder
 
-let sourcesPath: CommonAndPerTarget = (
+let crossPlatfromSourcesPathStr = "Common"
+
+let sourcesPath: CommonAndPerTarget<Path> = (
     (
-        baseSourcesPath + "/" + product.name + "/Common",
-        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.iOS.rawValue,
-        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.watchOS.rawValue,
-        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.tvOS.rawValue,
-        baseSourcesPath + "/" + product.name + "/" + OSIdentifier.macOS.rawValue
+        [baseSourcesPathStr, baseTargetName, crossPlatfromSourcesPathStr],
+        [baseSourcesPathStr, baseTargetName, OSIdentifier.iOS.rawValue],
+        [baseSourcesPathStr, baseTargetName, OSIdentifier.watchOS.rawValue],
+        [baseSourcesPathStr, baseTargetName, OSIdentifier.tvOS.rawValue],
+        [baseSourcesPathStr, baseTargetName, OSIdentifier.macOS.rawValue]
     ),
     (
-        baseSourcesPath + "/" + product.name + tstSuffix + "/Common",
-        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.iOS.rawValue,
+        [baseSourcesPathStr, baseTstTargetName, crossPlatfromSourcesPathStr],
+        [baseSourcesPathStr, baseTstTargetName, OSIdentifier.iOS.rawValue],
         // NO tests for .watchOS
-        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.tvOS.rawValue,
-        baseSourcesPath + "/" + product.name + tstSuffix + "/" + OSIdentifier.macOS.rawValue
+        [baseSourcesPathStr, baseTstTargetName, OSIdentifier.tvOS.rawValue],
+        [baseSourcesPathStr, baseTstTargetName, OSIdentifier.macOS.rawValue]
     )
 )
 
@@ -182,42 +245,42 @@ let sourcesFolder: CommonAndPerTarget<Folder> = try (
     (
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.main.common
+                withName: sourcesPath.main.common.rawValue
         ),
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.main.iOS
+                withName: sourcesPath.main.iOS.rawValue
         ),
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.main.watchOS
+                withName: sourcesPath.main.watchOS.rawValue
         ),
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.main.tvOS
+                withName: sourcesPath.main.tvOS.rawValue
         ),
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.main.macOS
+                withName: sourcesPath.main.macOS.rawValue
         )
     ),
     (
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.common
+                withName: sourcesPath.tst.common.rawValue
         ),
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.iOS
+                withName: sourcesPath.tst.iOS.rawValue
         ),
         // NO tests for .watchOS
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.tvOS
+                withName: sourcesPath.tst.tvOS.rawValue
         ),
         repoFolder
             .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.macOS
+                withName: sourcesPath.tst.macOS.rawValue
         )
     )
 )
@@ -240,7 +303,7 @@ let bundleId: PerTarget<String> = (
 let scriptsPath = "Scripts"
 
 let scriptName = (
-    structPostGen: scriptsPath + "/" + Struct.Spec.PostGenerateScript.defaultFileName,
+    structPostGen: Path(arrayLiteral: scriptsPath, Struct.Spec.PostGenerateScript.defaultFileName),
     none: ()
 )
 
@@ -257,7 +320,7 @@ do
     currentPodVersion = try shellOut(
         to: """
         fastlane run version_get_podspec \
-        path:"\(repoFolder.path + "/" + podspecFileName)" \
+            path:"\(repoFolder.path + "/" + podspecFileName)" \
         | grep "Result:" \
         | find-versions
         """
@@ -283,7 +346,7 @@ let commonPodDependencies = [
 let fastlaneFolder = try repoFolder
     .createSubfolderIfNeeded(
         withName: Defaults.pathToFastlaneFolder
-)
+    )
 
 // MARK: -
 
@@ -367,10 +430,10 @@ try Xcode
         preset: .iOS
     )
     .prepare(
-        name: infoPlistPaths.main.iOS,
+        name: infoPlistPaths.main.iOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 try Xcode
     .Target
@@ -379,10 +442,10 @@ try Xcode
         preset: nil
     )
     .prepare(
-        name: infoPlistPaths.main.watchOS,
+        name: infoPlistPaths.main.watchOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 try Xcode
     .Target
@@ -391,10 +454,10 @@ try Xcode
         preset: nil
     )
     .prepare(
-        name: infoPlistPaths.main.tvOS,
+        name: infoPlistPaths.main.tvOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 try Xcode
     .Target
@@ -406,10 +469,10 @@ try Xcode
         )
     )
     .prepare(
-        name: infoPlistPaths.main.macOS,
+        name: infoPlistPaths.main.macOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 // MARK: Write - Info plists - Tst
 
@@ -420,10 +483,10 @@ try Xcode
         preset: .iOS
     )
     .prepare(
-        name: infoPlistPaths.tst.iOS,
+        name: infoPlistPaths.tst.iOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 // NO tests for .watchOS
 
@@ -434,10 +497,10 @@ try Xcode
         preset: nil
     )
     .prepare(
-        name: infoPlistPaths.tst.tvOS,
+        name: infoPlistPaths.tst.tvOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 try Xcode
     .Target
@@ -449,10 +512,10 @@ try Xcode
         )
     )
     .prepare(
-        name: infoPlistPaths.tst.macOS,
+        name: infoPlistPaths.tst.macOS.rawValue,
         targetFolder: repoFolder.path
     )
-    .writeToFileSystem(ifFileExists: .doNotWrite) // write ONCE!
+    .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
 // MARK: Write - Dummy files - Main
 
@@ -534,7 +597,7 @@ try Struct
         )
     }
     .prepare(
-        name: scriptName.structPostGen,
+        name: scriptName.structPostGen.rawValue,
         targetFolder: repoFolder.path
     )
     .writeToFileSystem()
@@ -574,14 +637,14 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common)
-                fwk.include(sourcesPath.main.iOS)
+                fwk.include(sourcesPath.main.common.rawValue)
+                fwk.include(sourcesPath.main.iOS.rawValue)
 
                 //---
 
                 fwk.buildSettings.base.override(
 
-                    "INFOPLIST_FILE" <<< infoPlistPaths.main.iOS,
+                    "INFOPLIST_FILE" <<< infoPlistPaths.main.iOS.rawValue,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.iOS,
 
                     //--- platform specific:
@@ -598,14 +661,14 @@ try Struct
 
                     //---
 
-                    fwkTests.include(sourcesPath.tst.common)
-                    fwkTests.include(sourcesPath.tst.iOS)
+                    fwkTests.include(sourcesPath.tst.common.rawValue)
+                    fwkTests.include(sourcesPath.tst.iOS.rawValue)
 
                     //---
 
                     fwkTests.buildSettings.base.override(
 
-                        "INFOPLIST_FILE" <<< infoPlistPaths.tst.iOS,
+                        "INFOPLIST_FILE" <<< infoPlistPaths.tst.iOS.rawValue,
                         "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.iOS,
 
                         //--- platform specific:
@@ -623,14 +686,14 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common)
-                fwk.include(sourcesPath.main.watchOS)
+                fwk.include(sourcesPath.main.common.rawValue)
+                fwk.include(sourcesPath.main.watchOS.rawValue)
 
                 //---
 
                 fwk.buildSettings.base.override(
 
-                    "INFOPLIST_FILE" <<< infoPlistPaths.main.watchOS,
+                    "INFOPLIST_FILE" <<< infoPlistPaths.main.watchOS.rawValue,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.watchOS,
 
                     //--- platform specific:
@@ -652,14 +715,14 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common)
-                fwk.include(sourcesPath.main.tvOS)
+                fwk.include(sourcesPath.main.common.rawValue)
+                fwk.include(sourcesPath.main.tvOS.rawValue)
 
                 //---
 
                 fwk.buildSettings.base.override(
 
-                    "INFOPLIST_FILE" <<< infoPlistPaths.main.tvOS,
+                    "INFOPLIST_FILE" <<< infoPlistPaths.main.tvOS.rawValue,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.tvOS,
 
                     //--- platform specific:
@@ -675,14 +738,14 @@ try Struct
 
                     //---
 
-                    fwkTests.include(sourcesPath.tst.common)
-                    fwkTests.include(sourcesPath.tst.tvOS)
+                    fwkTests.include(sourcesPath.tst.common.rawValue)
+                    fwkTests.include(sourcesPath.tst.tvOS.rawValue)
 
                     //---
 
                     fwkTests.buildSettings.base.override(
 
-                        "INFOPLIST_FILE" <<< infoPlistPaths.tst.tvOS,
+                        "INFOPLIST_FILE" <<< infoPlistPaths.tst.tvOS.rawValue,
                         "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.tvOS,
 
                         //--- platform specific:
@@ -700,14 +763,14 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common)
-                fwk.include(sourcesPath.main.macOS)
+                fwk.include(sourcesPath.main.common.rawValue)
+                fwk.include(sourcesPath.main.macOS.rawValue)
 
                 //---
 
                 fwk.buildSettings.base.override(
 
-                    "INFOPLIST_FILE" <<< infoPlistPaths.main.macOS,
+                    "INFOPLIST_FILE" <<< infoPlistPaths.main.macOS.rawValue,
                     "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.main.macOS,
 
                     //--- platform specific:
@@ -723,14 +786,14 @@ try Struct
 
                     //---
 
-                    fwkTests.include(sourcesPath.tst.common)
-                    fwkTests.include(sourcesPath.tst.macOS)
+                    fwkTests.include(sourcesPath.tst.common.rawValue)
+                    fwkTests.include(sourcesPath.tst.macOS.rawValue)
 
                     //---
 
                     fwkTests.buildSettings.base.override(
 
-                        "INFOPLIST_FILE" <<< infoPlistPaths.tst.macOS,
+                        "INFOPLIST_FILE" <<< infoPlistPaths.tst.macOS.rawValue,
                         "PRODUCT_BUNDLE_IDENTIFIER" <<< bundleId.tst.macOS,
 
                         //--- platform specific:
@@ -829,7 +892,7 @@ try Struct
 
         // MARK: Write - Struct - Spec - Life Cycle Hooks
 
-        project.lifecycleHooks.post = scriptName.structPostGen
+        project.lifecycleHooks.post = scriptName.structPostGen.rawValue
     }
     .prepare(
         targetFolder: repoFolder.path
@@ -843,7 +906,9 @@ try CocoaPods
         workspaceName: product.name
     )
     .custom("""
-        # https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
+        # disable 'deterministic_uuids' to avoid warnings from CocoaPods
+        # which arise in case you have files with same names at different locations,
+        # see also https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
         install! 'cocoapods', :deterministic_uuids => false
         """
     )
@@ -894,7 +959,7 @@ try CocoaPods
         perPlatformSettings: {
 
             $0.settings(
-                for: nil,
+                for: nil, // common/base settings
                 "source_files = '\(sourcesPath.main.common)/**/*.swift'"
             )
 

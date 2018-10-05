@@ -1,5 +1,7 @@
 workspace 'Pipeline'
-# https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
+# disable 'deterministic_uuids' to avoid warnings from CocoaPods
+# which arise in case you have files with same names at different locations,
+# see also https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
 install! 'cocoapods', :deterministic_uuids => false
 
 target 'Pipeline-iOS' do
