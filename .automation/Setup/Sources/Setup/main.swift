@@ -285,7 +285,6 @@ try Bundler
     .Gemfile(
         basicFastlane: true,
         """
-        gem 'xcodeproj'
         gem 'cocoapods'
         gem 'struct'
         """
