@@ -224,12 +224,9 @@ let infoPlistPaths: PerTarget<Path> = (
     )
 )
 
-let baseSourcesPathStr = Defaults
-    .pathToSourcesFolder
-
 let sourcesPath: JustPerTarget<Path> = (
-    [baseSourcesPathStr, baseTargetName],
-    [baseSourcesPathStr, baseTstTargetName]
+    [Defaults.pathToSourcesFolder],
+    [tstSuffix]
 )
 
 let sourcesFolder: JustPerTarget<Folder> = try (

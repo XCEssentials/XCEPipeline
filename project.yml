@@ -25,7 +25,7 @@ targets:
     platform: ios
     type: ":framework"
     sources:
-    - Sources/Pipeline
+    - Sources
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"
@@ -164,7 +164,7 @@ targets:
     platform: mac
     type: ":framework"
     sources:
-    - Sources/Pipeline
+    - Sources
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"
@@ -304,7 +304,7 @@ targets:
     platform: tv
     type: ":framework"
     sources:
-    - Sources/Pipeline
+    - Sources
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"
@@ -443,7 +443,7 @@ targets:
     platform: watch
     type: ":framework"
     sources:
-    - Sources/Pipeline
+    - Sources
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"
@@ -586,7 +586,7 @@ targets:
     references:
     - location: Pipeline-iOS
     sources:
-    - Sources/PipelineTests
+    - Tests
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"
@@ -711,7 +711,7 @@ targets:
     references:
     - location: Pipeline-macOS
     sources:
-    - Sources/PipelineTests
+    - Tests
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"
@@ -835,7 +835,7 @@ targets:
     references:
     - location: Pipeline-tvOS
     sources:
-    - Sources/PipelineTests
+    - Tests
     configurations:
       debug:
         ALWAYS_SEARCH_USER_PATHS: "NO"

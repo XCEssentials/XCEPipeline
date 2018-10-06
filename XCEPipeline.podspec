@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 
     # === All platforms
 
-    s.source_files = 'Sources/Pipeline/**/*.swift'
+    s.source_files = 'Sources/**/*.swift'
 
     # === iOS
 
