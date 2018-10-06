@@ -104,6 +104,11 @@ typealias PerTarget<T> = (
     tst: PerPlatformTst<T>
 )
 
+typealias JustPerTarget<T> = (
+    main: T,
+    tst: T
+)
+
 typealias CommonAndPerTarget<T> = (
     main: CommonAndPerPlatform<T>,
     tst: CommonAndPerPlatformTst<T>
@@ -222,67 +227,20 @@ let infoPlistPaths: PerTarget<Path> = (
 let baseSourcesPathStr = Defaults
     .pathToSourcesFolder
 
-let crossPlatfromSourcesPathStr = "Common"
-
-let sourcesPath: CommonAndPerTarget<Path> = (
-    (
-        [baseSourcesPathStr, baseTargetName, crossPlatfromSourcesPathStr],
-        [baseSourcesPathStr, baseTargetName, OSIdentifier.iOS.rawValue],
-        [baseSourcesPathStr, baseTargetName, OSIdentifier.watchOS.rawValue],
-        [baseSourcesPathStr, baseTargetName, OSIdentifier.tvOS.rawValue],
-        [baseSourcesPathStr, baseTargetName, OSIdentifier.macOS.rawValue]
-    ),
-    (
-        [baseSourcesPathStr, baseTstTargetName, crossPlatfromSourcesPathStr],
-        [baseSourcesPathStr, baseTstTargetName, OSIdentifier.iOS.rawValue],
-        // NO tests for .watchOS
-        [baseSourcesPathStr, baseTstTargetName, OSIdentifier.tvOS.rawValue],
-        [baseSourcesPathStr, baseTstTargetName, OSIdentifier.macOS.rawValue]
-    )
+let sourcesPath: JustPerTarget<Path> = (
+    [baseSourcesPathStr, baseTargetName],
+    [baseSourcesPathStr, baseTstTargetName]
 )
 
-let sourcesFolder: CommonAndPerTarget<Folder> = try (
-    (
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.main.common.rawValue
+let sourcesFolder: JustPerTarget<Folder> = try (
+    repoFolder
+        .createSubfolderIfNeeded(
+            withName: sourcesPath.main.rawValue
         ),
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.main.iOS.rawValue
-        ),
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.main.watchOS.rawValue
-        ),
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.main.tvOS.rawValue
-        ),
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.main.macOS.rawValue
+    repoFolder
+        .createSubfolderIfNeeded(
+            withName: sourcesPath.tst.rawValue
         )
-    ),
-    (
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.common.rawValue
-        ),
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.iOS.rawValue
-        ),
-        // NO tests for .watchOS
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.tvOS.rawValue
-        ),
-        repoFolder
-            .createSubfolderIfNeeded(
-                withName: sourcesPath.tst.macOS.rawValue
-        )
-    )
 )
 
 let bundleId: PerTarget<String> = (
@@ -536,72 +494,19 @@ try Xcode
     )
     .writeToFileSystem(ifFileExists: .skip) // write ONCE!
 
-// MARK: Write - Dummy files - Main
+// MARK: Write - Dummy files
 
 try CustomTextFile()
     .prepare(
         name: targetName.main.common + swiftExt,
-        targetFolder: sourcesFolder.main.common.path
+        targetFolder: sourcesFolder.main.path
     )
     .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.main.iOS + swiftExt,
-        targetFolder: sourcesFolder.main.iOS.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.main.watchOS + swiftExt,
-        targetFolder: sourcesFolder.main.watchOS.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.main.tvOS + swiftExt,
-        targetFolder: sourcesFolder.main.tvOS.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.main.macOS + swiftExt,
-        targetFolder: sourcesFolder.main.macOS.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-// MARK: Write - Dummy files - Tst
 
 try CustomTextFile()
     .prepare(
         name: targetName.tst.common + swiftExt,
-        targetFolder: sourcesFolder.tst.common.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.tst.iOS + swiftExt,
-        targetFolder: sourcesFolder.tst.iOS.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-// NO tests for .watchOS
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.tst.tvOS + swiftExt,
-        targetFolder: sourcesFolder.tst.tvOS.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.tst.macOS + swiftExt,
-        targetFolder: sourcesFolder.tst.macOS.path
+        targetFolder: sourcesFolder.tst.path
     )
     .writeToFileSystem(ifFileExists: .skip)
 
@@ -656,8 +561,7 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common.rawValue)
-                fwk.include(sourcesPath.main.iOS.rawValue)
+                fwk.include(sourcesPath.main.rawValue)
 
                 //---
 
@@ -680,8 +584,7 @@ try Struct
 
                     //---
 
-                    fwkTests.include(sourcesPath.tst.common.rawValue)
-                    fwkTests.include(sourcesPath.tst.iOS.rawValue)
+                    fwkTests.include(sourcesPath.tst.rawValue)
 
                     //---
 
@@ -705,8 +608,7 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common.rawValue)
-                fwk.include(sourcesPath.main.watchOS.rawValue)
+                fwk.include(sourcesPath.main.rawValue)
 
                 //---
 
@@ -734,8 +636,7 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common.rawValue)
-                fwk.include(sourcesPath.main.tvOS.rawValue)
+                fwk.include(sourcesPath.main.rawValue)
 
                 //---
 
@@ -757,8 +658,7 @@ try Struct
 
                     //---
 
-                    fwkTests.include(sourcesPath.tst.common.rawValue)
-                    fwkTests.include(sourcesPath.tst.tvOS.rawValue)
+                    fwkTests.include(sourcesPath.tst.rawValue)
 
                     //---
 
@@ -782,8 +682,7 @@ try Struct
 
                 //---
 
-                fwk.include(sourcesPath.main.common.rawValue)
-                fwk.include(sourcesPath.main.macOS.rawValue)
+                fwk.include(sourcesPath.main.rawValue)
 
                 //---
 
@@ -805,8 +704,7 @@ try Struct
 
                     //---
 
-                    fwkTests.include(sourcesPath.tst.common.rawValue)
-                    fwkTests.include(sourcesPath.tst.macOS.rawValue)
+                    fwkTests.include(sourcesPath.tst.rawValue)
 
                     //---
 
@@ -979,27 +877,23 @@ try CocoaPods
 
             $0.settings(
                 for: nil, // common/base settings
-                "source_files = '\(sourcesPath.main.common)/**/*.swift'"
+                "source_files = '\(sourcesPath.main)/**/*.swift'"
             )
 
             $0.settings(
-                for: depTargets.iOS,
-                "source_files = '\(sourcesPath.main.iOS)/**/*.swift'"
+                for: depTargets.iOS
             )
 
             $0.settings(
-                for: depTargets.watchOS,
-                "source_files = '\(sourcesPath.main.watchOS)/**/*.swift'"
+                for: depTargets.watchOS
             )
 
             $0.settings(
-                for: depTargets.tvOS,
-                "source_files = '\(sourcesPath.main.tvOS)/**/*.swift'"
+                for: depTargets.tvOS
             )
 
             $0.settings(
-                for: depTargets.macOS,
-                "source_files = '\(sourcesPath.main.macOS)/**/*.swift'"
+                for: depTargets.macOS
             )
     }
     )
