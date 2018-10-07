@@ -9,54 +9,6 @@ import XCERepoConfigurator
 print("\n")
 print("--- BEGIN of '\(Executable.name!)' script ---")
 
-// MARK: - Type declarations
-
-typealias PerPlatform<T> = (
-    iOS: T,
-    watchOS: T,
-    tvOS: T,
-    macOS: T
-)
-
-typealias PerPlatformTst<T> = (
-    iOS: T,
-    // NO tests for .watchOS
-    tvOS: T,
-    macOS: T
-)
-
-typealias CommonAndPerPlatform<T> = (
-    common: T,
-    iOS: T,
-    watchOS: T,
-    tvOS: T,
-    macOS: T
-)
-
-typealias CommonAndPerPlatformTst<T> = (
-    common: T,
-    iOS: T,
-    // NO tests for .watchOS
-    tvOS: T,
-    macOS: T
-)
-
-// one item for main target, and one - for unit tests
-typealias PerTarget<T> = (
-    main: PerPlatform<T>,
-    tst: PerPlatformTst<T>
-)
-
-typealias JustPerTarget<T> = (
-    main: T,
-    tst: T
-)
-
-typealias CommonAndPerTarget<T> = (
-    main: CommonAndPerPlatform<T>,
-    tst: CommonAndPerPlatformTst<T>
-)
-
 // MARK: - Parameters
 
 guard
@@ -106,9 +58,6 @@ let company: CocoaPods.Podspec.Company = (
     prefix: "XCE"
 )
 
-// necessary for signing FWK on macOS:
-let developmentTeamId = "UJA88X59XP" // "Maxim Khatskevich"
-
 let cocoaPodsModuleName = company.prefix + product.name
 
 let author: CocoaPods.Podspec.Author = (
@@ -123,7 +72,8 @@ let tstSuffix = Defaults.tstSuffix
 let baseTargetName = product.name
 let baseTstTargetName = product.name + tstSuffix
 
-let targetName: CommonAndPerTarget<String> = (
+// TODO: do we really need that?
+let targetName: PerTarget<PerPlatformAndCommon<String>, PerPlatformAndCommonTst<String>> = (
     (
         baseTargetName,
         baseTargetName + "-" + OSIdentifier.iOS.rawValue,
@@ -140,8 +90,6 @@ let targetName: CommonAndPerTarget<String> = (
     )
 )
 
-let defaultTargetName = targetName.main.macOS
-
 let depTargets: PerPlatform<DeploymentTarget> = (
     (.iOS, "9.0"),
     (.watchOS, "3.0"),
@@ -149,30 +97,12 @@ let depTargets: PerPlatform<DeploymentTarget> = (
     (.macOS, "10.11")
 )
 
-let baseInfoPlistsPathStr = Defaults
-    .pathToInfoPlistsFolder
-
-let infoPlistPaths: PerTarget<Path> = (
-    (
-        [baseInfoPlistsPathStr, "\(targetName.main.iOS).plist"],
-        [baseInfoPlistsPathStr, "\(targetName.main.watchOS).plist"],
-        [baseInfoPlistsPathStr, "\(targetName.main.tvOS).plist"],
-        [baseInfoPlistsPathStr, "\(targetName.main.macOS).plist"]
-    ),
-    (
-        [baseInfoPlistsPathStr, "\(targetName.tst.iOS).plist"],
-        // NO tests for .watchOS
-        [baseInfoPlistsPathStr, "\(targetName.tst.tvOS).plist"],
-        [baseInfoPlistsPathStr, "\(targetName.tst.macOS).plist"]
-    )
-)
-
-let sourcesPath: JustPerTarget<Path> = (
+let sourcesPath: PerTarget<Path, Path> = (
     [Defaults.pathToSourcesFolder],
     [tstSuffix]
 )
 
-let sourcesFolder: JustPerTarget<Folder> = try (
+let sourcesFolder: PerTarget<Folder, Folder> = try (
     repoFolder
         .createSubfolderIfNeeded(
             withName: sourcesPath.main.rawValue
@@ -181,28 +111,6 @@ let sourcesFolder: JustPerTarget<Folder> = try (
         .createSubfolderIfNeeded(
             withName: sourcesPath.tst.rawValue
         )
-)
-
-let bundleId: PerTarget<String> = (
-    (
-        company.identifier + "." + targetName.main.iOS,
-        company.identifier + "." + targetName.main.watchOS,
-        company.identifier + "." + targetName.main.tvOS,
-        company.identifier + "." + targetName.main.macOS
-    ),
-    (
-        company.identifier + "." + targetName.tst.iOS,
-        // NO tests for .watchOS
-        company.identifier + "." + targetName.tst.tvOS,
-        company.identifier + "." + targetName.tst.macOS
-    )
-)
-
-let scriptsPath = "Scripts"
-
-let scriptName = (
-    structPostGen: Path(arrayLiteral: scriptsPath, Struct.Spec.PostGenerateScript.defaultFileName),
-    none: ()
 )
 
 let podspecFileName = cocoaPodsModuleName + ".podspec"
@@ -279,6 +187,7 @@ try ReadMe()
     .addCocoaPodsPlatformsBadge(
         podName: cocoaPodsModuleName
     )
+    .addSwiftPMCompatibleBadge()
     .addCarthageCompatibleBadge()
     .addWrittenInSwiftBadge(
         version: swiftVersion
@@ -345,19 +254,19 @@ try LicenseMIT(
 
 // MARK: Write - Dummy files
 
-try CustomTextFile()
-    .prepare(
-        name: targetName.main.common + swiftExt,
-        targetFolder: sourcesFolder.main.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: targetName.tst.common + swiftExt,
-        targetFolder: sourcesFolder.tst.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
+//try CustomTextFile()
+//    .prepare(
+//        name: "RemoveMe" + swiftExt,
+//        targetFolder: sourcesFolder.main.path
+//    )
+//    .writeToFileSystem(ifFileExists: .skip)
+//
+//try CustomTextFile()
+//    .prepare(
+//        name: "RemoveMe" + swiftExt,
+//        targetFolder: sourcesFolder.tst.path
+//    )
+//    .writeToFileSystem(ifFileExists: .skip)
 
 // MARK: Write - CocoaPods - Podfile
 
