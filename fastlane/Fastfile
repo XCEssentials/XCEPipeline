@@ -39,7 +39,7 @@ lane :beforeRelease do
     # === Remember current version number
 
     versionNumber = version_get_podspec(
-        path: './XCEPipeline.podspec'
+        path: 'XCEPipeline.podspec'
     )
 
     puts 'Current VERSION number: ' + versionNumber
@@ -53,260 +53,35 @@ lane :beforeRelease do
     # ===
 
     version_bump_podspec(
-        path: './XCEPipeline.podspec',
+        path: 'XCEPipeline.podspec',
         version_number: newVersionNumber
     )
 
     git_commit(
-        path: './XCEPipeline.podspec',
+        path: 'XCEPipeline.podspec',
         message: 'Version Bump to ' + newVersionNumber + ' in Podspec file'
     )
 
 end # lane :beforeRelease
 
-lane :regenerateProject do
-
-    # === Remember current version and build numbers
-
-    versionNumber = version_get_podspec(
-        path: './XCEPipeline.podspec'
-    )
-
-    # === Remove completely current project file/package
-
-    # default initial location for any command
-    # is inside 'Fastlane' folder
-
-    sh 'cd ./.. && rm -r ./Pipeline.xcworkspace'
-    sh 'cd ./.. && rm -r ./Pipeline.xcodeproj'
+lane :generateProjectViaCP do
 
     # === Regenerate project
 
     # default initial location for any command
     # is inside 'Fastlane' folder
 
-    sh 'cd ./.. && pod gen'
+    sh 'cd ./.. && pod gen --gen-directory="Xcode"'
 
-    # === Set proper current version and build numbers
+end # lane :generateProjectViaCP
 
-    # increment_version_number(
-    #     # xcodeproj: 'Pipeline.xcodeproj',
-    #     version_number: versionNumber
-    # )
+lane :generateProjectViaIce do
 
-    # === Sort all project entries
+    # === Regenerate project
 
     # default initial location for any command
     # is inside 'Fastlane' folder
 
-    # sh 'cd ./.. && xcodeproj sort "Pipeline.xcodeproj"'
+    sh 'cd ./.. && ice xc'
 
-end # lane :regenerateProject
-
-# lane :beforeRelease do
-
-#     ensure_git_branch(
-#         branch: '(release/*|hotfix/*)'
-#     )
-
-#     ensure_git_status_clean
-
-#     # ===
-
-#     pod_lib_lint(
-#         allow_warnings: true,
-#         quick: true
-#     )
-
-#     # === Remember current version number
-
-#     versionNumber = get_version_number(
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         target: 'Pipeline-macOS'
-#     )
-
-#     puts 'Current VERSION number: ' + versionNumber
-
-#     # === Infer new version number
-
-#     defaultNewVersion = git_branch.split('/').last
-
-#     # === Define new version number
-
-#     useInferredNEWVersionNumber = prompt(
-#         text: 'Proceed with inferred NEW version number (' + defaultNewVersion + ')?',
-#         boolean: true
-#     )
-
-#     if useInferredNEWVersionNumber
-
-#         newVersionNumber = defaultNewVersion
-
-#     else
-
-#         newVersionNumber = prompt(
-#             text: 'New VERSION number:'
-#         )
-
-#     end
-
-#     # === Apply NEW version number and increment build number
-
-#     increment_version_number(
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         version_number: newVersionNumber
-#     )
-
-#     increment_build_number(
-#         xcodeproj: 'Pipeline.xcodeproj'
-#     )
-
-#     # ===
-
-#     newBuildNumber = get_build_number(
-#         xcodeproj: 'Pipeline.xcodeproj'
-#     )
-
-#     commit_version_bump( # it will fail if more than version bump
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         message: 'Version Bump to ' + newVersionNumber + ' (' + newBuildNumber + ')'
-#     )
-
-#     # ===
-
-#     version_bump_podspec(
-#         path: './XCEPipeline.podspec',
-#         version_number: newVersionNumber
-#     )
-
-#     git_commit(
-#         path: './XCEPipeline.podspec',
-#         message: 'Version Bump to ' + newVersionNumber + ' in Podspec file'
-#     )
-
-# end # lane :beforeRelease
-
-# lane :regenerateProject do
-
-#     # === Remember current version and build numbers
-
-#     versionNumber = get_version_number(
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         target: 'Pipeline-macOS'
-#     )
-
-#     buildNumber = get_build_number(
-#         xcodeproj: 'Pipeline.xcodeproj'
-#     )
-
-#     # === Remove completely current project file/package
-
-#     # default initial location for any command
-#     # is inside 'Fastlane' folder
-
-#     sh 'cd ./.. && rm -r ./Pipeline.xcodeproj'
-
-#     # === Regenerate project
-
-#     # default initial location for any command
-#     # is inside 'Fastlane' folder
-
-#     sh 'cd ./.. && struct generate && pod install'
-
-#     # === Set proper current version and build numbers
-
-#     increment_version_number(
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         version_number: versionNumber
-#     )
-
-#     increment_build_number(
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         build_number: buildNumber
-#     )
-
-#     # === Sort all project entries
-
-#     # default initial location for any command
-#     # is inside 'Fastlane' folder
-
-#     sh 'cd ./.. && xcodeproj sort "Pipeline.xcodeproj"'
-
-#     # === Add BUILD PHASE script 'SwiftLintPods'
-
-#     # remember, we are in ./fastlane/ folder now...
-#     fullProjFilePath = Dir.pwd + '/../Pipeline.xcodeproj'
-
-#     project = Xcodeproj::Project.open(fullProjFilePath)
-
-#     project
-#         .targets
-#         .select{ |t| ['Pipeline-iOS', 'Pipeline-watchOS', 'Pipeline-tvOS', 'Pipeline-macOS', 'PipelineTests-iOS', 'PipelineTests-tvOS', 'PipelineTests-macOS'].include?(t.name) }
-#         .each{ |t|
-
-#             thePhase = t.new_shell_script_build_phase('SwiftLintPods')
-#             thePhase.shell_script = '"${PODS_ROOT}/SwiftLint/swiftlint"'
-#             # thePhase.run_only_for_deployment_postprocessing = '1'
-
-#             t.build_phases.delete(thePhase)
-#             t.build_phases.unshift(thePhase)
-
-#         }
-
-#     project.save()
-
-# end # lane :regenerateProject
-
-# lane :generateProject do
-
-#     # === Generate project from scratch
-
-#     # default initial location for any command
-#     # is inside 'Fastlane' folder
-
-#     sh 'cd ./.. && struct generate && pod update'
-
-#     # === Set proper build number
-
-#     # NOTE: proper version number is stored in the Info files
-
-#     newBuildNumber = prompt(
-#         text: 'Desired BUILD number:'
-#     )
-
-#     increment_build_number(
-#         xcodeproj: 'Pipeline.xcodeproj',
-#         build_number: newBuildNumber
-#     )
-
-#     # === Sort all project entries
-
-#     # default initial location for any command
-#     # is inside 'Fastlane' folder
-
-#     sh 'cd ./.. && xcodeproj sort "Pipeline.xcodeproj"'
-
-#     # === Add BUILD PHASE script 'SwiftLintPods'
-
-#     # remember, we are in ./fastlane/ folder now...
-#     fullProjFilePath = Dir.pwd + '/../Pipeline.xcodeproj'
-
-#     project = Xcodeproj::Project.open(fullProjFilePath)
-
-#     project
-#         .targets
-#         .select{ |t| ['Pipeline-iOS', 'Pipeline-watchOS', 'Pipeline-tvOS', 'Pipeline-macOS', 'PipelineTests-iOS', 'PipelineTests-tvOS', 'PipelineTests-macOS'].include?(t.name) }
-#         .each{ |t|
-
-#             thePhase = t.new_shell_script_build_phase('SwiftLintPods')
-#             thePhase.shell_script = '"${PODS_ROOT}/SwiftLint/swiftlint"'
-#             # thePhase.run_only_for_deployment_postprocessing = '1'
-
-#             t.build_phases.delete(thePhase)
-#             t.build_phases.unshift(thePhase)
-
-#         }
-
-#     project.save()
-
-# end # lane :generateProject
+end # lane :generateProjectViaIce
