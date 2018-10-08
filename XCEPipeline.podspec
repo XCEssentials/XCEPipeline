@@ -19,24 +19,39 @@ Pod::Spec.new do |s|
 
     s.cocoapods_version = '>= 1.5.3'
 
-    # === All platforms
-
-    s.source_files = 'Sources/**/*.swift'
-
-    # === iOS
+    # === ios
 
     s.ios.deployment_target = '9.0'
 
-    # === watchOS
+    # === watchos
 
     s.watchos.deployment_target = '3.0'
 
-    # === tvOS
+    # === tvos
 
     s.tvos.deployment_target = '9.0'
 
-    # === macOS
+    # === osx
 
     s.osx.deployment_target = '10.11'
+
+    # === SUBSPECS ===
+
+    s.subspec 'Core' do |ss|
+
+        # === All platforms
+
+        ss.source_files = 'Sources/**/*.swift'
+
+    end # subspec 'Core'
+
+    s.test_spec 'Tests' do |ss|
+
+        # === All platforms
+
+        ss.requires_app_host = false
+        ss.source_files = 'Tests/**/*.swift'
+
+    end # test_spec 'Tests'
 
 end # spec s

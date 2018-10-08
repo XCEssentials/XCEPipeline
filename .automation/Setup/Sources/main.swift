@@ -117,7 +117,7 @@ let podspecFileName = cocoaPodsModuleName + ".podspec"
 
 let currentPodVersion: VersionString // will be defined later
 
-let commonPodDependencies = [
+let commonPodDependencies: [String] = [
 
     "pod 'SwiftLint'"
 ]
@@ -318,7 +318,7 @@ try CocoaPods
 
 try CocoaPods
     .Podspec
-    .standard(
+    .withSubSpecs(
         product: product,
         company: company,
         version: currentPodVersion,
@@ -326,28 +326,44 @@ try CocoaPods
         authors: [author],
         swiftVersion: swiftVersion,
         perPlatformSettings: {
-
-            $0.settings(
-                for: nil, // common/base settings
-                "source_files = '\(sourcesPath.main)/**/*.swift'"
-            )
-
+            
             $0.settings(
                 for: depTargets.iOS
             )
-
+            
             $0.settings(
                 for: depTargets.watchOS
             )
-
+            
             $0.settings(
                 for: depTargets.tvOS
             )
-
+            
             $0.settings(
                 for: depTargets.macOS
             )
-    }
+        },
+        subSpecs: {
+            
+            $0.subSpec("Core"){
+                
+                $0.settings(
+                    "source_files = '\(sourcesPath.main)/**/*.swift'"
+                )
+                
+                
+            }
+        },
+        testSubSpecs: {
+            
+            $0.testSubSpec(tstSuffix){
+                
+                $0.settings(
+                    "requires_app_host = false",
+                    "source_files = '\(sourcesPath.tst)/**/*.swift'"
+                )
+            }
+        }
     )
     .prepare(
         name: podspecFileName,
