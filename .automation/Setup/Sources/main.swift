@@ -350,8 +350,6 @@ try CocoaPods
                 $0.settings(
                     "source_files = '\(sourcesPath.main)/**/*.swift'"
                 )
-                
-                
             }
         },
         testSubSpecs: {
@@ -361,6 +359,18 @@ try CocoaPods
                 $0.settings(
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'"
+                )
+                
+                $0.settings(
+                    for: .macOS,
+                    
+                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
+                    """
+                    pod_target_xcconfig = {
+                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+                    }
+                    """
                 )
             }
         }

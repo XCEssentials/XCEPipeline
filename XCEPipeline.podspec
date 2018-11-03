@@ -52,6 +52,13 @@ Pod::Spec.new do |s|
         ss.requires_app_host = false
         ss.source_files = 'Tests/**/*.swift'
 
+        # === osx
+
+        ss.osx.pod_target_xcconfig = {
+            'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+            'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+        }
+
     end # test_spec 'Tests'
 
 end # spec s
