@@ -4,7 +4,27 @@ import ShellOut
 
 import XCERepoConfigurator
 
-//---
+// MARK: - Helper typealiases
+
+/**
+ Declares kinds of platforms supported by this library.
+ */
+typealias PerPlatform<T> = (
+    iOS: T,
+    watchOS: T,
+    tvOS: T,
+    macOS: T
+)
+
+/**
+ Declares kinds of targets presetned in this library.
+ */
+typealias PerTarget<M, T> = (
+    main: M,
+    tst: T
+)
+
+// MARK: - PRE-script invocation output
 
 print("\n")
 print("--- BEGIN of '\(Executable.name!)' script ---")
@@ -66,27 +86,6 @@ let author: CocoaPods.Podspec.Author = (
 typealias LicenseMIT = License.MIT
 
 let tstSuffix = Defaults.tstSuffix
-
-let baseTargetName = product.name
-let baseTstTargetName = product.name + tstSuffix
-
-// TODO: do we really need that?
-let targetName: PerTarget<PerPlatformAndCommon<String>, PerPlatformAndCommonTst<String>> = (
-    (
-        baseTargetName,
-        baseTargetName + "-" + OSIdentifier.iOS.rawValue,
-        baseTargetName + "-" + OSIdentifier.watchOS.rawValue,
-        baseTargetName + "-" + OSIdentifier.tvOS.rawValue,
-        baseTargetName + "-" + OSIdentifier.macOS.rawValue
-    ),
-    (
-        baseTstTargetName,
-        baseTstTargetName + "-" + OSIdentifier.iOS.rawValue,
-        // NO tests for .watchOS
-        baseTstTargetName + "-" + OSIdentifier.tvOS.rawValue,
-        baseTstTargetName + "-" + OSIdentifier.macOS.rawValue
-    )
-)
 
 let depTargets: PerPlatform<DeploymentTarget> = (
     (.iOS, "9.0"),
@@ -353,20 +352,6 @@ try Fastlane
     )
     .generateProjectViaCP()
     .generateProjectViaIce()
-//    .framework(
-//        swiftLintTargets: [
-//
-//            targetName.main.iOS,
-//            targetName.main.watchOS,
-//            targetName.main.tvOS,
-//            targetName.main.macOS,
-//
-//            targetName.tst.iOS,
-//            // NO tests for .watchOS,
-//            targetName.tst.tvOS,
-//            targetName.tst.macOS
-//        ]
-//    )
     .prepare(
         targetFolder: fastlaneFolder.path
     )
@@ -381,6 +366,6 @@ try GitHub
     )
     .writeToFileSystem()
 
-//---
+// MARK: - POST-script invocation output
 
 print("--- END of '\(Executable.name!)' script ---")
