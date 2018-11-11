@@ -39,8 +39,6 @@ print("✅ Product name (without company prefix): \(productName)")
 
 //---
 
-let swiftExt = ".swift"
-
 let projectName = productName
 
 let swiftVersion: VersionString = "4.2"
@@ -122,7 +120,25 @@ let fastlaneFolder = try repoFolder
         withName: Defaults.pathToFastlaneFolder
     )
 
+//let swiftExt = ".swift"
+
 // MARK: -
+
+// MARK: Write - Dummy files
+
+//try CustomTextFile()
+//    .prepare(
+//        name: "RemoveMe" + swiftExt,
+//        targetFolder: sourcesFolder.main.path
+//    )
+//    .writeToFileSystem(ifFileExists: .skip)
+//
+//try CustomTextFile()
+//    .prepare(
+//        name: "RemoveMe" + swiftExt,
+//        targetFolder: sourcesFolder.tst.path
+//    )
+//    .writeToFileSystem(ifFileExists: .skip)
 
 // MARK: Write - Bundler - Gemfile
 
@@ -246,22 +262,6 @@ try LicenseMIT(
         targetFolder: repoFolder.path
     )
     .writeToFileSystem()
-
-// MARK: Write - Dummy files
-
-//try CustomTextFile()
-//    .prepare(
-//        name: "RemoveMe" + swiftExt,
-//        targetFolder: sourcesFolder.main.path
-//    )
-//    .writeToFileSystem(ifFileExists: .skip)
-//
-//try CustomTextFile()
-//    .prepare(
-//        name: "RemoveMe" + swiftExt,
-//        targetFolder: sourcesFolder.tst.path
-//    )
-//    .writeToFileSystem(ifFileExists: .skip)
 
 // MARK: Write - CocoaPods - Podspec
 
