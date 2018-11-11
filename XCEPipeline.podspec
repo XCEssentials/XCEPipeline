@@ -51,6 +51,12 @@ Pod::Spec.new do |s|
 
         ss.requires_app_host = false
         ss.source_files = 'Tests/**/*.swift'
+        ss.dependency 'SwiftLint'
+        ss.script_phase = {
+            :name => 'SwiftLint',
+            :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
+            :execution_position => :before_compile
+        }
 
         # === osx
 

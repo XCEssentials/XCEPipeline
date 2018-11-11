@@ -117,11 +117,6 @@ let podspecFileName = cocoaPodsModuleName + ".podspec"
 
 let currentPodVersion: VersionString // will be defined later
 
-let commonPodDependencies: [String] = [
-
-    "pod 'SwiftLint'"
-]
-
 let fastlaneFolder = try repoFolder
     .createSubfolderIfNeeded(
         withName: Defaults.pathToFastlaneFolder
@@ -268,52 +263,6 @@ try LicenseMIT(
 //    )
 //    .writeToFileSystem(ifFileExists: .skip)
 
-// MARK: Write - CocoaPods - Podfile
-
-try CocoaPods
-    .Podfile(
-        workspaceName: product.name
-    )
-    .custom("""
-        # disable 'deterministic_uuids' to avoid warnings from CocoaPods
-        # which arise in case you have files with same names at different locations,
-        # see also https://github.com/CocoaPods/CocoaPods/issues/4370#issuecomment-284075060
-        install! 'cocoapods', :deterministic_uuids => false
-        """
-    )
-    .target(
-        targetName.main.iOS,
-        projectName: projectName,
-        deploymentTarget: depTargets.iOS,
-        includePodsFromPodspec: true,
-        pods: commonPodDependencies
-    )
-    .target(
-        targetName.main.watchOS,
-        projectName: projectName,
-        deploymentTarget: depTargets.watchOS,
-        includePodsFromPodspec: true,
-        pods: commonPodDependencies
-    )
-    .target(
-        targetName.main.tvOS,
-        projectName: projectName,
-        deploymentTarget: depTargets.tvOS,
-        includePodsFromPodspec: true,
-        pods: commonPodDependencies
-    )
-    .target(
-        targetName.main.macOS,
-        projectName: projectName,
-        deploymentTarget: depTargets.macOS,
-        includePodsFromPodspec: true,
-        pods: commonPodDependencies
-    )
-    .prepare(
-        targetFolder: repoFolder.path
-    )
-    .writeToFileSystem()
-
 // MARK: Write - CocoaPods - Podspec
 
 try CocoaPods
@@ -358,7 +307,19 @@ try CocoaPods
                 
                 $0.settings(
                     "requires_app_host = false",
-                    "source_files = '\(sourcesPath.tst)/**/*.swift'"
+                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+                    
+                    // https://github.com/realm/SwiftLint#xcode
+                    "dependency 'SwiftLint'",
+                    
+                    // NOTE: cocoapods-generate will output into './{Some_Subfolder}/{Pod_Name}/'
+                    """
+                    script_phase = {
+                        :name => 'SwiftLint',
+                        :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
+                        :execution_position => :before_compile
+                    }
+                    """
                 )
                 
                 $0.settings(
