@@ -436,11 +436,11 @@ try Git
             \(sourcesPath.tst)/\(dummyFileName)
             \(Bundler.Gemfile.fileName)
             \(Bundler.Gemfile.fileName).lock
+            \(fastlaneFolderPath)/\(Fastlane.Fastfile.fileName)
             # \(ReadMe.fileName)
-            \(SwiftLint.fileName)
+            # \(SwiftLint.fileName)
             # \(License.MIT.fileName)
             # \(podspecFileName)
-            \(fastlaneFolderPath)/\(Fastlane.Fastfile.fileName)
             # \(GitHub.PagesConfig.fileName)
             """
     )
