@@ -146,7 +146,7 @@ try Bundler
     .Gemfile(
         basicFastlane: true,
         """
-        gem 'cocoapods'
+        gem 'cocoapods', '1.6.0.beta.2'
         gem 'cocoapods-generate'
         """
     )
@@ -283,11 +283,20 @@ try CocoaPods
         },
         testSubSpecs: {
             
-            $0.testSubSpec(tstSuffix){
+            // NOTE: excluding watchOS !!!
+            
+            // had to define independently due to a bug in CocoaPods
+            // https://github.com/CocoaPods/CocoaPods/issues/7174#issuecomment-437743516
+            
+            $0.testSubSpec("\(tstSuffix)-\(OSIdentifier.iOS.rawValue)"){
                 
                 $0.settings(
+                    
+                    "platform = :\(OSIdentifier.iOS.cocoaPodsId)",
+                    
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
+                    "framework = 'XCTest'",
                     
                     // https://github.com/realm/SwiftLint#xcode
                     "dependency 'SwiftLint'",
@@ -301,6 +310,71 @@ try CocoaPods
                     }
                     """,
                     
+                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
+                    """
+                    pod_target_xcconfig = {
+                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+                    }
+                    """
+                )
+            }
+            
+            $0.testSubSpec("\(tstSuffix)-\(OSIdentifier.tvOS.rawValue)"){
+
+                $0.settings(
+
+                    // NOTE: excluding watchOS !!!
+                    "platform = :\(OSIdentifier.tvOS.cocoaPodsId)",
+
+                    "requires_app_host = false",
+                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+                    "framework = 'XCTest'",
+
+                    // https://github.com/realm/SwiftLint#xcode
+                    "dependency 'SwiftLint'",
+
+                    // NOTE: cocoapods-generate will output into './{Some_Subfolder}/{Pod_Name}/'
+                    """
+                    script_phase = {
+                        :name => 'SwiftLint',
+                        :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
+                        :execution_position => :before_compile
+                    }
+                    """,
+
+                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
+                    """
+                    pod_target_xcconfig = {
+                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+                    }
+                    """
+                )
+            }
+            
+            $0.testSubSpec("\(tstSuffix)-\(OSIdentifier.macOS.rawValue)"){
+
+                $0.settings(
+
+                    "platform = :\(OSIdentifier.macOS.cocoaPodsId)",
+
+                    "requires_app_host = false",
+                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+                    "framework = 'XCTest'",
+
+                    // https://github.com/realm/SwiftLint#xcode
+                    "dependency 'SwiftLint'",
+
+                    // NOTE: cocoapods-generate will output into './{Some_Subfolder}/{Pod_Name}/'
+                    """
+                    script_phase = {
+                        :name => 'SwiftLint',
+                        :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
+                        :execution_position => :before_compile
+                    }
+                    """,
+
                     // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
                     """
                     pod_target_xcconfig = {
