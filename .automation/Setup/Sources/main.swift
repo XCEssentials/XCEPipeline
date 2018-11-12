@@ -366,12 +366,12 @@ try Git
             \(sourcesPath.tst)/\(dummyFileName)
             \(Bundler.Gemfile.fileName)
             \(Bundler.Gemfile.fileName).lock
-            \(ReadMe.fileName)
+            # \(ReadMe.fileName)
             \(SwiftLint.fileName)
-            \(License.MIT.fileName)
-            \(podspecFileName)
+            # \(License.MIT.fileName)
+            # \(podspecFileName)
             \(fastlaneFolderPath)/\(Fastlane.Fastfile.fileName)
-            \(GitHub.PagesConfig.fileName)
+            # \(GitHub.PagesConfig.fileName)
             """
     )
     .prepare(

@@ -148,12 +148,12 @@ Sources/RemoveMe.swift
 Tests/RemoveMe.swift
 Gemfile
 Gemfile.lock
-README.md
+# README.md
 .swiftlint.yml
-LICENSE
-XCEPipeline.podspec
+# LICENSE
+# XCEPipeline.podspec
 fastlane/Fastfile
-_config.yml
+# _config.yml
 
 ### Custom repo-specific ###
 # ==========
