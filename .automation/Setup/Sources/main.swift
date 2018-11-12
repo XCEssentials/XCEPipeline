@@ -299,11 +299,7 @@ try CocoaPods
                         :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
                         :execution_position => :before_compile
                     }
-                    """
-                )
-                
-                $0.settings(
-                    for: .macOS,
+                    """,
                     
                     // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
                     """

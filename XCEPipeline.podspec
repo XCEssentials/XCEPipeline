@@ -57,10 +57,7 @@ Pod::Spec.new do |s|
             :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
             :execution_position => :before_compile
         }
-
-        # === osx
-
-        ss.osx.pod_target_xcconfig = {
+        ss.pod_target_xcconfig = {
             'EXPANDED_CODE_SIGN_IDENTITY' => '-',
             'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
         }
