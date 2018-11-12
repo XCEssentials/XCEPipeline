@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "FileKit",
+        "repositoryURL": "https://github.com/nvzqz/FileKit",
+        "state": {
+          "branch": null,
+          "revision": "cb1a5285ca780d66264a3e70862f9845ff1cfb18",
+          "version": "5.2.0"
+        }
+      },
+      {
+        "package": "Files",
+        "repositoryURL": "https://github.com/JohnSundell/Files",
+        "state": {
+          "branch": null,
+          "revision": "06f95bd1bf4f8d5f50bc6bb30b808c253acd4c88",
+          "version": "2.2.1"
+        }
+      },
+      {
+        "package": "XCERepoConfigurator",
+        "repositoryURL": "https://github.com/XCEssentials/RepoConfigurator",
+        "state": {
+          "branch": null,
+          "revision": "62c91759aa25510171105c31d3d5768f37295f02",
+          "version": "1.10.2"
+        }
+      },
+      {
+        "package": "ShellOut",
+        "repositoryURL": "https://github.com/JohnSundell/ShellOut",
+        "state": {
+          "branch": null,
+          "revision": "f1c253a34a40df4bfd268b09fdb101b059f6d52d",
+          "version": "2.1.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
