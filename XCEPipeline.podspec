@@ -43,13 +43,34 @@ Pod::Spec.new do |s|
 
     end # subspec 'Core'
 
-    s.test_spec 'Tests' do |ss|
+    s.test_spec 'Tests-iOS' do |ss|
 
+        ss.platform = :ios
         ss.requires_app_host = false
         ss.source_files = 'Tests/**/*.swift'
         ss.framework = 'XCTest'
         ss.dependency 'SwiftLint'
 
-    end # test_spec 'Tests'
+    end # test_spec 'Tests-iOS'
+
+    s.test_spec 'Tests-tvOS' do |ss|
+
+        ss.platform = :tvos
+        ss.requires_app_host = false
+        ss.source_files = 'Tests/**/*.swift'
+        ss.framework = 'XCTest'
+        ss.dependency 'SwiftLint'
+
+    end # test_spec 'Tests-tvOS'
+
+    s.test_spec 'Tests-macOS' do |ss|
+
+        ss.platform = :osx
+        ss.requires_app_host = false
+        ss.source_files = 'Tests/**/*.swift'
+        ss.framework = 'XCTest'
+        ss.dependency 'SwiftLint'
+
+    end # test_spec 'Tests-macOS'
 
 end # spec s

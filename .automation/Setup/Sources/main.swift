@@ -307,10 +307,46 @@ try CocoaPods
         },
         testSubSpecs: {
             
-            $0.testSubSpec(tstSuffix){
+//            $0.testSubSpec(tstSuffix){
+//
+//                $0.settings(
+//
+//                    "requires_app_host = false",
+//                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+//                    "framework = 'XCTest'",
+//                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
+//                )
+//            }
+            
+            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.iOS.rawValue)"){
                 
                 $0.settings(
                     
+                    "platform = :\(OSIdentifier.iOS.cocoaPodsId)",
+                    "requires_app_host = false",
+                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+                    "framework = 'XCTest'",
+                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
+                )
+            }
+            
+            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.tvOS.rawValue)"){
+                
+                $0.settings(
+                    
+                    "platform = :\(OSIdentifier.tvOS.cocoaPodsId)",
+                    "requires_app_host = false",
+                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+                    "framework = 'XCTest'",
+                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
+                )
+            }
+            
+            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.macOS.rawValue)"){
+                
+                $0.settings(
+                    
+                    "platform = :\(OSIdentifier.macOS.cocoaPodsId)",
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
