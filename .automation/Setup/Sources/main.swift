@@ -334,6 +334,10 @@ try Fastlane
     .beforeRelease(
         cocoaPodsModuleName: cocoaPodsModuleName
     )
+    .lane("lintThoroughly"){
+        
+        "pod_lib_lint"
+    }
     .generateProjectViaCP(
         callCocoaPods: .viaBundler,
         targetPath: genXcodeArtifactsPath,
