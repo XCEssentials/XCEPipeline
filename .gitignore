@@ -151,6 +151,8 @@ Gemfile.lock
 fastlane/Fastfile
 # README.md
 # .swiftlint.yml
+Sources/.swiftlint.yml
+Tests/.swiftlint.yml
 # LICENSE
 # XCEPipeline.podspec
 # _config.yml

@@ -112,6 +112,30 @@ let podspecFileName = cocoaPodsModuleName + ".podspec"
 
 let currentPodVersion: VersionString // will be defined later
 
+let genXcodeArtifactsPath = Path("Xcode")
+
+let symLinkCmd: (String, String) -> String = {
+    
+    """
+    ln -sf "\($0)" "\($1)"
+    """
+}
+
+// NOTE: Origin path MUST be absolute in oreder symlink to work properly
+let linterCfgOriginPath = """
+    \(SwiftLint.fileName)
+    """
+
+let linterCfgSymLinkPath: PerTarget<String, String> = (
+    "\(sourcesPath.main.rawValue)/\(SwiftLint.fileName)",
+    "\(sourcesPath.tst.rawValue)/\(SwiftLint.fileName)"
+)
+
+// NOTE: 'Pods' project!!!
+let genXcodeProjectBeforeExt = """
+    \(genXcodeArtifactsPath.rawValue)/\(cocoaPodsModuleName)/Pods
+    """
+
 let fastlaneFolderPath = Defaults.pathToFastlaneFolder
 
 let fastlaneFolder = try repoFolder
@@ -125,19 +149,19 @@ let dummyFileName = "RemoveMe.swift"
 
 // MARK: Write - Dummy files
 
-try CustomTextFile()
-    .prepare(
-        name: dummyFileName,
-        targetFolder: sourcesFolder.main.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
-
-try CustomTextFile()
-    .prepare(
-        name: dummyFileName,
-        targetFolder: sourcesFolder.tst.path
-    )
-    .writeToFileSystem(ifFileExists: .skip)
+//try CustomTextFile()
+//    .prepare(
+//        name: dummyFileName,
+//        targetFolder: sourcesFolder.main.path
+//    )
+//    .writeToFileSystem(ifFileExists: .skip)
+//
+//try CustomTextFile()
+//    .prepare(
+//        name: dummyFileName,
+//        targetFolder: sourcesFolder.tst.path
+//    )
+//    .writeToFileSystem(ifFileExists: .skip)
 
 // MARK: Write - Bundler - Gemfile
 
@@ -283,105 +307,50 @@ try CocoaPods
         },
         testSubSpecs: {
             
-            // NOTE: excluding watchOS !!!
+//            $0.testSubSpec(tstSuffix){
+//
+//                $0.settings(
+//
+//                    "requires_app_host = false",
+//                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
+//                    "framework = 'XCTest'",
+//                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
+//                )
+//            }
             
-            // had to define independently due to a bug in CocoaPods
-            // https://github.com/CocoaPods/CocoaPods/issues/7174#issuecomment-437743516
-            
-            $0.testSubSpec("\(tstSuffix)-\(OSIdentifier.iOS.rawValue)"){
+            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.iOS.rawValue)"){
                 
                 $0.settings(
                     
                     "platform = :\(OSIdentifier.iOS.cocoaPodsId)",
-                    
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
-                    
-                    // https://github.com/realm/SwiftLint#xcode
-                    "dependency 'SwiftLint'",
-                    
-                    // NOTE: cocoapods-generate will output into './{Some_Subfolder}/{Pod_Name}/'
-                    """
-                    script_phase = {
-                        :name => 'SwiftLint',
-                        :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
-                        :execution_position => :before_compile
-                    }
-                    """,
-                    
-                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
-                    """
-                    pod_target_xcconfig = {
-                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
-                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
-                    }
-                    """
+                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
                 )
             }
             
-            $0.testSubSpec("\(tstSuffix)-\(OSIdentifier.tvOS.rawValue)"){
-
+            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.tvOS.rawValue)"){
+                
                 $0.settings(
-
-                    // NOTE: excluding watchOS !!!
+                    
                     "platform = :\(OSIdentifier.tvOS.cocoaPodsId)",
-
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
-
-                    // https://github.com/realm/SwiftLint#xcode
-                    "dependency 'SwiftLint'",
-
-                    // NOTE: cocoapods-generate will output into './{Some_Subfolder}/{Pod_Name}/'
-                    """
-                    script_phase = {
-                        :name => 'SwiftLint',
-                        :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
-                        :execution_position => :before_compile
-                    }
-                    """,
-
-                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
-                    """
-                    pod_target_xcconfig = {
-                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
-                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
-                    }
-                    """
+                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
                 )
             }
             
-            $0.testSubSpec("\(tstSuffix)-\(OSIdentifier.macOS.rawValue)"){
-
+            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.macOS.rawValue)"){
+                
                 $0.settings(
-
+                    
                     "platform = :\(OSIdentifier.macOS.cocoaPodsId)",
-
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
-
-                    // https://github.com/realm/SwiftLint#xcode
-                    "dependency 'SwiftLint'",
-
-                    // NOTE: cocoapods-generate will output into './{Some_Subfolder}/{Pod_Name}/'
-                    """
-                    script_phase = {
-                        :name => 'SwiftLint',
-                        :script => '"${PODS_ROOT}/SwiftLint/swiftlint" --path ./../../',
-                        :execution_position => :before_compile
-                    }
-                    """,
-
-                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
-                    """
-                    pod_target_xcconfig = {
-                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
-                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
-                    }
-                    """
+                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
                 )
             }
         }
@@ -401,7 +370,58 @@ try Fastlane
     .beforeRelease(
         cocoaPodsModuleName: cocoaPodsModuleName
     )
-    .generateProjectViaCP()
+    .lane("lintThoroughly"){
+        
+        "pod_lib_lint"
+    }
+    .generateProjectViaCP(
+        callCocoaPods: .viaBundler,
+        targetPath: genXcodeArtifactsPath,
+        extraScriptBuildPhases: [
+            
+            .swiftLint(
+                projectName: genXcodeProjectBeforeExt,
+                targetNames: [
+                    
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.iOS.rawValue)",
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.watchOS.rawValue)",
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.tvOS.rawValue)",
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.macOS.rawValue)"
+                ],
+                params: [
+                    
+                    """
+                    --path "${SRCROOT}/../../\(sourcesPath.main.rawValue)"
+                    """
+                ]
+            ),
+            
+            .swiftLint(
+                projectName: genXcodeProjectBeforeExt,
+                targetNames: [
+                    
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.iOS.rawValue)-Unit-\(tstSuffix)",
+                    // NOTE: skip watchOS!
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.tvOS.rawValue)-Unit-\(tstSuffix)",
+                    "\(cocoaPodsModuleName)-\(OSIdentifier.macOS.rawValue)-Unit-\(tstSuffix)"
+                ],
+                params: [
+                
+                    """
+                    --path "${SRCROOT}/../../\(sourcesPath.tst.rawValue)"
+                    """
+                ]
+            )
+        ],
+        endingEntries: [
+            
+            """
+            # NOTE: Origin path MUST be absolute in order the symlink to work properly!
+            sh 'cd ./.. && \(symLinkCmd("$PWD/" + linterCfgOriginPath, linterCfgSymLinkPath.main))'
+            sh 'cd ./.. && \(symLinkCmd("$PWD/" + linterCfgOriginPath, linterCfgSymLinkPath.tst))'
+            """
+        ]
+    )
     .generateProjectViaIce()
     .prepare(
         targetFolder: fastlaneFolder.path
@@ -422,7 +442,8 @@ try GitHub
 try Git
     .RepoIgnore
     .framework(
-        otherEntries: """
+        otherEntries: [
+            """
             # we don't need to store any project files,
             # as we generate them on-demand from specs
             *.xcodeproj
@@ -439,10 +460,13 @@ try Git
             \(fastlaneFolderPath)/\(Fastlane.Fastfile.fileName)
             # \(ReadMe.fileName)
             # \(SwiftLint.fileName)
+            \(linterCfgSymLinkPath.main)
+            \(linterCfgSymLinkPath.tst)
             # \(License.MIT.fileName)
             # \(podspecFileName)
             # \(GitHub.PagesConfig.fileName)
             """
+            ]
     )
     .prepare(
         targetFolder: repoFolder.path
