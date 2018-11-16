@@ -53,9 +53,7 @@ Pod::Spec.new do |s|
         ss.framework = 'XCTest'
         ss.dependency 'SwiftLint'
 
-        # === osx
-
-        ss.osx.pod_target_xcconfig = {
+        ss.pod_target_xcconfig = {
             'EXPANDED_CODE_SIGN_IDENTITY' => '-',
             'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
         }
