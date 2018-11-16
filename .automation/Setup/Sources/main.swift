@@ -347,7 +347,6 @@ try CocoaPods
                 )
                 
                 $0.settings(
-                    for: .macOS,
                     
                     // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
                     """
