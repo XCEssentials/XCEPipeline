@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
     s.name          = 'XCEPipeline'
     s.summary       = 'Custom pipeline operators for easy chaining in Swift.'
-    s.version       = '1.1.0'
+    s.version       = '1.1.1'
     s.homepage      = 'https://XCEssentials.github.io/Pipeline'
 
     s.source        = { :git => 'https://github.com/XCEssentials/Pipeline.git', :tag => s.version }
