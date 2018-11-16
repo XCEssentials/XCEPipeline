@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
     s.name          = 'XCEPipeline'
     s.summary       = 'Custom pipeline operators for easy chaining in Swift.'
-    s.version       = '1.1.1'
+    s.version       = '1.1.2'
     s.homepage      = 'https://XCEssentials.github.io/Pipeline'
 
     s.source        = { :git => 'https://github.com/XCEssentials/Pipeline.git', :tag => s.version }
@@ -52,11 +52,6 @@ Pod::Spec.new do |s|
         ss.source_files = 'Tests/**/*.swift'
         ss.framework = 'XCTest'
         ss.dependency 'SwiftLint'
-
-        ss.pod_target_xcconfig = {
-            'EXPANDED_CODE_SIGN_IDENTITY' => '-',
-            'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
-        }
 
     end # test_spec 'Tests'
 
