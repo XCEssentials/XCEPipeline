@@ -188,7 +188,7 @@ try Bundler
     .Gemfile(
         basicFastlane: true,
         """
-        gem 'cocoapods'
+        gem 'cocoapods', '~> 1.6.0.beta.2'
         gem 'cocoapods-generate'
         """
     )
@@ -344,17 +344,6 @@ try CocoaPods
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
                     "dependency 'SwiftLint'" // we will be running linting from unit tests!
-                )
-                
-                $0.settings(
-                    
-                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
-                    """
-                    pod_target_xcconfig = {
-                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
-                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
-                    }
-                    """
                 )
             }
         }
