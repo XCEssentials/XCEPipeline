@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
     s.name          = 'XCEPipeline'
     s.summary       = 'Custom pipeline operators for easy chaining in Swift.'
-    s.version       = '1.0.9'
+    s.version       = '1.1.0'
     s.homepage      = 'https://XCEssentials.github.io/Pipeline'
 
     s.source        = { :git => 'https://github.com/XCEssentials/Pipeline.git', :tag => s.version }
@@ -23,10 +23,6 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = '9.0'
 
-    # === watchos
-
-    s.watchos.deployment_target = '3.0'
-
     # === tvos
 
     s.tvos.deployment_target = '9.0'
@@ -39,38 +35,31 @@ Pod::Spec.new do |s|
 
     s.subspec 'Core' do |ss|
 
-        ss.source_files = 'Sources/**/*.swift'
+        ss.source_files = 'Sources/Core/**/*.swift'
 
     end # subspec 'Core'
 
-    s.test_spec 'Tests-iOS' do |ss|
+    s.subspec 'Operators' do |ss|
 
-        ss.platform = :ios
+        ss.dependency 'XCEPipeline/Core'
+        ss.source_files = 'Sources/Operators/**/*.swift'
+
+    end # subspec 'Operators'
+
+    s.test_spec 'Tests' do |ss|
+
         ss.requires_app_host = false
         ss.source_files = 'Tests/**/*.swift'
         ss.framework = 'XCTest'
         ss.dependency 'SwiftLint'
 
-    end # test_spec 'Tests-iOS'
+        # === osx
 
-    s.test_spec 'Tests-tvOS' do |ss|
+        ss.osx.pod_target_xcconfig = {
+            'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+            'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+        }
 
-        ss.platform = :tvos
-        ss.requires_app_host = false
-        ss.source_files = 'Tests/**/*.swift'
-        ss.framework = 'XCTest'
-        ss.dependency 'SwiftLint'
-
-    end # test_spec 'Tests-tvOS'
-
-    s.test_spec 'Tests-macOS' do |ss|
-
-        ss.platform = :osx
-        ss.requires_app_host = false
-        ss.source_files = 'Tests/**/*.swift'
-        ss.framework = 'XCTest'
-        ss.dependency 'SwiftLint'
-
-    end # test_spec 'Tests-macOS'
+    end # test_spec 'Tests'
 
 end # spec s

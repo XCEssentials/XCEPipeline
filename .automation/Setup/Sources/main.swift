@@ -108,6 +108,24 @@ let sourcesFolder: PerTarget<Folder, Folder> = try (
         )
 )
 
+enum PodSubSpecs: String
+{
+    case core
+    case operators
+    
+    var name: String
+    {
+        return self.rawValue.capitalized
+    }
+    
+    var path: Path
+    {
+        return .init(arrayLiteral:
+            sourcesPath.main.rawValue, self.rawValue.capitalized, "**", "*.swift"
+        )
+    }
+}
+
 let podspecFileName = cocoaPodsModuleName + ".podspec"
 
 let currentPodVersion: VersionString // will be defined later
@@ -170,7 +188,7 @@ try Bundler
     .Gemfile(
         basicFastlane: true,
         """
-        gem 'cocoapods', '1.6.0.beta.2'
+        gem 'cocoapods'
         gem 'cocoapods-generate'
         """
     )
@@ -283,11 +301,7 @@ try CocoaPods
             $0.settings(
                 for: depTargets.iOS
             )
-            
-            $0.settings(
-                for: depTargets.watchOS
-            )
-            
+
             $0.settings(
                 for: depTargets.tvOS
             )
@@ -298,59 +312,50 @@ try CocoaPods
         },
         subSpecs: {
             
-            $0.subSpec("Core"){
+            $0.subSpec(PodSubSpecs.core.name){
                 
                 $0.settings(
-                    "source_files = '\(sourcesPath.main)/**/*.swift'"
+                    """
+                    source_files = '\(PodSubSpecs.core.path)'
+                    """
+                )
+            }
+            
+            $0.subSpec(PodSubSpecs.operators.name){
+                
+                $0.settings(
+                    """
+                    dependency '\(cocoaPodsModuleName)/\(PodSubSpecs.core.name)'
+                    """,
+                    
+                    """
+                    source_files = '\(PodSubSpecs.operators.path)'
+                    """
                 )
             }
         },
         testSubSpecs: {
             
-//            $0.testSubSpec(tstSuffix){
-//
-//                $0.settings(
-//
-//                    "requires_app_host = false",
-//                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
-//                    "framework = 'XCTest'",
-//                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
-//                )
-//            }
-            
-            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.iOS.rawValue)"){
-                
+            $0.testSubSpec(tstSuffix){
+
                 $0.settings(
-                    
-                    "platform = :\(OSIdentifier.iOS.cocoaPodsId)",
+
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
                     "dependency 'SwiftLint'" // we will be running linting from unit tests!
                 )
-            }
-            
-            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.tvOS.rawValue)"){
                 
                 $0.settings(
+                    for: .macOS,
                     
-                    "platform = :\(OSIdentifier.tvOS.cocoaPodsId)",
-                    "requires_app_host = false",
-                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
-                    "framework = 'XCTest'",
-                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
-                )
-            }
-            
-            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.macOS.rawValue)"){
-                
-                $0.settings(
-                    
-                    "platform = :\(OSIdentifier.macOS.cocoaPodsId)",
-                    "requires_app_host = false",
-                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
-                    "framework = 'XCTest'",
-                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
+                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
+                    """
+                    pod_target_xcconfig = {
+                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+                    }
+                    """
                 )
             }
         }
