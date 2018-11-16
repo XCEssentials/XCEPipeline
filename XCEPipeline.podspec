@@ -23,10 +23,6 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = '9.0'
 
-    # === watchos
-
-    s.watchos.deployment_target = '3.0'
-
     # === tvos
 
     s.tvos.deployment_target = '9.0'
@@ -50,34 +46,20 @@ Pod::Spec.new do |s|
 
     end # subspec 'Operators'
 
-    s.test_spec 'Tests-iOS' do |ss|
+    s.test_spec 'Tests' do |ss|
 
-        ss.platform = :ios
         ss.requires_app_host = false
         ss.source_files = 'Tests/**/*.swift'
         ss.framework = 'XCTest'
         ss.dependency 'SwiftLint'
 
-    end # test_spec 'Tests-iOS'
+        # === osx
 
-    s.test_spec 'Tests-tvOS' do |ss|
+        ss.osx.pod_target_xcconfig = {
+            'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+            'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+        }
 
-        ss.platform = :tvos
-        ss.requires_app_host = false
-        ss.source_files = 'Tests/**/*.swift'
-        ss.framework = 'XCTest'
-        ss.dependency 'SwiftLint'
-
-    end # test_spec 'Tests-tvOS'
-
-    s.test_spec 'Tests-macOS' do |ss|
-
-        ss.platform = :osx
-        ss.requires_app_host = false
-        ss.source_files = 'Tests/**/*.swift'
-        ss.framework = 'XCTest'
-        ss.dependency 'SwiftLint'
-
-    end # test_spec 'Tests-macOS'
+    end # test_spec 'Tests'
 
 end # spec s

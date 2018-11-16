@@ -188,7 +188,7 @@ try Bundler
     .Gemfile(
         basicFastlane: true,
         """
-        gem 'cocoapods', '1.6.0.beta.2'
+        gem 'cocoapods'
         gem 'cocoapods-generate'
         """
     )
@@ -301,11 +301,7 @@ try CocoaPods
             $0.settings(
                 for: depTargets.iOS
             )
-            
-            $0.settings(
-                for: depTargets.watchOS
-            )
-            
+
             $0.settings(
                 for: depTargets.tvOS
             )
@@ -340,50 +336,26 @@ try CocoaPods
         },
         testSubSpecs: {
             
-//            $0.testSubSpec(tstSuffix){
-//
-//                $0.settings(
-//
-//                    "requires_app_host = false",
-//                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
-//                    "framework = 'XCTest'",
-//                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
-//                )
-//            }
-            
-            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.iOS.rawValue)"){
-                
+            $0.testSubSpec(tstSuffix){
+
                 $0.settings(
-                    
-                    "platform = :\(OSIdentifier.iOS.cocoaPodsId)",
+
                     "requires_app_host = false",
                     "source_files = '\(sourcesPath.tst)/**/*.swift'",
                     "framework = 'XCTest'",
                     "dependency 'SwiftLint'" // we will be running linting from unit tests!
                 )
-            }
-            
-            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.tvOS.rawValue)"){
                 
                 $0.settings(
+                    for: .macOS,
                     
-                    "platform = :\(OSIdentifier.tvOS.cocoaPodsId)",
-                    "requires_app_host = false",
-                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
-                    "framework = 'XCTest'",
-                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
-                )
-            }
-            
-            $0.testSubSpec(tstSuffix + "-\(OSIdentifier.macOS.rawValue)"){
-                
-                $0.settings(
-                    
-                    "platform = :\(OSIdentifier.macOS.cocoaPodsId)",
-                    "requires_app_host = false",
-                    "source_files = '\(sourcesPath.tst)/**/*.swift'",
-                    "framework = 'XCTest'",
-                    "dependency 'SwiftLint'" // we will be running linting from unit tests!
+                    // https://github.com/CocoaPods/CocoaPods/issues/7708#issuecomment-424392893
+                    """
+                    pod_target_xcconfig = {
+                        'EXPANDED_CODE_SIGN_IDENTITY' => '-',
+                        'EXPANDED_CODE_SIGN_IDENTITY_NAME' => '-'
+                    }
+                    """
                 )
             }
         }
