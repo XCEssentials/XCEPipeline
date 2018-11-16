@@ -39,9 +39,16 @@ Pod::Spec.new do |s|
 
     s.subspec 'Core' do |ss|
 
-        ss.source_files = 'Sources/**/*.swift'
+        ss.source_files = 'Sources/Core/**/*.swift'
 
     end # subspec 'Core'
+
+    s.subspec 'Operators' do |ss|
+
+        ss.dependency 'XCEPipeline/Core'
+        ss.source_files = 'Sources/Operators/**/*.swift'
+
+    end # subspec 'Operators'
 
     s.test_spec 'Tests-iOS' do |ss|
 

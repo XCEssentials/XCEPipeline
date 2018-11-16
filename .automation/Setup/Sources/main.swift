@@ -108,6 +108,24 @@ let sourcesFolder: PerTarget<Folder, Folder> = try (
         )
 )
 
+enum PodSubSpecs: String
+{
+    case core
+    case operators
+    
+    var name: String
+    {
+        return self.rawValue.capitalized
+    }
+    
+    var path: Path
+    {
+        return .init(arrayLiteral:
+            sourcesPath.main.rawValue, self.rawValue.capitalized, "**", "*.swift"
+        )
+    }
+}
+
 let podspecFileName = cocoaPodsModuleName + ".podspec"
 
 let currentPodVersion: VersionString // will be defined later
@@ -298,10 +316,25 @@ try CocoaPods
         },
         subSpecs: {
             
-            $0.subSpec("Core"){
+            $0.subSpec(PodSubSpecs.core.name){
                 
                 $0.settings(
-                    "source_files = '\(sourcesPath.main)/**/*.swift'"
+                    """
+                    source_files = '\(PodSubSpecs.core.path)'
+                    """
+                )
+            }
+            
+            $0.subSpec(PodSubSpecs.operators.name){
+                
+                $0.settings(
+                    """
+                    dependency '\(cocoaPodsModuleName)/\(PodSubSpecs.core.name)'
+                    """,
+                    
+                    """
+                    source_files = '\(PodSubSpecs.operators.path)'
+                    """
                 )
             }
         },
