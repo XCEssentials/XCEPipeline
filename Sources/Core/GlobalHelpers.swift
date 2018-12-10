@@ -107,7 +107,7 @@ func unwrapOrThrow<T>(
 }
 
 public
-func unwrapOrThrow<T>(
+func throwIfNil<T>(
     _ error: Error = PipelineUnwrapOptionalError()
     ) -> (T?) throws -> Void
 {
