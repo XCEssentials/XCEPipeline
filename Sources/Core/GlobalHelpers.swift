@@ -79,6 +79,33 @@ func use<T>(
     return { body($0); return $0 }
 }
 
+// MARK: - Unwrap
+
+public
+struct PipelineUnwrapOptionalError: Error
+{
+    public
+    init() { }
+}
+
+public
+func unwrapOrThrow<T>(
+    _ error: Error = PipelineUnwrapOptionalError()
+    ) -> (T?) throws -> T
+{
+    return {
+        
+        switch $0
+        {
+        case .some(let value):
+            return value
+            
+        case .none:
+            throw error
+        }
+    }
+}
+
 // MARK: - Ensure
 
 /**
