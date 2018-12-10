@@ -106,6 +106,21 @@ func unwrapOrThrow<T>(
     }
 }
 
+public
+func unwrapOrThrow<T>(
+    _ error: Error = PipelineUnwrapOptionalError()
+    ) -> (T?) throws -> Void
+{
+    return {
+        
+        if
+            case .none = $0
+        {
+            throw error
+        }
+    }
+}
+
 // MARK: - Ensure
 
 /**
