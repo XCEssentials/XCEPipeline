@@ -1,0 +1,130 @@
+# Customise this file, documentation can be found here:
+# https://github.com/KrauseFx/fastlane/tree/master/docs
+# All available actions: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+# More information about multiple platforms in fastlane: https://github.com/KrauseFx/fastlane/blob/master/docs/Platforms.md
+# All available actions: https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md
+
+# By default, fastlane will send which actions are used
+# No personal data is shared, more information on https://github.com/fastlane/enhancer
+# Uncomment the following line to opt out
+# opt_out_usage
+
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
+# This is the minimum version number required.
+# Update this, if you use features of a newer version
+fastlane_version '2.100.0'
+
+lane :beforeRelease do
+
+    ensure_git_branch(
+        branch: '(release/*|hotfix/*)'
+    )
+
+    ensure_git_status_clean
+
+    # ===
+
+    pod_lib_lint(
+        allow_warnings: true,
+        quick: true
+    )
+
+    # === Remember current version number
+
+    versionNumber = version_get_podspec(
+        path: 'XCEPipeline.podspec'
+    )
+
+    puts 'Current VERSION number: ' + versionNumber
+
+    # === Infer new version number
+
+    newVersionNumber = git_branch.split('/').last
+
+    puts 'New VERSION number: ' + newVersionNumber
+
+    # === Bump version number & commit changes
+
+    version_bump_podspec(
+        path: 'XCEPipeline.podspec',
+        version_number: newVersionNumber
+    )
+
+    git_commit(
+        path: 'XCEPipeline.podspec',
+        message: 'Version Bump to ' + newVersionNumber + ' in Podspec file'
+    )
+
+end # lane :beforeRelease
+
+lane :lintThoroughly do
+
+    pod_lib_lint
+
+end # lane :lintThoroughly
+
+lane :generateProjectViaCP do
+
+    # === Regenerate project
+
+    # default initial location for any command
+    # is inside 'Fastlane' folder
+
+    sh 'cd ./.. && rm -rf "Xcode" && bundle exec pod gen --gen-directory="Xcode"'
+
+    # === Build Phase Script - SwiftLint | 'XCEPipeline-tvOS-Unit-AllTests', 'XCEPipeline-macOS-Unit-AllTests', 'XCEPipeline-iOS-Unit-AllTests' | ./../Xcode/XCEPipeline/Pods.xcodeproj
+
+    begin
+
+        project = Xcodeproj::Project.open("./../Xcode/XCEPipeline/Pods.xcodeproj")
+
+    rescue => ex
+
+        # https://github.com/fastlane/fastlane/issues/7944#issuecomment-274232674
+        UI.error ex
+        UI.error("Failed to add Build Phase Script - SwiftLint | 'XCEPipeline-tvOS-Unit-AllTests', 'XCEPipeline-macOS-Unit-AllTests', 'XCEPipeline-iOS-Unit-AllTests' | ./../Xcode/XCEPipeline/Pods.xcodeproj")
+
+    end
+
+    project
+        .targets
+        .select{ |t| ['XCEPipeline-tvOS-Unit-AllTests', 'XCEPipeline-macOS-Unit-AllTests', 'XCEPipeline-iOS-Unit-AllTests'].include?(t.name) }
+        .each{ |t|
+
+            thePhase = t.shell_script_build_phases.find { |s| s.name == "SwiftLint" }
+
+            unless thePhase.nil?
+                t.build_phases.delete(thePhase)
+            end
+
+            thePhase = t.new_shell_script_build_phase("SwiftLint")
+            thePhase.shell_script = '"SwiftLint/swiftlint" --path "${SRCROOT}/../../Sources"'
+            # thePhase.run_only_for_deployment_postprocessing = ...
+
+            t.build_phases.unshift(t.build_phases.delete(thePhase)) # move to top
+
+        }
+
+    project.save()
+
+    UI.success("Added Build Phase Script - SwiftLint | 'XCEPipeline-tvOS-Unit-AllTests', 'XCEPipeline-macOS-Unit-AllTests', 'XCEPipeline-iOS-Unit-AllTests' | ./../Xcode/XCEPipeline/Pods.xcodeproj")
+
+end # lane :generateProjectViaCP
+
+lane :generateProjectViaSwiftPM do
+
+    # === Regenerate project
+
+    # default initial location for any command
+    # is inside 'Fastlane' folder
+
+    sh 'cd ./.. && rm -rf ".build" && rm -rf "XCEPipeline.xcodeproj" && swift package generate-xcodeproj'
+
+end # lane :generateProjectViaSwiftPM

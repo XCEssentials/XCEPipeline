@@ -31,7 +31,7 @@ import XCEPipeline
 
 //---
 
-class MainTests: XCTestCase
+class AllTests: XCTestCase
 {
     func testBasics()
     {
