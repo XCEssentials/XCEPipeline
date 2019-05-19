@@ -27,11 +27,16 @@
 import XCTest
 
 //@testable
+#if COCOAPODS
 import XCEPipeline
+#else
+import XCEPipelineCore
+import XCEPipelineOperators
+#endif
 
 //---
 
-class MainTests: XCTestCase
+class AllTests: XCTestCase
 {
     func testBasics()
     {

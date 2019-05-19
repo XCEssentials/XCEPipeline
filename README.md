@@ -8,10 +8,10 @@
 
 # Pipeline
 
-Custom pipeline operators for easy chaining in Swift.
+Custom pipeline operators for easy chaining in Swift
 
 ```swift
-22 ./ { "\($0)" } ./ { print($0) }
+22 ./ Utils.funcThatConvertsIntIntoString ./ { print($0) }
 ```
 
 See more examples of usage in unit tests.

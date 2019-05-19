@@ -24,6 +24,10 @@
 
  */
 
+#if !COCOAPODS
+import XCEPipelineCore
+#endif
+
 // MARK: - Precedence
 
 precedencegroup CompositionPrecedence {
