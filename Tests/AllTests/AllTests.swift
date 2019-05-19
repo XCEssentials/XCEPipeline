@@ -27,7 +27,12 @@
 import XCTest
 
 //@testable
+#if COCOAPODS
 import XCEPipeline
+#else
+import XCEPipelineCore
+import XCEPipelineOperators
+#endif
 
 //---
 
