@@ -1,0 +1,36 @@
+# https://docs.travis-ci.com/user/customizing-the-build/
+# https://docs.travis-ci.com/user/job-lifecycle/#the-job-lifecycle
+# https://docs.travis-ci.com/user/languages/objective-c/
+
+branches:
+  only:
+  - master
+  - /^hotfix.*$/
+  - /^release.*$/
+  - /^feature.*$/
+
+git:
+  depth: 3
+  submodules: false
+
+language: objective-c # fine for Swift as well
+
+osx_image:
+  - xcode10.2
+  - xcode10.1
+
+before_install:
+ - bundle install --path .vendor/bundle --jobs=3 --retry=3 --deployment
+ - bundle exec pod repo update
+
+install:
+ - bundle exec pod install
+
+before_script:
+  # cd ./.setup && swift run && cd ./.. # RUN this manually!
+  - bundle exec fastlane generateProjectViaSwiftPM
+  - swift --version
+
+xcode_project: XCEPipeline.xcodeproj
+xcode_scheme: XCEPipeline-Package
+xcode_destination: platform=macOS
