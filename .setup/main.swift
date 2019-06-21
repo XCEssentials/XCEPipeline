@@ -402,17 +402,12 @@ try CustomTextFile("""
      - bundle install --path .vendor/bundle --jobs=3 --retry=3 --deployment
      - bundle exec pod repo update
 
-    install:
-     - bundle exec pod install
-
     before_script:
       # cd ./.setup && swift run && cd ./.. # RUN this manually!
-      - bundle exec fastlane generateProjectViaSwiftPM
       - swift --version
 
-    xcode_project: \(cocoaPod.product.name).\(Xcode.Project.extension)
-    xcode_scheme: \(cocoaPod.product.name)-Package
-    xcode_destination: platform=macOS
+    script:
+      - bundle exec fastlane lintThoroughly
     
     """
     )
