@@ -94,12 +94,10 @@ func unwrapOrThrow<T>(
     ) -> (T?) throws -> T
 {
     return {
-        
         switch $0
         {
         case .some(let value):
             return value
-            
         case .none:
             throw error
         }
@@ -112,7 +110,6 @@ func throwIfNil<T>(
     ) -> (T?) throws -> Void
 {
     return {
-        
         if
             case .none = $0
         {
@@ -151,7 +148,6 @@ func ensure<T>(
     ) -> (T) throws -> T
 {
     return {
-
         if
             body($0)
         {
