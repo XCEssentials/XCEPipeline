@@ -252,10 +252,7 @@ try Fastlane
     .lane("lintThoroughly"){
 
         """
-        pod_lib_lint(
-            verbose: true,
-            allow_warnings: true
-        )
+        pod_lib_lint()
         """
     }
     .generateProjectViaCP(
@@ -400,14 +397,13 @@ try CustomTextFile("""
     language: objective-c # fine for Swift as well
 
     osx_image:
-      - xcode10.2
       - xcode10.1
 
     before_install:
-     - bundle install --path .vendor/bundle --jobs=3 --retry=3 --deployment
-     - bundle exec pod repo update
+     - bundle install --jobs=3 --retry=3 --deployment --path .vendor/bundle
 
-    install: false
+    install:
+      - bundle exec pod repo update
 
     before_script:
       # cd ./.setup && swift run && cd ./.. # RUN this manually!
