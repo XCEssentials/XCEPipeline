@@ -402,6 +402,8 @@ try CustomTextFile("""
      - bundle install --path .vendor/bundle --jobs=3 --retry=3 --deployment
      - bundle exec pod repo update
 
+    install: false
+
     before_script:
       # cd ./.setup && swift run && cd ./.. # RUN this manually!
       - swift --version
