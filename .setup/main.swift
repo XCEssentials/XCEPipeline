@@ -251,7 +251,12 @@ try Fastlane
     )
     .lane("lintThoroughly"){
 
-        "pod_lib_lint"
+        """
+        pod_lib_lint(
+            verbose: true,
+            allow_warnings: true
+        )
+        """
     }
     .generateProjectViaCP(
         callCocoaPods: .viaBundler,
