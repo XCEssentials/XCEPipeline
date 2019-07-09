@@ -94,16 +94,6 @@ try allSubspecs
             )
     }
 
-// MARK: Write - Bundler - Gemfile
-
-// https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
-try Bundler
-    .Gemfile(
-        basicFastlane: true
-    )
-    .prepare()
-    .writeToFileSystem()
-
 // MARK: Write - ReadMe
 
 try ReadMe()
@@ -149,27 +139,6 @@ try License
     .prepare()
     .writeToFileSystem()
 
-// MARK: Write - Fastlane - Fastfile
-
-try Fastlane
-    .Fastfile
-    .ForLibrary()
-    .defaultHeader()
-    .beforeRelease(
-        podspecLocation: .from(cocoaPod)
-    )
-    .lane("lintThoroughly"){
-
-        """
-        pod_lib_lint()
-        """
-    }
-    .generateProjectViaSwiftPM(
-        for: cocoaPod
-    )
-    .prepare()
-    .writeToFileSystem()
-
 // MARK: Write - GitHub - PagesConfig
 
 try GitHub
@@ -187,10 +156,6 @@ try Git
             # we don't need to store any project files,
             # as we generate them on-demand from specs
             *.\(Xcode.Project.extension)
-            
-            # Bundler related
-            .bundle
-            .vendor
             """
         ]
     )

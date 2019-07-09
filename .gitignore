@@ -139,10 +139,6 @@ fastlane/test_output
 # as we generate them on-demand from specs
 *.xcodeproj
 
-# Bundler related
-.bundle
-.vendor
-
 ### Custom repo-specific ###
 # ==========
 #
