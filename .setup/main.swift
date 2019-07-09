@@ -149,15 +149,16 @@ try GitHub
 // MARK: Write - Git - .gitignore
 
 try Git
-    .RepoIgnore
-    .framework(
-        otherEntries: [
-            """
-            # we don't need to store any project files,
-            # as we generate them on-demand from specs
-            *.\(Xcode.Project.extension)
-            """
-        ]
+    .RepoIgnore()
+    .addMacOSSection()
+    .addCocoaSection()
+    .addSwiftPackageManagerSection(ignoreSources: true)
+    .add(
+        """
+        # we don't need to store project file,
+        # as we generate it on-demand
+        *.\(Xcode.Project.extension)
+        """
     )
     .prepare()
     .writeToFileSystem()
