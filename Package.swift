@@ -10,34 +10,20 @@ let package = Package(
             targets: [
                 "XCEPipelineCore"
             ]
-        ),
-        .library(
-            name: "XCEPipelineWithOperators",
-            targets: [
-                "XCEPipelineOperators"
-            ]
-        ),
+        )
     ],
     targets: [
         .target(
             name: "XCEPipelineCore",
             path: "Sources/Core"
         ),
-        .target(
-            name: "XCEPipelineOperators",
-            dependencies: [
-                "XCEPipelineCore"
-            ],
-            path: "Sources/Operators"
-        ),
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipelineCore",
-                "XCEPipelineOperators"
+                "XCEPipelineCore"
             ],
             path: "Tests/AllTests"
         ),
     ],
-    swiftLanguageVersions: [.v4, .v4_2]
+    swiftLanguageVersions: [.version("4.2")]
 )

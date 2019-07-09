@@ -12,15 +12,13 @@ print("--- BEGIN of '\(Executable.name)' script ---")
 // MARK: Parameters
 
 Spec.BuildSettings.swiftVersion.value = "4.2"
-let swiftLanguageVersionsForSPM = "[.v4, .v4_2]"
 
 let localRepo = try Spec.LocalRepo.current()
 
 let remoteRepo = try Spec.RemoteRepo()
 
 let company = try Spec.Company(
-    prefix: "XCE",
-    identifier: "com.\(remoteRepo.accountName)"
+    prefix: "XCE"
 )
 
 let project = try Spec.Project(
@@ -28,45 +26,92 @@ let project = try Spec.Project(
     copyrightYear: 2018,
     deploymentTargets: [
         .iOS : "9.0",
-        //.watchOS : "3.0", // be prepared to fail 'pod lib lint' if uncomment!
+        .watchOS : "3.0",
         .tvOS : "9.0",
         .macOS : "10.11"
     ]
 )
 
-var cocoaPod = try Spec.CocoaPod(
-    companyInfo: .from(company),
-    productInfo: .from(project),
-    authors: [
-        ("Maxim Khatskevich", "maxim@khatskevi.ch")
-    ]
+let product = (
+    name: company.prefix + project.name,
+    none: ()
 )
+
+let authors = [
+    ("Maxim Khatskevich", "maxim@khatskevi.ch")
+    ]
+
+//var cocoaPod = try Spec.CocoaPod(
+//    companyInfo: .from(company),
+//    productInfo: .from(project),
+//    authors: [
+//        ("Maxim Khatskevich", "maxim@khatskevi.ch")
+//    ]
+//)
+
+struct SubSpec
+{
+    let name: String
+    let isTests: Bool
+    
+    var target: String
+    {
+        return product.name + name
+    }
+    
+    var sourcesPath: Path
+    {
+        return (isTests ? Spec.Locations.tests : Spec.Locations.sources) + name
+    }
+    
+    init(
+        _ name: String,
+        isTests: Bool = false
+        )
+    {
+        self.name = name
+        self.isTests = isTests
+    }
+    
+    static
+    func tests(
+        _ name: String = "AllTests"
+        ) -> SubSpec
+    {
+        return .init(
+            name,
+            isTests: true
+        )
+    }
+    
+}
 
 let subSpecs = (
-    core: Spec.CocoaPod.SubSpec("Core"),
-    operators: Spec.CocoaPod.SubSpec("Operators"),
-    tests: Spec.CocoaPod.SubSpec.tests()
+    core: SubSpec("Core"),
+    tests: SubSpec.tests()
 )
 
-let allSubspecs = try Spec
-    .CocoaPod
-    .SubSpec
-    .extractAll(from: subSpecs)
+//let subSpecs = (
+//    core: Spec.CocoaPod.SubSpec("Core"),
+//    operators: Spec.CocoaPod.SubSpec("Operators"),
+//    tests: Spec.CocoaPod.SubSpec.tests()
+//)
 
-let targetsSPM = (
-    core: (
-        productName: cocoaPod.product.name,
-        name: cocoaPod.product.name + subSpecs.core.name
-    ),
-    operators: (
-        productName: cocoaPod.product.name + "WithOperators",
-        name: cocoaPod.product.name + subSpecs.operators.name
-    ),
-    allTests: (
-        name: cocoaPod.product.name + subSpecs.tests.name,
-        none: ()
-    )
-)
+//let allSubspecs = try Spec
+//    .CocoaPod
+//    .SubSpec
+//    .extractAll(from: subSpecs)
+
+//let targetsSPM = (
+//    core: (
+//        productName: cocoaPod.product.name,
+//        name: cocoaPod.product.name + subSpecs.core.name
+//    ),
+//    allTests: (
+//        name: cocoaPod.product.name + subSpecs.tests.name,
+//        none: ()
+//    )
+//)
 
 // MARK: Parameters - Summary
 
@@ -79,7 +124,10 @@ project.report()
 
 // MARK: Write - Dummy files
 
-try allSubspecs
+try [
+    subSpecs.core,
+    subSpecs.tests
+    ]
     .forEach{
     
         try CustomTextFile
@@ -87,7 +135,7 @@ try allSubspecs
                 "//"
             )
             .prepare(
-                at: $0.sourcesLocation + ["\($0.name).swift"]
+                at: $0.sourcesPath + ["\($0.name).swift"]
             )
             .writeToFileSystem(
                 ifFileExists: .skip
@@ -134,7 +182,7 @@ try ReadMe()
 try License
     .MIT(
         copyrightYear: project.copyrightYear,
-        copyrightEntity: cocoaPod.authors[0].name
+        copyrightEntity: authors.map{ $0.0 }.joined(separator: ", ")
     )
     .prepare()
     .writeToFileSystem()
@@ -171,43 +219,29 @@ try CustomTextFile("""
     import PackageDescription
 
     let package = Package(
-        name: "\(cocoaPod.product.name)",
+        name: "\(product.name)",
         products: [
             .library(
-                name: "\(targetsSPM.core.productName)",
+                name: "\(product.name)",
                 targets: [
-                    "\(targetsSPM.core.name)"
+                    "\(subSpecs.core.target)"
                 ]
-            ),
-            .library(
-                name: "\(targetsSPM.operators.productName)",
-                targets: [
-                    "\(targetsSPM.operators.name)"
-                ]
-            ),
+            )
         ],
         targets: [
             .target(
-                name: "\(targetsSPM.core.name)",
-                path: "\(subSpecs.core.sourcesLocation)"
-            ),
-            .target(
-                name: "\(targetsSPM.operators.name)",
-                dependencies: [
-                    "\(targetsSPM.core.name)"
-                ],
-                path: "\(subSpecs.operators.sourcesLocation)"
+                name: "\(subSpecs.core.target)",
+                path: "\(subSpecs.core.sourcesPath)"
             ),
             .testTarget(
-                name: "\(targetsSPM.allTests.name)",
+                name: "\(subSpecs.tests.target)",
                 dependencies: [
-                    "\(targetsSPM.core.name)",
-                    "\(targetsSPM.operators.name)"
+                    "\(subSpecs.core.target)"
                 ],
-                path: "\(subSpecs.tests.sourcesLocation)"
+                path: "\(subSpecs.tests.sourcesPath)"
             ),
         ],
-        swiftLanguageVersions: \(swiftLanguageVersionsForSPM)
+        swiftLanguageVersions: [.version("\(Spec.BuildSettings.swiftVersion.value)")]
     )
     """
     )
