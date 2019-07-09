@@ -49,7 +49,6 @@ Pod::Spec.new do |s|
     s.test_spec 'AllTests' do |ss|
 
         ss.requires_app_host = false
-        ss.dependency 'SwiftLint'
         ss.source_files = 'Tests/AllTests/**/*'
 
     end # test_spec 'AllTests'
