@@ -50,9 +50,9 @@ extension Pipeline
      Takes `input` and passes it into `body` and returns result.
      */
     static
-    func next<T, U>(
+    func take<T, U>(
         _ input: T,
-        _ body: (T) throws -> U
+        map body: (T) throws -> U
         ) rethrows -> U
     {
         return try body(input)
@@ -64,9 +64,9 @@ extension Pipeline
      `Optional.map(...)` function.
      */
     static
-    func next<T, U>(
+    func take<T, U>(
         _ input: T?,
-        _ body: (T) throws -> U
+        map body: (T) throws -> U
         ) rethrows -> U?
     {
         return try input.map(body)
@@ -79,9 +79,9 @@ extension Pipeline
      next step taking no input (Void).
      */
     static
-    func end<T>(
+    func take<T>(
         _ input: T,
-        _ body: (T) throws -> Void
+        end body: (T) throws -> Void
         ) rethrows
     {
         try body(input)
@@ -95,9 +95,9 @@ extension Pipeline
      next step taking no input (Void).
      */
     static
-    func end<T>(
+    func take<T>(
         _ input: T?,
-        _ body: (T) throws -> Void
+        end body: (T) throws -> Void
         ) rethrows
     {
         try input.map(body)

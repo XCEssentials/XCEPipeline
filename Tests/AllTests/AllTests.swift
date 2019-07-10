@@ -49,12 +49,12 @@ class AllTests: XCTestCase
 
     func testMutate()
     {
-        22 ./ mutate{ $0 += 1 } ./ { XCTAssert($0 == 23) }
+        22 ./ Pipeline.mutate{ $0 += 1 } ./ { XCTAssert($0 == 23) }
     }
 
     func testUse()
     {
-        22 ./ use{ print($0) } ./ { XCTAssert($0 == 22) }
+        22 ./ Pipeline.use{ print($0) } ./ { XCTAssert($0 == 22) }
     }
 
     func testEnsure()
@@ -62,10 +62,10 @@ class AllTests: XCTestCase
         do
         {
             try 22
-                ./ ensure{ _ in throw PipelineError.unsatisfiedCondition(message: "XYZ") }
+                ./ Pipeline.ensure{ _ in throw Pipeline.Error.unsatisfiedCondition(message: "XYZ") }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch PipelineError.unsatisfiedCondition(let message)
+        catch Pipeline.Error.unsatisfiedCondition(let message)
         {
             XCTAssert(message == "XYZ")
         }
@@ -78,7 +78,7 @@ class AllTests: XCTestCase
 
         do
         {
-            try 22 ./ ensure{ $0 == 22 } ./ { XCTAssert($0 == 22) }
+            try 22 ./ Pipeline.ensure{ $0 == 22 } ./ { XCTAssert($0 == 22) }
         }
         catch
         {
@@ -90,10 +90,10 @@ class AllTests: XCTestCase
         do
         {
             try 22
-                ./ ensure("Must be 1"){ $0 == 1 }
+                ./ Pipeline.ensure("Must be 1"){ $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch PipelineError.unsatisfiedCondition(let message)
+        catch Pipeline.Error.unsatisfiedCondition(let message)
         {
             XCTAssert(message == "Must be 1")
         }

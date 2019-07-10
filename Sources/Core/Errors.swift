@@ -25,28 +25,32 @@
  */
 
 public
-enum PipelineError: Error
+extension Pipeline
 {
-    case unsatisfiedCondition(
-        message: String
-    )
+    enum Error: Swift.Error
+    {
+        case unsatisfiedCondition(
+            message: String
+        )
+        
+        case emptyOptional
+    }
 }
 
 //---
 
 //internal
-extension PipelineError
+extension Pipeline.Error
 {
     static
     func conditionFailed(
-        // swiftlint:disable:next large_tuple
         context: (
             file: String,
             line: Int,
             function: String
         ),
         _ message: String?
-        ) -> PipelineError
+        ) -> Pipeline.Error
     {
         let defaultMessage = "Failed condition @ \(context.file)"
             + ":\(context.line)"
