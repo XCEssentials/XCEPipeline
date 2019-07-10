@@ -11,7 +11,8 @@ print("--- BEGIN of '\(Executable.name)' script ---")
 
 // MARK: Parameters
 
-Spec.BuildSettings.swiftVersion.value = "4.2"
+Spec.BuildSettings.swiftVersion.value = "5.0"
+let swiftLangVersions = "[.v5]"
 
 let localRepo = try Spec.LocalRepo.current()
 
@@ -108,6 +109,13 @@ try ReadMe()
     .addWrittenInSwiftBadge(
         version: Spec.BuildSettings.swiftVersion.value
     )
+    .addStaticShieldsBadge(
+        "platforms",
+        status: "macOS | iOS | tvOS | watchOS | Linux",
+        color: "blue",
+        title: "Supported platforms",
+        link: "Package.swift"
+    )
     .add("""
 
         # \(project.name)
@@ -191,7 +199,7 @@ try CustomTextFile("""
                 path: "\(sourcesLocations.tests)"
             ),
         ],
-        swiftLanguageVersions: [.version("\(Spec.BuildSettings.swiftVersion.value)")]
+        swiftLanguageVersions: \(swiftLangVersions)
     )
     """
     )
