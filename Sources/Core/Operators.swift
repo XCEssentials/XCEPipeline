@@ -39,6 +39,8 @@ infix operator .| : CompositionPrecedence // pass & stop chain
 infix operator ?/ : CompositionPrecedence // pass through unwrapped optional
 infix operator ?| : CompositionPrecedence // pass unwrapped optional & stop chain
 
+infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
+
 // MARK: - Implementation
 
 public
@@ -79,4 +81,57 @@ func ?| <T>(
     ) rethrows
 {
     try Pipeline.take(input, end: body)
+}
+
+public
+//infix
+func ?! <T>(
+    input: T?,
+    error: Swift.Error
+    ) throws -> T
+{
+    if
+        let input = input
+    {
+        return input
+    }
+    else
+    {
+        throw error
+    }
+}
+
+public
+//infix
+func ?! (
+    input: Bool,
+    error: Swift.Error
+    ) throws
+{
+    if
+        !input
+    {
+        throw error
+    }
+}
+
+public
+//infix
+func ?! <T>(
+    input: T?,
+    error: Swift.Error
+    ) throws -> T
+    where
+    T: Collection
+{
+    if
+        let input = input,
+        !input.isEmpty
+    {
+        return input
+    }
+    else
+    {
+        throw error
+    }
 }
