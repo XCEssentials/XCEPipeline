@@ -98,13 +98,7 @@ extension Pipeline
         ) -> (T?) throws -> T
     {
         return {
-            switch $0
-            {
-            case .some(let value):
-                return value
-            case .none:
-                throw error
-            }
+            try $0 ?! error
         }
     }
 
@@ -114,11 +108,29 @@ extension Pipeline
         ) -> (T?) throws -> Void
     {
         return {
-            if
-                case .none = $0
-            {
-                throw error
-            }
+            _ = try $0 ?! error
+        }
+    }
+
+    static
+    func throwIfFalse(
+        _ error: Swift.Error = Pipeline.Error.falseBool
+        ) -> (Bool) throws -> Void
+    {
+        return {
+            _ = try $0 ?! error
+        }
+    }
+
+    static
+    func throwIfEmpty<T>(
+        _ error: Swift.Error = Pipeline.Error.emptyCollection
+        ) -> (T?) throws -> T
+        where
+        T: Collection
+    {
+        return {
+            try $0 ?! error
         }
     }
 }
