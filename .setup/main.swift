@@ -41,22 +41,22 @@ let authors = [
     ("Maxim Khatskevich", "maxim@khatskevi.ch")
     ]
 
-typealias PerSubSpecs<T> = (
+typealias PerSubSpec<T> = (
     core: T,
     tests: T
 )
 
-let subSpecs: PerSubSpecs = (
+let subSpecs: PerSubSpec = (
     "Core",
     "AllTests"
 )
 
-let targetNames: PerSubSpecs = (
+let targetNames: PerSubSpec = (
     product.name,
     product.name + subSpecs.tests
 )
 
-let sourcesLocations: PerSubSpecs = (
+let sourcesLocations: PerSubSpec = (
     Spec.Locations.sources + subSpecs.core,
     Spec.Locations.tests + subSpecs.tests
 )
