@@ -24,10 +24,6 @@
 
  */
 
-#if !COCOAPODS
-import XCEPipelineCore
-#endif
-
 // MARK: - Precedence
 
 precedencegroup CompositionPrecedence {
@@ -52,7 +48,7 @@ func ./ <T, U>(
     body: (T) throws -> U
     ) rethrows -> U
 {
-    return try Pipeline.next(input, body)
+    return try Pipeline.take(input, map: body)
 }
 
 public
@@ -62,7 +58,7 @@ func ?/ <T, U>(
     body: (T) throws -> U
     ) rethrows -> U?
 {
-    return try Pipeline.next(input, body)
+    return try Pipeline.take(input, map: body)
 }
 
 public
@@ -72,7 +68,7 @@ func .| <T>(
     body: (T) throws -> Void
     ) rethrows
 {
-    try Pipeline.end(input, body)
+    try Pipeline.take(input, end: body)
 }
 
 public
@@ -82,5 +78,5 @@ func ?| <T>(
     body: (T) throws -> Void
     ) rethrows
 {
-    try Pipeline.end(input, body)
+    try Pipeline.take(input, end: body)
 }

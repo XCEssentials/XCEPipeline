@@ -1,4 +1,4 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.0
 
 import PackageDescription
 
@@ -8,36 +8,22 @@ let package = Package(
         .library(
             name: "XCEPipeline",
             targets: [
-                "XCEPipelineCore"
+                "XCEPipeline"
             ]
-        ),
-        .library(
-            name: "XCEPipelineWithOperators",
-            targets: [
-                "XCEPipelineOperators"
-            ]
-        ),
+        )
     ],
     targets: [
         .target(
-            name: "XCEPipelineCore",
+            name: "XCEPipeline",
             path: "Sources/Core"
-        ),
-        .target(
-            name: "XCEPipelineOperators",
-            dependencies: [
-                "XCEPipelineCore"
-            ],
-            path: "Sources/Operators"
         ),
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipelineCore",
-                "XCEPipelineOperators"
+                "XCEPipeline"
             ],
             path: "Tests/AllTests"
         ),
     ],
-    swiftLanguageVersions: [.v4, .v4_2]
+    swiftLanguageVersions: [.v5]
 )
