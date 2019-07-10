@@ -34,6 +34,10 @@ extension Pipeline
         )
         
         case emptyOptional
+        
+        case falseBool
+        
+        case emptyCollection
     }
 }
 

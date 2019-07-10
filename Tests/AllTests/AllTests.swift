@@ -56,6 +56,129 @@ class AllTests: XCTestCase
     {
         22 ./ Pipeline.use{ print($0) } ./ { XCTAssert($0 == 22) }
     }
+    
+    func test_unwrapOrThrow()
+    {
+        do
+        {
+            try Optional<Int>.none
+                ./ Pipeline.unwrapOrThrow()
+                ./ { _ in XCTFail("Should never get here!") }
+        }
+        catch Pipeline.Error.emptyOptional
+        {
+            // okay
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+        
+        //---
+        
+        do
+        {
+            try Optional(22)
+                ./ Pipeline.unwrapOrThrow()
+                ./ { XCTAssert($0 == 22) }
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+    }
+    
+    func test_throwIfNil()
+    {
+        do
+        {
+            try Optional<Int>.none
+                ./ Pipeline.throwIfNil()
+                ./ { XCTFail("Should never get here!") }
+        }
+        catch Pipeline.Error.emptyOptional
+        {
+            // okay
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+        
+        //---
+        
+        do
+        {
+            try Optional(22)
+                ./ Pipeline.throwIfNil()
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+    }
+    
+    func test_throwIfFalse()
+    {
+        do
+        {
+            try false
+                ./ Pipeline.throwIfFalse()
+                ./ { _ in XCTFail("Should never get here!") }
+        }
+        catch Pipeline.Error.falseBool
+        {
+            // okay
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+        
+        //---
+        
+        do
+        {
+            try true
+                ./ Pipeline.throwIfFalse()
+                ./ { /* it was TRUE */ }
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+    }
+    
+    func test_throwIfEmpty()
+    {
+        do
+        {
+            try Array<Int>()
+                ./ Pipeline.throwIfEmpty()
+                ./ { _ in XCTFail("Should never get here!") }
+        }
+        catch Pipeline.Error.emptyCollection
+        {
+            // okay
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+        
+        //---
+        
+        do
+        {
+            try [22]
+                ./ Pipeline.throwIfEmpty()
+                ./ { XCTAssert($0[0] == 22) }
+        }
+        catch
+        {
+            XCTFail("Should never get here!")
+        }
+    }
 
     func testEnsure()
     {

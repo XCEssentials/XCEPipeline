@@ -18,6 +18,11 @@ let localRepo = try Spec.LocalRepo.current()
 
 let remoteRepo = try Spec.RemoteRepo()
 
+let travisCI = (
+    address: "https://travis-ci.com/\(remoteRepo.accountName)/\(remoteRepo.name)",
+    branch: "master"
+)
+
 let company = try Spec.Company(
     prefix: "XCE"
 )
@@ -115,6 +120,10 @@ try ReadMe()
         color: "blue",
         title: "Supported platforms",
         link: "Package.swift"
+    )
+    .add("""
+        [![Build Status](\(travisCI.address).svg?branch=\(travisCI.branch))](\(travisCI.address))
+        """
     )
     .add("""
 
