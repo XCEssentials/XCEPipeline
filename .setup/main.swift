@@ -41,77 +41,30 @@ let authors = [
     ("Maxim Khatskevich", "maxim@khatskevi.ch")
     ]
 
-//var cocoaPod = try Spec.CocoaPod(
-//    companyInfo: .from(company),
-//    productInfo: .from(project),
-//    authors: [
-//        ("Maxim Khatskevich", "maxim@khatskevi.ch")
-//    ]
-//)
-
-struct SubSpec
-{
-    let name: String
-    let isTests: Bool
-    
-    var target: String
-    {
-        return product.name + name
-    }
-    
-    var sourcesPath: Path
-    {
-        return (isTests ? Spec.Locations.tests : Spec.Locations.sources) + name
-    }
-    
-    init(
-        _ name: String,
-        isTests: Bool = false
-        )
-    {
-        self.name = name
-        self.isTests = isTests
-    }
-    
-    static
-    func tests(
-        _ name: String = "AllTests"
-        ) -> SubSpec
-    {
-        return .init(
-            name,
-            isTests: true
-        )
-    }
-    
-}
-
-let subSpecs = (
-    core: SubSpec("Core"),
-    tests: SubSpec.tests()
+typealias PerSubSpecs<T> = (
+    core: T,
+    tests: T
 )
 
-//let subSpecs = (
-//    core: Spec.CocoaPod.SubSpec("Core"),
-//    operators: Spec.CocoaPod.SubSpec("Operators"),
-//    tests: Spec.CocoaPod.SubSpec.tests()
-//)
+let subSpecs: PerSubSpecs = (
+    "Core",
+    "AllTests"
+)
 
-//let allSubspecs = try Spec
-//    .CocoaPod
-//    .SubSpec
-//    .extractAll(from: subSpecs)
+let targetNames: PerSubSpecs = (
+    product.name,
+    product.name + subSpecs.tests
+)
 
-//let targetsSPM = (
-//    core: (
-//        productName: cocoaPod.product.name,
-//        name: cocoaPod.product.name + subSpecs.core.name
-//    ),
-//    allTests: (
-//        name: cocoaPod.product.name + subSpecs.tests.name,
-//        none: ()
-//    )
-//)
+let sourcesLocations: PerSubSpecs = (
+    Spec.Locations.sources + subSpecs.core,
+    Spec.Locations.tests + subSpecs.tests
+)
+
+let dummyFiles = [
+    sourcesLocations.core + "\(subSpecs.core).swift",
+    sourcesLocations.tests + "\(subSpecs.tests).swift"
+]
 
 // MARK: Parameters - Summary
 
@@ -124,10 +77,7 @@ project.report()
 
 // MARK: Write - Dummy files
 
-try [
-    subSpecs.core,
-    subSpecs.tests
-    ]
+try dummyFiles
     .forEach{
     
         try CustomTextFile
@@ -135,7 +85,7 @@ try [
                 "//"
             )
             .prepare(
-                at: $0.sourcesPath + ["\($0.name).swift"]
+                at: $0
             )
             .writeToFileSystem(
                 ifFileExists: .skip
@@ -224,21 +174,21 @@ try CustomTextFile("""
             .library(
                 name: "\(product.name)",
                 targets: [
-                    "\(subSpecs.core.target)"
+                    "\(targetNames.core)"
                 ]
             )
         ],
         targets: [
             .target(
-                name: "\(subSpecs.core.target)",
-                path: "\(subSpecs.core.sourcesPath)"
+                name: "\(targetNames.core)",
+                path: "\(sourcesLocations.core)"
             ),
             .testTarget(
-                name: "\(subSpecs.tests.target)",
+                name: "\(targetNames.tests)",
                 dependencies: [
-                    "\(subSpecs.core.target)"
+                    "\(targetNames.core)"
                 ],
-                path: "\(subSpecs.tests.sourcesPath)"
+                path: "\(sourcesLocations.tests)"
             ),
         ],
         swiftLanguageVersions: [.version("\(Spec.BuildSettings.swiftVersion.value)")]
