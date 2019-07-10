@@ -8,19 +8,19 @@ let package = Package(
         .library(
             name: "XCEPipeline",
             targets: [
-                "XCEPipelineCore"
+                "XCEPipeline"
             ]
         )
     ],
     targets: [
         .target(
-            name: "XCEPipelineCore",
+            name: "XCEPipeline",
             path: "Sources/Core"
         ),
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipelineCore"
+                "XCEPipeline"
             ],
             path: "Tests/AllTests"
         ),
