@@ -16,32 +16,28 @@ let swiftLangVersions = "[.v5]"
 
 let localRepo = try Spec.LocalRepo.current()
 
-let remoteRepo = try Spec.RemoteRepo()
+let remoteRepo = try Spec.RemoteRepo(
+     accountName: localRepo.context,
+     name: localRepo.name
+)
 
 let travisCI = (
     address: "https://travis-ci.com/\(remoteRepo.accountName)/\(remoteRepo.name)",
     branch: "master"
 )
 
-let company = try Spec.Company(
-    prefix: "XCE"
+let company = (
+    prefix: "XCE",
+    name: remoteRepo.accountName
 )
 
-let project = try Spec.Project(
+let project = (
+    name: remoteRepo.name,
     summary: "Custom pipeline operators for easy chaining in Swift",
-    copyrightYear: 2018,
-    deploymentTargets: [
-        .iOS : "9.0",
-        .watchOS : "3.0",
-        .tvOS : "9.0",
-        .macOS : "10.11"
-    ]
+    copyrightYear: 2018
 )
 
-let product = (
-    name: company.prefix + project.name,
-    none: ()
-)
+let productName = company.prefix + project.name
 
 let authors = [
     ("Maxim Khatskevich", "maxim@khatskevi.ch")
@@ -58,8 +54,8 @@ let subSpecs: PerSubSpec = (
 )
 
 let targetNames: PerSubSpec = (
-    product.name,
-    product.name + subSpecs.tests
+    productName,
+    productName + subSpecs.tests
 )
 
 let sourcesLocations: PerSubSpec = (
@@ -76,8 +72,6 @@ let dummyFiles = [
 
 localRepo.report()
 remoteRepo.report()
-company.report()
-project.report()
 
 // MARK: -
 
@@ -148,7 +142,7 @@ try ReadMe()
 
 try License
     .MIT(
-        copyrightYear: project.copyrightYear,
+        copyrightYear: UInt(project.copyrightYear),
         copyrightEntity: authors.map{ $0.0 }.joined(separator: ", ")
     )
     .prepare()
@@ -186,10 +180,10 @@ try CustomTextFile("""
     import PackageDescription
 
     let package = Package(
-        name: "\(product.name)",
+        name: "\(productName)",
         products: [
             .library(
-                name: "\(product.name)",
+                name: "\(productName)",
                 targets: [
                     "\(targetNames.core)"
                 ]
