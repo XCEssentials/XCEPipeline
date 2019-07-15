@@ -89,14 +89,14 @@ extension Pipeline
     }
 }
 
-// MARK: - Unwrap
+// MARK: - Throw
 
 public
 extension Pipeline
 {
     static
     func unwrapOrThrow<T>(
-        _ error: Swift.Error = Pipeline.Error.emptyOptional
+        _ error: Swift.Error
         ) -> (T?) throws -> T
     {
         return {
@@ -106,7 +106,7 @@ extension Pipeline
 
     static
     func throwIfNil<T>(
-        _ error: Swift.Error = Pipeline.Error.emptyOptional
+        _ error: Swift.Error
         ) -> (T?) throws -> Void
     {
         return {
@@ -116,7 +116,7 @@ extension Pipeline
 
     static
     func throwIfFalse(
-        _ error: Swift.Error = Pipeline.Error.falseBool
+        _ error: Swift.Error
         ) -> (Bool) throws -> Void
     {
         return {
@@ -126,7 +126,7 @@ extension Pipeline
 
     static
     func throwIfEmpty<T>(
-        _ error: Swift.Error = Pipeline.Error.emptyCollection
+        _ error: Swift.Error
         ) -> (T?) throws -> T
         where
         T: Collection
