@@ -26,6 +26,8 @@
 
 import XCTest
 
+import XCERequirement
+
 //@testable
 import XCEPipeline
 
@@ -33,6 +35,11 @@ import XCEPipeline
 
 class AllTests: XCTestCase
 {
+    enum The: Error
+    {
+        case error
+    }
+    
     func testBasics()
     {
         XCTAssert((22 ./ { "\($0)" }) == "22")
@@ -62,10 +69,10 @@ class AllTests: XCTestCase
         do
         {
             try Optional<Int>.none
-                ./ Pipeline.unwrapOrThrow()
+                ./ Pipeline.unwrapOrThrow(The.error)
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch Pipeline.Error.emptyOptional
+        catch The.error
         {
             // okay
         }
@@ -79,7 +86,7 @@ class AllTests: XCTestCase
         do
         {
             try Optional(22)
-                ./ Pipeline.unwrapOrThrow()
+                ./ Pipeline.unwrapOrThrow(The.error)
                 ./ { XCTAssert($0 == 22) }
         }
         catch
@@ -93,10 +100,10 @@ class AllTests: XCTestCase
         do
         {
             try Optional<Int>.none
-                ./ Pipeline.throwIfNil()
+                ./ Pipeline.throwIfNil(The.error)
                 ./ { XCTFail("Should never get here!") }
         }
-        catch Pipeline.Error.emptyOptional
+        catch The.error
         {
             // okay
         }
@@ -110,7 +117,7 @@ class AllTests: XCTestCase
         do
         {
             try Optional(22)
-                ./ Pipeline.throwIfNil()
+                ./ Pipeline.throwIfNil(The.error)
         }
         catch
         {
@@ -123,10 +130,10 @@ class AllTests: XCTestCase
         do
         {
             try false
-                ./ Pipeline.throwIfFalse()
+                ./ Pipeline.throwIfFalse(The.error)
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch Pipeline.Error.falseBool
+        catch The.error
         {
             // okay
         }
@@ -140,7 +147,7 @@ class AllTests: XCTestCase
         do
         {
             try true
-                ./ Pipeline.throwIfFalse()
+                ./ Pipeline.throwIfFalse(The.error)
                 ./ { /* it was TRUE */ }
         }
         catch
@@ -154,10 +161,10 @@ class AllTests: XCTestCase
         do
         {
             try Array<Int>()
-                ./ Pipeline.throwIfEmpty()
+                ./ Pipeline.throwIfEmpty(The.error)
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch Pipeline.Error.emptyCollection
+        catch The.error
         {
             // okay
         }
@@ -171,7 +178,7 @@ class AllTests: XCTestCase
         do
         {
             try [22]
-                ./ Pipeline.throwIfEmpty()
+                ./ Pipeline.throwIfEmpty(The.error)
                 ./ { XCTAssert($0[0] == 22) }
         }
         catch
@@ -185,12 +192,12 @@ class AllTests: XCTestCase
         do
         {
             try 22
-                ./ Pipeline.ensure{ _ in throw Pipeline.Error.unsatisfiedCondition(message: "XYZ") }
+                ./ Pipeline.ensure{ _ in throw The.error }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch Pipeline.Error.unsatisfiedCondition(let message)
+        catch The.error
         {
-            XCTAssert(message == "XYZ")
+            // okay
         }
         catch
         {
@@ -201,7 +208,9 @@ class AllTests: XCTestCase
 
         do
         {
-            try 22 ./ Pipeline.ensure{ $0 == 22 } ./ { XCTAssert($0 == 22) }
+            try 22
+                ./ Pipeline.ensure("Equal to 22"){ $0 == 22 }
+                ./ { XCTAssert($0 == 22) }
         }
         catch
         {
@@ -216,9 +225,11 @@ class AllTests: XCTestCase
                 ./ Pipeline.ensure("Must be 1"){ $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch Pipeline.Error.unsatisfiedCondition(let message)
+        catch let error as UnsatisfiedRequirement
         {
-            XCTAssert(message == "Must be 1")
+            XCTAssert(error.requirement == "Must be 1")
+            XCTAssert((error.input as! Int) == 22)
+            XCTAssert(error.context.function == "testEnsure()")
         }
         catch
         {

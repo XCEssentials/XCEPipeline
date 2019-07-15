@@ -189,15 +189,25 @@ try CustomTextFile("""
                 ]
             )
         ],
+        dependencies: [
+            .package(
+                url: "https://github.com/XCEssentials/Requirement",
+                from: "2.0.0"
+            )
+        ],
         targets: [
             .target(
                 name: "\(targetNames.core)",
+                dependencies: [
+                    "XCERequirement"
+                ],
                 path: "\(sourcesLocations.core)"
             ),
             .testTarget(
                 name: "\(targetNames.tests)",
                 dependencies: [
-                    "\(targetNames.core)"
+                    "\(targetNames.core)",
+                    "XCERequirement"
                 ],
                 path: "\(sourcesLocations.tests)"
             ),

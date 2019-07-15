@@ -41,6 +41,9 @@
 public
 enum Pipeline {} // scope
 
+public
+typealias Pipe = Pipeline
+
 //---
 
 public
