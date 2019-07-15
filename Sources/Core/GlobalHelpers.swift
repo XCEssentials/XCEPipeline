@@ -178,7 +178,7 @@ extension Pipeline
                     file: file,
                     line: line,
                     function: function,
-                    value: $0
+                    /*value:*/ $0
                 )
             
             return $0
