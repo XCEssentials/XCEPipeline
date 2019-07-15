@@ -24,6 +24,8 @@
 
  */
 
+import XCERequirement
+
 // MARK: - Mutate
 
 public
@@ -87,14 +89,14 @@ extension Pipeline
     }
 }
 
-// MARK: - Unwrap
+// MARK: - Throw
 
 public
 extension Pipeline
 {
     static
     func unwrapOrThrow<T>(
-        _ error: Swift.Error = Pipeline.Error.emptyOptional
+        _ error: Swift.Error
         ) -> (T?) throws -> T
     {
         return {
@@ -104,7 +106,7 @@ extension Pipeline
 
     static
     func throwIfNil<T>(
-        _ error: Swift.Error = Pipeline.Error.emptyOptional
+        _ error: Swift.Error
         ) -> (T?) throws -> Void
     {
         return {
@@ -114,7 +116,7 @@ extension Pipeline
 
     static
     func throwIfFalse(
-        _ error: Swift.Error = Pipeline.Error.falseBool
+        _ error: Swift.Error
         ) -> (Bool) throws -> Void
     {
         return {
@@ -124,7 +126,7 @@ extension Pipeline
 
     static
     func throwIfEmpty<T>(
-        _ error: Swift.Error = Pipeline.Error.emptyCollection
+        _ error: Swift.Error
         ) -> (T?) throws -> T
         where
         T: Collection
@@ -163,23 +165,23 @@ extension Pipeline
         file: String = #file,
         line: Int = #line,
         function: String = #function,
-        _ description: String? = nil,
-        _ body: @escaping (T) -> Bool
+        _ description: String,
+        _ body: @escaping (T) throws -> Bool
         ) -> (T) throws -> T
     {
         return {
-            if
-                body($0)
-            {
-                return $0
-            }
-            else
-            {
-                throw Pipeline.Error.conditionFailed(
-                    context: (file, line, function),
-                    description
+            try Require(
+                description,
+                body
                 )
-            }
+                .validate(
+                    file: file,
+                    line: line,
+                    function: function,
+                    value: $0
+                )
+            
+            return $0
         }
     }
 }

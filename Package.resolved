@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "XCERequirement",
+        "repositoryURL": "https://github.com/XCEssentials/Requirement",
+        "state": {
+          "branch": null,
+          "revision": "d63e0e30cff48a0798f599904f69ebe9a31fcb10",
+          "version": "2.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
