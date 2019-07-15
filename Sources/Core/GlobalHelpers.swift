@@ -24,6 +24,8 @@
 
  */
 
+import XCERequirement
+
 // MARK: - Mutate
 
 public
@@ -163,23 +165,23 @@ extension Pipeline
         file: String = #file,
         line: Int = #line,
         function: String = #function,
-        _ description: String? = nil,
-        _ body: @escaping (T) -> Bool
+        _ description: String,
+        _ body: @escaping (T) throws -> Bool
         ) -> (T) throws -> T
     {
         return {
-            if
-                body($0)
-            {
-                return $0
-            }
-            else
-            {
-                throw Pipeline.Error.conditionFailed(
-                    context: (file, line, function),
-                    description
+            try Require(
+                description,
+                body
                 )
-            }
+                .validate(
+                    file: file,
+                    line: line,
+                    function: function,
+                    value: $0
+                )
+            
+            return $0
         }
     }
 }
