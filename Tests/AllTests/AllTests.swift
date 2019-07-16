@@ -40,6 +40,107 @@ class AllTests: XCTestCase
         case error
     }
     
+    func test_takeMap()
+    {
+        let val1: Int = 21
+        let val2: Int? = 21
+        
+        func f1(_ input: Int)
+        {
+            XCTAssert(input == 21)
+        }
+        
+        func f2(_ input: Int?)
+        {
+            XCTAssert(input == 21)
+        }
+        
+        func f3(_ input: Int) -> Int
+        {
+            return input + 1
+        }
+        
+        func f4(_ input: Int?) -> Int?
+        {
+            return input.map{ $0  + 1 }
+        }
+        
+        XCTAssert(Pipeline.take(val1, map: f1) == ())
+        XCTAssert(Pipeline.take(val1, map: f2) == ())
+        XCTAssert(Pipeline.take(val1, map: f3) == val1+1)
+        XCTAssert(Pipeline.take(val1, map: f4) == val1+1)
+        
+        XCTAssert(Pipeline.take(val2, map: f2) == ())
+        XCTAssert(Pipeline.take(val2, map: f4) == val2.map{ $0 + 1 })
+        
+        
+        XCTAssert(Pipeline.take(optional: val2, map: f1)! == ())
+        XCTAssert(Pipeline.take(optional: val2, map: f2)! == ())
+        XCTAssert(Pipeline.take(optional: val2, map: f3) == val2.map{ $0 + 1 })
+        XCTAssert(Pipeline.take(optional: val2, map: f4) == val2.map{ $0 + 1 })
+        
+        XCTAssert((val1 ./ f1) == ())
+        XCTAssert((val1 ./ f2) == ())
+        XCTAssert((val1 ./ f3) == val1+1)
+        XCTAssert((val1 ./ f4) == val1+1)
+        
+        XCTAssert((val2 ?/ f1)! == ())
+        XCTAssert((val2 ?/ f2)! == ())
+        XCTAssert((val2 ?/ f3) == val2.map{ $0 + 1 })
+        XCTAssert((val2 ?/ f4) == val2.map{ $0 + 1 })
+    }
+    
+    func test_takeEnd()
+    {
+        let val1: Int = 21
+        let val2: Int? = 21
+        
+        func f1(_ input: Int)
+        {
+            XCTAssert(input == 21)
+        }
+        
+        func f2(_ input: Int?)
+        {
+            XCTAssert(input == 21)
+        }
+        
+        func f3(_ input: Int) -> Int
+        {
+            XCTAssert(input == 21)
+            return input
+        }
+        
+        func f4(_ input: Int?) -> Int?
+        {
+            XCTAssert(input == 21)
+            return input
+        }
+        
+        Pipeline.take(val1, end: f1)
+        Pipeline.take(val1, end: f2)
+        Pipeline.take(val1, end: f3)
+        Pipeline.take(val1, end: f4)
+        
+        Pipeline.take(val2, end: f2)
+        Pipeline.take(val2, end: f4)
+        
+        Pipeline.take(optional: val2, end: f1)
+        Pipeline.take(optional: val2, end: f2)
+        Pipeline.take(optional: val2, end: f3)
+        Pipeline.take(optional: val2, end: f4)
+        
+        val1 .* f1
+        val1 .* f2
+        val1 .* f3
+        val1 .* f4
+        
+        val2 ?* f1
+        val2 ?* f2
+        val2 ?* f3
+        val2 ?* f4
+    }
+
     func testBasics()
     {
         XCTAssert((22 ./ { "\($0)" }) == "22")
@@ -48,10 +149,14 @@ class AllTests: XCTestCase
 
     func testOptionals()
     {
+        Optional(22) ./ { String(describing: $0) } ./ { XCTAssert($0 == "Optional(22)") }
         Optional(22) ?/ { "\($0)" } ./ { XCTAssert($0 == "22") }
         Optional(22) ?/ { "\($0)" } ?/ { XCTAssert($0 == "22") }
         Optional(22) ?/ { XCTAssert(type(of: $0) == Int.self) }
         Optional(22) ./ { XCTAssert(type(of: $0) == Optional<Int>.self) }
+        Optional<Int>.none ./ { XCTAssert($0 == nil) }
+        Optional<Int>.none ?/ { _ in XCTFail("Should never get here!") }
+        Optional<Int>.none ?* { _ in XCTFail("Should never get here!") }
     }
 
     func testMutate()
@@ -61,7 +166,7 @@ class AllTests: XCTestCase
 
     func testUse()
     {
-        22 ./ Pipeline.use{ print($0) } ./ { XCTAssert($0 == 22) }
+        22 ./ Pipeline.use{ XCTAssert($0 == 22) } ./ { XCTAssert($0 == 22) }
     }
     
     func test_unwrapOrThrow()

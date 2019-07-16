@@ -35,14 +35,17 @@ precedencegroup CompositionPrecedence {
 // MARK: - Declaration
 
 infix operator ./ : CompositionPrecedence // pass through
-infix operator .| : CompositionPrecedence // pass & stop chain
-infix operator ?/ : CompositionPrecedence // pass through unwrapped optional
-infix operator ?| : CompositionPrecedence // pass unwrapped optional & stop chain
+infix operator ?/ : CompositionPrecedence // pass through unwrapped
+
+infix operator .* : CompositionPrecedence // pass & stop chain
+infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
 
 infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
 
 // MARK: - Implementation
 
+/// Passes `input` value into `body` as is and returns whatever
+/// `body` returns to continue the pipeline.
 public
 //infix
 func ./ <T, U>(
@@ -53,6 +56,10 @@ func ./ <T, U>(
     return try Pipeline.take(input, map: body)
 }
 
+/// Passes unwrapped `input` value into `body` if it's non-nil,
+/// or does nothing otherwise. Returns whatever `body` supposed
+/// to return (or `nil`) as optional to continue the pipeline.
+/// Analogue of `map(...)` function of `Optional` type.
 public
 //infix
 func ?/ <T, U>(
@@ -60,37 +67,36 @@ func ?/ <T, U>(
     body: (T) throws -> U
     ) rethrows -> U?
 {
-    return try Pipeline.take(input, map: body)
+    return try Pipeline.take(optional: input, map: body)
 }
 
+/// Passes `input` value into `body` as is. Returns nothing.
+/// Typically defines final step in pipeline. Alternatively
+/// can be used to "restart" pipeline — continue chain with
+/// next step taking no input (Void).
 public
 //infix
-func .| <T>(
-    input: T,
-    body: (T) throws -> Void
-    ) rethrows
-{
-    try Pipeline.take(input, end: body)
-}
-
-public
-//infix
-func .| <T, U>(
+func .* <T, U>(
     input: T,
     body: (T) throws -> U
     ) rethrows
 {
-    try Pipeline.take(input, end: { _ = try body($0) })
+    try Pipeline.take(input, end: body)
 }
 
+/// Passes unwrapped `input` value into `body` if it's non-nil,
+/// or does nothing otherwise. Returns nothing anyway.
+/// Typically defines final step in pipeline. Alternatively
+/// can be used to "restart" pipeline — continue chain with
+/// next step taking no input (Void).
 public
 //infix
-func ?| <T>(
+func ?* <T, U>(
     input: T?,
-    body: (T) throws -> Void
+    body: (T) throws -> U
     ) rethrows
 {
-    try Pipeline.take(input, end: body)
+    try Pipeline.take(optional: input, end: body)
 }
 
 public
