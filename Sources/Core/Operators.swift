@@ -75,6 +75,16 @@ func .| <T>(
 
 public
 //infix
+func .| <T, U>(
+    input: T,
+    body: (T) throws -> U
+    ) rethrows
+{
+    try Pipeline.take(input, end: { _ = try body($0) })
+}
+
+public
+//infix
 func ?| <T>(
     input: T?,
     body: (T) throws -> Void
