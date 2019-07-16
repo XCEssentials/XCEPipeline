@@ -49,9 +49,8 @@ typealias Pipe = Pipeline
 public
 extension Pipeline
 {
-    /**
-     Takes `input` and passes it into `body` and returns result.
-     */
+    /// Passes `input` value into `body` as is and returns whatever
+    /// `body` returns to continue the pipeline.
     static
     func take<T, U>(
         _ input: T,
@@ -61,48 +60,43 @@ extension Pipeline
         return try body(input)
     }
 
-    /**
-     Takes `input` and passes its unwrapped value into `body` and
-     returns result, or returns `nil` otherwise. Analogue of
-     `Optional.map(...)` function.
-     */
+    /// Passes unwrapped `input` value into `body` if it's non-nil,
+    /// or does nothing otherwise. Returns whatever `body` supposed
+    /// to return (or `nil`) as optional to continue the pipeline.
+    /// Analogue of `map(...)` function of `Optional` type.
     static
     func take<T, U>(
-        _ input: T?,
+        optional input: T?,
         map body: (T) throws -> U
         ) rethrows -> U?
     {
         return try input.map(body)
     }
 
-    /**
-     Takes `input` and passes it into `body`, returns nothing.
-     Typically defines final step in pipeline. Alternatively
-     can be used to "restart" pipeline — continue chain with
-     next step taking no input (Void).
-     */
+    /// Passes `input` value into `body` as is. Returns nothing.
+    /// Typically defines final step in pipeline. Alternatively
+    /// can be used to "restart" pipeline — continue chain with
+    /// next step taking no input (Void).
     static
-    func take<T>(
+    func take<T, U>(
         _ input: T,
-        end body: (T) throws -> Void
+        end body: (T) throws -> U
         ) rethrows
     {
-        try body(input)
+        _ = try body(input)
     }
-
-    /**
-     Takes `input` and passes its unwrapped value into `body`,
-     or does nothing if `input` is `nil. Returns nothing anyway.
-     Typically defines final step in pipeline. Alternatively
-     can be used to "restart" pipeline — continue chain with
-     next step taking no input (Void).
-     */
+    
+    /// Passes unwrapped `input` value into `body` if it's non-nil,
+    /// or does nothing otherwise. Returns nothing anyway.
+    /// Typically defines final step in pipeline. Alternatively
+    /// can be used to "restart" pipeline — continue chain with
+    /// next step taking no input (Void).
     static
-    func take<T>(
-        _ input: T?,
-        end body: (T) throws -> Void
+    func take<T, U>(
+        optional input: T?,
+        end body: (T) throws -> U
         ) rethrows
     {
-        try input.map(body)
+        _ = try input.map(body)
     }
 }
