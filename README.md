@@ -15,3 +15,7 @@ Custom pipeline operators for easy chaining in Swift
 ```
 
 See more examples of usage in unit tests.
+
+## How to install
+
+The recommended way is to install using [SwiftPM](https://swift.org/package-manager/), but [Carthage](https://github.com/Carthage/Carthage) is also supported out of the box.
