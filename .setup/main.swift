@@ -169,6 +169,7 @@ try Git
         # we don't need to store project file,
         # as we generate it on-demand
         *.\(Xcode.Project.extension)
+        !\(productName).\(Xcode.Project.extension)
         """
     )
     .prepare()
