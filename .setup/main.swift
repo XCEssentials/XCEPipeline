@@ -224,7 +224,7 @@ try CustomTextFile("""
     )
     .writeToFileSystem()
 
-// MARK: Write - Package.swift
+// MARK: Write - Cartfile
 
 try CustomTextFile("""
     github "XCEssentials/Requirement"
