@@ -224,6 +224,17 @@ try CustomTextFile("""
     )
     .writeToFileSystem()
 
+// MARK: Write - Package.swift
+
+try CustomTextFile("""
+    github "XCEssentials/Requirement"
+    """
+    )
+    .prepare(
+        at: ["Cartfile"]
+    )
+    .writeToFileSystem()
+
 // MARK: - POST-script invocation output
 
 print("--- END of '\(Executable.name)' script ---")
