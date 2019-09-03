@@ -89,6 +89,18 @@ Package.pins
 #
 
 # ==========
+### Carthage ###
+
+Carthage/Build
+Carthage/Checkouts
+
+### Carthage ###
+# ==========
+#
+#
+#
+
+# ==========
 ### Custom repo-specific ###
 
 # we don't need to store project file,

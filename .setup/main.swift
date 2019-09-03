@@ -164,6 +164,7 @@ try Git
     .addMacOSSection()
     .addCocoaSection()
     .addSwiftPackageManagerSection(ignoreSources: true)
+    .addCarthageSection(ignoreSources: true)
     .add(
         """
         # we don't need to store project file,
