@@ -11,6 +11,21 @@ print("--- BEGIN of '\(Executable.name)' script ---")
 
 // MARK: Parameters
 
+let dependencies = (
+    requirement: (
+        name: """
+            XCERequirement
+            """,
+        carthage: """
+            github "XCEssentials/Requirement"
+            """,
+        swiftPM: """
+            .package(url: "https://github.com/XCEssentials/Requirement", from: "2.0.0")
+            """
+    ),
+    ()
+)
+
 Spec.BuildSettings.swiftVersion.value = "5.0"
 let swiftLangVersions = "[.v5]"
 
@@ -194,16 +209,13 @@ try CustomTextFile("""
             )
         ],
         dependencies: [
-            .package(
-                url: "https://github.com/XCEssentials/Requirement",
-                from: "2.0.0"
-            )
+            \(dependencies.requirement.swiftPM)
         ],
         targets: [
             .target(
                 name: "\(targetNames.core)",
                 dependencies: [
-                    "XCERequirement"
+                    "\(dependencies.requirement.name)"
                 ],
                 path: "\(sourcesLocations.core)"
             ),
@@ -211,7 +223,7 @@ try CustomTextFile("""
                 name: "\(targetNames.tests)",
                 dependencies: [
                     "\(targetNames.core)",
-                    "XCERequirement"
+                    "\(dependencies.requirement.name)"
                 ],
                 path: "\(sourcesLocations.tests)"
             ),
@@ -222,6 +234,17 @@ try CustomTextFile("""
     )
     .prepare(
         at: ["Package.swift"]
+    )
+    .writeToFileSystem()
+
+// MARK: Write - Cartfile
+
+try CustomTextFile("""
+    \(dependencies.requirement.carthage)
+    """
+    )
+    .prepare(
+        at: ["Cartfile"]
     )
     .writeToFileSystem()
 
