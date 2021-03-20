@@ -62,22 +62,6 @@ let sourcesLocations: PerSubSpec = (
     Spec.Locations.tests + subSpecs.tests
 )
 
-let dependencies = (
-    requirement: (
-        name: """
-            XCERequirement
-            """,
-        package: """
-            .package(
-                name: "XCERequirement",
-                url: "https://github.com/XCEssentials/Requirement",
-                from: "2.2.0"
-            )
-            """
-    ),
-    ()
-)
-
 // MARK: Parameters - Summary
 
 localRepo.report()
@@ -184,13 +168,17 @@ try CustomTextFile("""
             )
         ],
         dependencies: [
-            \(dependencies.requirement.package)
+            .package(
+                name: "XCERequirement",
+                url: "https://github.com/XCEssentials/Requirement",
+                from: "2.2.0"
+            )
         ],
         targets: [
             .target(
                 name: "\(targetNames.core)",
                 dependencies: [
-                    "\(dependencies.requirement.name)"
+                    "XCERequirement"
                 ],
                 path: "\(sourcesLocations.core)"
             ),
@@ -198,7 +186,7 @@ try CustomTextFile("""
                 name: "\(targetNames.tests)",
                 dependencies: [
                     "\(targetNames.core)",
-                    "\(dependencies.requirement.name)"
+                    "XCERequirement"
                 ],
                 path: "\(sourcesLocations.tests)"
             ),
