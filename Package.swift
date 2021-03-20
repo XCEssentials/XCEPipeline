@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -13,7 +13,11 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/XCEssentials/Requirement", from: "2.0.0")
+        .package(
+            name: "XCERequirement",
+            url: "https://github.com/XCEssentials/Requirement",
+            from: "2.2.0"
+        )
     ],
     targets: [
         .target(
@@ -31,6 +35,5 @@ let package = Package(
             ],
             path: "Tests/AllTests"
         ),
-    ],
-    swiftLanguageVersions: [.v5]
+    ]
 )
