@@ -37,6 +37,8 @@ precedencegroup CompositionPrecedence {
 infix operator ./ : CompositionPrecedence // pass through
 infix operator ?/ : CompositionPrecedence // pass through unwrapped
 
+infix operator .+ : CompositionPrecedence // pass through for editing
+
 infix operator .* : CompositionPrecedence // pass & stop chain
 infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
 
@@ -68,6 +70,46 @@ func ?/ <T, U>(
     ) rethrows -> U?
 {
     return try Pipeline.take(optional: input, map: body)
+}
+
+/**
+ Mutates `input` even if it's a `let` instance of value type with
+ a throwing closure, so the whole expression throws if the closure
+ throws.
+ 
+ NOTE: for reference type it will return same input instance with
+ given mutations, but for value type it will return a copy of
+ `input` instance with given mutations.
+ */
+public
+//infix
+func .+ <T>(
+    input: T,
+    _ body: @escaping (inout T) throws -> Void
+    ) throws -> T
+{
+    var tmp = input
+    try body(&tmp)
+    return tmp
+}
+
+/**
+ Mutates `input` even if it's a `let` instance of value type.
+ 
+ NOTE: for reference type it will return same input instance with
+ given mutations, but for value type it will return a copy of
+ `input` instance with given mutations.
+ */
+public
+//infix
+func .+ <T>(
+    input: T,
+    _ body: @escaping (inout T) -> Void
+    ) -> T
+{
+    var tmp = input
+    body(&tmp)
+    return tmp
 }
 
 /// Passes `input` value into `body` as is. Returns nothing.
