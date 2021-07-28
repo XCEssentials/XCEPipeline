@@ -162,6 +162,26 @@ class AllTests: XCTestCase
     func testMutate()
     {
         22 ./ Pipeline.mutate{ $0 += 1 } ./ { XCTAssert($0 == 23) }
+        
+        struct ValueObject
+        {
+            var note: String
+        }
+        
+        let val3 = ValueObject(note: "Hello")
+        
+        XCTAssert(val3.note == "Hello")
+        val3 .+ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
+        
+        class ReferenceObject
+        {
+            var note: String = "Hello"
+        }
+
+        let val4 = ReferenceObject()
+
+        XCTAssert(val4.note == "Hello")
+        val4 .+ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
     }
 
     func testUse()
