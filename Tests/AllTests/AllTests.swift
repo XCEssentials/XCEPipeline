@@ -171,7 +171,7 @@ class AllTests: XCTestCase
         let val3 = ValueObject(note: "Hello")
         
         XCTAssert(val3.note == "Hello")
-        val3 .+ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
+        val3 +/ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
         
         class ReferenceObject
         {
@@ -181,7 +181,7 @@ class AllTests: XCTestCase
         let val4 = ReferenceObject()
 
         XCTAssert(val4.note == "Hello")
-        val4 .+ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
+        val4 +/ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
     }
 
     func testUse()
