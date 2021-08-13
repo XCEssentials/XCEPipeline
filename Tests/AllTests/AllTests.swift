@@ -361,4 +361,98 @@ class AllTests: XCTestCase
             XCTFail("Should never get here!")
         }
     }
+    
+    func test_forceCastError_nonThrowing()
+    {
+        struct TheError: Error {}
+        func nonThrowingFunc() throws -> String { "OK" }
+        
+        let sut = { try nonThrowingFunc() !! TheError.self }
+        
+        XCTAssertNoThrow(try sut())
+        XCTAssertEqual(try! sut(), "OK")
+    }
+    
+    func test_forceCastError_throwing()
+    {
+        struct TheError: Error {}
+        func throwingFunc() throws { throw TheError() }
+        
+        let sut = { try throwingFunc() !! TheError.self }
+        
+        XCTAssertThrowsError(try sut()) { error in
+            switch error
+            {
+                case is TheError:
+                    break // as expected
+                    
+                default:
+                    XCTFail("Thrown unexpected error!")
+            }
+        }
+    }
+    
+    func test_forceCastErrorMapped_nonThrowing()
+    {
+        struct TheError: Error {}
+        enum MappingError: Error { case one(TheError) }
+        func nonThrowingFunc() throws -> String { "OK" }
+        
+        let sut = { try nonThrowingFunc() !! MappingError.one }
+        
+        XCTAssertNoThrow(try sut())
+        XCTAssertEqual(try! sut(), "OK")
+    }
+    
+    func test_forceCastErrorMapped_throwing()
+    {
+        struct TheError: Error {}
+        enum MappingError: Error { case one(TheError) }
+        func throwingFunc() throws { throw TheError() }
+        
+        let sut = { try throwingFunc() !! MappingError.one }
+        
+        XCTAssertThrowsError(try sut()) { error in
+            switch error
+            {
+                case MappingError.one:
+                    break // as expected
+                    
+                default:
+                    XCTFail("Thrown unexpected error!")
+            }
+        }
+    }
+    
+    func test_forceCastErrorMappedFromNonTyped_nonThrowing()
+    {
+        enum MappingError: Error { case one(Error) }
+        func nonThrowingFunc() throws -> String { "OK" }
+        
+        let sut = { try nonThrowingFunc() !! MappingError.one }
+        
+        XCTAssertNoThrow(try sut())
+        XCTAssertEqual(try! sut(), "OK")
+    }
+    
+    
+    func test_forceCastErrorMappedFromNonTyped_throwing()
+    {
+        struct SomeError: Error {}
+        enum MappingError: Error { case one(Error) }
+        func throwingFunc() throws { throw SomeError() }
+        
+        let sut = { try throwingFunc() !! MappingError.one }
+        
+        XCTAssertThrowsError(try sut()) { error in
+            switch error
+            {
+                case MappingError.one:
+                    break // as expected
+                    
+                default:
+                    XCTFail("Thrown unexpected error!")
+            }
+        }
+    }
 }
