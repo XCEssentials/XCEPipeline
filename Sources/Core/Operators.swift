@@ -43,6 +43,7 @@ infix operator .* : CompositionPrecedence // pass & stop chain
 infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
 
 infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
+infix operator !! : NilCoalescingPrecedence // rethrow with FORCE error typecast
 
 // MARK: - Implementation
 
@@ -191,5 +192,68 @@ func ?! <T>(
     else
     {
         throw error
+    }
+}
+
+/// Pass the result of `inputClosure` or catch
+/// the `error` thrown by `inputClosure`, FORCE type cast it
+/// into `E` and rethrow result error.
+///
+/// WARNING: it will crash in case the `error` is not of expected type!
+public
+func !! <T, E: Error>(
+    _ inputClosure: @autoclosure () throws -> T,
+    _ : E.Type
+    ) rethrows -> T
+{
+    do
+    {
+        return try inputClosure()
+    }
+    catch
+    {
+        throw error as! E
+    }
+}
+
+/// Pass the result of `inputClosure` or catch
+/// the `error` thrown by `inputClosure`, FORCE type cast it
+/// into `E` and rethrow result error.
+///
+/// WARNING: it will crash in case the `error` is not of expected type!
+public
+func !! <T, E: Error, U: Error>(
+    _ inputClosure: @autoclosure () throws -> T,
+    _ errorMapping: (E) -> U
+    ) rethrows -> T
+{
+    do
+    {
+        return try inputClosure()
+    }
+    catch
+    {
+        throw errorMapping(error as! E)
+    }
+}
+
+/// Pass the result of `inputClosure` or catch
+/// the `error` thrown by `inputClosure`, FORCE type cast it
+/// into `E` and rethrow result error.
+///
+/// WARNING: it will crash in case the `error` is not of expected type!
+public
+func !! <T, E: Error>(
+    _ inputClosure: @autoclosure () throws -> T,
+    _ errorMapping: (Error) -> E?
+    ) rethrows -> T
+{
+    do
+    {
+        return try inputClosure()
+    }
+    catch
+    {
+        throw errorMapping(error)!
     }
 }
