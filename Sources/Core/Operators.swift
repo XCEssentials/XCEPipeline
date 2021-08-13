@@ -37,7 +37,7 @@ precedencegroup CompositionPrecedence {
 infix operator ./ : CompositionPrecedence // pass through
 infix operator ?/ : CompositionPrecedence // pass through unwrapped
 
-infix operator +/ : CompositionPrecedence // pass through for editing
+infix operator .+ : CompositionPrecedence // pass through for editing
 
 infix operator .* : CompositionPrecedence // pass & stop chain
 infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
@@ -84,7 +84,7 @@ func ?/ <T, U>(
  */
 public
 //infix
-func +/ <T>(
+func .+ <T>(
     input: T,
     _ body: @escaping (inout T) throws -> Void
     ) throws -> T
@@ -103,7 +103,7 @@ func +/ <T>(
  */
 public
 //infix
-func +/ <T>(
+func .+ <T>(
     input: T,
     _ body: @escaping (inout T) -> Void
     ) -> T
