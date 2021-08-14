@@ -199,7 +199,7 @@ func ?! <T>(
 /// the `error` thrown by `inputClosure`, FORCE type cast it
 /// into `E` and rethrow result error.
 ///
-/// WARNING: it will crash in case the `error` is not of expected type!
+/// WARNING: it will crash in case the `error` is not of expected type `E`!
 public
 func !! <T, E: Error>(
     _ inputClosure: @autoclosure () throws -> T,
@@ -220,7 +220,7 @@ func !! <T, E: Error>(
 /// the `error` thrown by `inputClosure`, FORCE type cast it
 /// into `E` and rethrow result error.
 ///
-/// WARNING: it will crash in case the `error` is not of expected type!
+/// WARNING: it will crash in case the `error` is not of expected type `E`!
 public
 func !! <T, E: Error, U: Error>(
     _ inputClosure: @autoclosure () throws -> T,
@@ -241,7 +241,7 @@ func !! <T, E: Error, U: Error>(
 /// the `error` thrown by `inputClosure`, FORCE type cast it
 /// into `E` and rethrow result error.
 ///
-/// WARNING: it will crash in case the `error` is not of expected type!
+/// WARNING: it will crash in case the `errorMapping` returns `nil`!
 public
 func !! <T, E: Error>(
     _ inputClosure: @autoclosure () throws -> T,
@@ -256,4 +256,31 @@ func !! <T, E: Error>(
     {
         throw errorMapping(error)!
     }
+}
+
+/// FORCE type cast generic `input`
+/// into specified type `T` and map
+/// it into `U` using `mapping`.
+///
+/// WARNING: it will crash in case the `input` is not of expected type `T`!
+public
+func !! <T, U>(
+    _ input: Any,
+    _ mapping: (T) -> U
+    ) -> U
+{
+    return mapping(input as! T)
+}
+
+/// Maps generic `input` into `U` and
+/// FORCE unwraps the `mapping` result.
+///
+/// WARNING: it will crash in case the `mapping` returns `nil`!
+public
+func !! <U>(
+    _ input: Any,
+    _ mapping: (Any) -> U?
+    ) -> U
+{
+    return mapping(input)!
 }
