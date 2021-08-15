@@ -287,33 +287,6 @@ func !! <T, E: Error>(
     }
 }
 
-/// FORCE type cast generic `input`
-/// into specified type `T` and map
-/// it into `U` using `mapping`.
-///
-/// WARNING: it will crash in case the `input` is not of expected type `T`!
-public
-func !! <T, U>(
-    _ input: Any,
-    _ mapping: (T) -> U
-    ) -> U
-{
-    return mapping(input as! T)
-}
-
-/// Maps generic `input` into `U` and
-/// FORCE unwraps the `mapping` result.
-///
-/// WARNING: it will crash in case the `mapping` returns `nil`!
-public
-func !! <U>(
-    _ input: Any,
-    _ mapping: (Any) -> U?
-    ) -> U
-{
-    return mapping(input)!
-}
-
 /// Combine `Result` producing closure with error mapping
 /// and producing transient `Result` with mapped error.
 public
