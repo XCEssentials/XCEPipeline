@@ -313,3 +313,16 @@ func !! <U>(
 {
     return mapping(input)!
 }
+
+/// Combine `Result` producing closure with error mapping
+/// and producing transient `Result` with mapped error.
+public
+func !! <T, E: Error, U: Error, X>(
+    _ inputClosure: @escaping (T) -> Result<X, E>,
+    _ mapError: @escaping (E) -> U
+    ) -> (T) -> Result<X, U>
+{
+    return {
+        $0 ./ inputClosure ./ Result.mapError ./> mapError
+    }
+}
