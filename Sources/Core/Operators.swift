@@ -37,6 +37,7 @@ precedencegroup CompositionPrecedence {
 infix operator ./ : CompositionPrecedence // pass through
 infix operator ?/ : CompositionPrecedence // pass through unwrapped
 
+infix operator ./> : CompositionPrecedence // tap one level deeper
 infix operator .+ : CompositionPrecedence // pass through for editing
 
 infix operator .* : CompositionPrecedence // pass & stop chain
@@ -71,6 +72,34 @@ func ?/ <T, U>(
     ) rethrows -> U?
 {
     return try Pipeline.take(optional: input, map: body)
+}
+
+/// Pass `mapper` function into `input`
+/// and returns whatever `input` returns.
+///
+/// This is meant to be used for tapping into chaining
+/// modifier functions on instances by using Swift ability
+/// to give you static versions of any instance level functions
+/// that returns reference to instance level function if you pass
+/// reference to object/value instance.
+///
+/// BEFORE:
+/// ```
+/// input ./ makeResult ./ Result.mapError ./ { $0(errorMapper) }
+/// ```
+///
+/// AFTER:
+/// ```
+/// input ./ makeResult ./ Result.mapError ./> errorMapper
+/// ```
+public
+//infix
+func ./> <A, B, C>(
+    input: ((A) -> B) -> C,
+    mapper: @escaping (A) -> B
+    ) -> C
+{
+    return input(mapper)
 }
 
 /**
