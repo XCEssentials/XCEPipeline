@@ -245,48 +245,6 @@ func !! <T, E: Error>(
     }
 }
 
-/// Pass the result of `inputClosure` or catch
-/// the `error` thrown by `inputClosure`, FORCE type cast it
-/// into `E` and rethrow result error.
-///
-/// WARNING: it will crash in case the `error` is not of expected type `E`!
-public
-func !! <T, E: Error, U: Error>(
-    _ inputClosure: @autoclosure () throws -> T,
-    _ errorMapping: (E) -> U
-    ) rethrows -> T
-{
-    do
-    {
-        return try inputClosure()
-    }
-    catch
-    {
-        throw errorMapping(error as! E)
-    }
-}
-
-/// Pass the result of `inputClosure` or catch
-/// the `error` thrown by `inputClosure`, FORCE type cast it
-/// into `E` and rethrow result error.
-///
-/// WARNING: it will crash in case the `errorMapping` returns `nil`!
-public
-func !! <T, E: Error>(
-    _ inputClosure: @autoclosure () throws -> T,
-    _ errorMapping: (Error) -> E?
-    ) rethrows -> T
-{
-    do
-    {
-        return try inputClosure()
-    }
-    catch
-    {
-        throw errorMapping(error)!
-    }
-}
-
 /// Combine `Result` producing closure with error mapping
 /// and producing transient `Result` with mapped error.
 public
