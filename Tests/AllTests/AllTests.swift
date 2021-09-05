@@ -391,4 +391,55 @@ class AllTests: XCTestCase
             }
         }
     }
+    
+    func test_resultMapError_success()
+    {
+        struct InnerError: Error, Equatable {}
+        enum MappedError: Error, Equatable { case inner(InnerError) }
+        
+        func succeedingFunc(_ : String) -> Result<String, InnerError>
+        {
+            return .success("OK")
+        }
+        
+        let sut: Result<String, MappedError> = (succeedingFunc !/ MappedError.inner)("")
+        
+        XCTAssertEqual(sut, .success("OK"))
+    }
+    
+    func test_resultMapError_failure()
+    {
+        struct InnerError: Error, Equatable {}
+        enum MappedError: Error, Equatable { case inner(InnerError) }
+        
+        func failingFunc(_ : String) -> (Int) -> Result<String, InnerError>
+        {
+            return { _ in
+                
+                return .failure(InnerError())
+            }
+        }
+        
+        let sut: Result<String, MappedError> = ("" ./ failingFunc !/ MappedError.inner)(1)
+        
+        XCTAssertEqual(sut, .failure(.inner(InnerError())))
+    }
+    
+    func test_resultMapError_success_complexExample()
+    {
+        struct InnerError: Error, Equatable {}
+        enum MappedError: Error, Equatable { case inner(InnerError) }
+        
+        func makeFullName(first: String) -> (String) -> Result<String, InnerError>
+        {
+            return { last in
+                
+                return .success("\(first) \(last)")
+            }
+        }
+        
+        let sut = "John" ./ makeFullName !/ MappedError.inner ./ { $0("Doe") }
+        
+        XCTAssertEqual(sut, .success("John Doe"))
+    }
 }
