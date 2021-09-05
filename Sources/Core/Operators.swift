@@ -36,6 +36,7 @@ precedencegroup CompositionPrecedence {
 
 infix operator ./ : CompositionPrecedence // pass through
 infix operator ?/ : CompositionPrecedence // pass through unwrapped
+infix operator !/ : CompositionPrecedence // map error and pass through
 
 infix operator ./> : CompositionPrecedence // tap one level deeper
 infix operator .+ : CompositionPrecedence // pass through for editing
@@ -72,6 +73,19 @@ func ?/ <T, U>(
     ) rethrows -> U?
 {
     return try Pipeline.take(optional: input, map: body)
+}
+
+/// Combine `Result` producing closure with error mapping
+/// and producing transient `Result` with mapped error.
+public
+func !/ <T, E: Error, U: Error, X>(
+    _ inputClosure: @escaping (T) -> Result<X, E>,
+    _ mapError: @escaping (E) -> U
+    ) -> (T) -> Result<X, U>
+{
+    return {
+        $0 ./ inputClosure ./ Result.mapError ./> mapError
+    }
 }
 
 /// Pass `mapper` function into `input`
@@ -242,18 +256,5 @@ func !! <T, E: Error>(
     catch
     {
         throw error as! E
-    }
-}
-
-/// Combine `Result` producing closure with error mapping
-/// and producing transient `Result` with mapped error.
-public
-func !! <T, E: Error, U: Error, X>(
-    _ inputClosure: @escaping (T) -> Result<X, E>,
-    _ mapError: @escaping (E) -> U
-    ) -> (T) -> Result<X, U>
-{
-    return {
-        $0 ./ inputClosure ./ Result.mapError ./> mapError
     }
 }

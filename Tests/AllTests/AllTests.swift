@@ -392,67 +392,54 @@ class AllTests: XCTestCase
         }
     }
     
-    func test_forceCastErrorMapped_nonThrowing()
+    func test_resultMapError_success()
     {
-        struct TheError: Error {}
-        enum MappingError: Error { case one(TheError) }
-        func nonThrowingFunc() throws -> String { "OK" }
+        struct InnerError: Error, Equatable {}
+        enum MappedError: Error, Equatable { case inner(InnerError) }
         
-        let sut = { try nonThrowingFunc() !! MappingError.one }
+        func succeedingFunc(_ : String) -> Result<String, InnerError>
+        {
+            return .success("OK")
+        }
         
-        XCTAssertNoThrow(try sut())
-        XCTAssertEqual(try! sut(), "OK")
+        let sut: Result<String, MappedError> = (succeedingFunc !/ MappedError.inner)("")
+        
+        XCTAssertEqual(sut, .success("OK"))
     }
     
-    func test_forceCastErrorMapped_throwing()
+    func test_resultMapError_failure()
     {
-        struct TheError: Error {}
-        enum MappingError: Error { case one(TheError) }
-        func throwingFunc() throws { throw TheError() }
+        struct InnerError: Error, Equatable {}
+        enum MappedError: Error, Equatable { case inner(InnerError) }
         
-        let sut = { try throwingFunc() !! MappingError.one }
-        
-        XCTAssertThrowsError(try sut()) { error in
-            switch error
-            {
-                case MappingError.one:
-                    break // as expected
-                    
-                default:
-                    XCTFail("Thrown unexpected error!")
+        func failingFunc(_ : String) -> (Int) -> Result<String, InnerError>
+        {
+            return { _ in
+                
+                return .failure(InnerError())
             }
         }
+        
+        let sut: Result<String, MappedError> = ("" ./ failingFunc !/ MappedError.inner)(1)
+        
+        XCTAssertEqual(sut, .failure(.inner(InnerError())))
     }
     
-    func test_forceCastErrorMappedFromNonTyped_nonThrowing()
+    func test_resultMapError_success_complexExample()
     {
-        enum MappingError: Error { case one(Error) }
-        func nonThrowingFunc() throws -> String { "OK" }
+        struct InnerError: Error, Equatable {}
+        enum MappedError: Error, Equatable { case inner(InnerError) }
         
-        let sut = { try nonThrowingFunc() !! MappingError.one }
-        
-        XCTAssertNoThrow(try sut())
-        XCTAssertEqual(try! sut(), "OK")
-    }
-    
-    
-    func test_forceCastErrorMappedFromNonTyped_throwing()
-    {
-        struct SomeError: Error {}
-        enum MappingError: Error { case one(Error) }
-        func throwingFunc() throws { throw SomeError() }
-        
-        let sut = { try throwingFunc() !! MappingError.one }
-        
-        XCTAssertThrowsError(try sut()) { error in
-            switch error
-            {
-                case MappingError.one:
-                    break // as expected
-                    
-                default:
-                    XCTFail("Thrown unexpected error!")
+        func makeFullName(first: String) -> (String) -> Result<String, InnerError>
+        {
+            return { last in
+                
+                return .success("\(first) \(last)")
             }
         }
+        
+        let sut = "John" ./ makeFullName !/ MappedError.inner ./ { $0("Doe") }
+        
+        XCTAssertEqual(sut, .success("John Doe"))
     }
 }
