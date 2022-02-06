@@ -238,6 +238,31 @@ func ?! <T>(
     }
 }
 
+public
+//infix
+func ?! <T>(
+    input: T,
+    condition: (T) throws -> Bool
+    ) throws -> T
+{
+    do
+    {
+        if
+            try condition(input)
+        {
+            return input
+        }
+        else
+        {
+            throw CheckFailedError.unsatisfiedCondition
+        }
+    }
+    catch
+    {
+        throw CheckFailedError.errorDuringConditionCheck(error)
+    }
+}
+
 /// Pass the result of `inputClosure` or catch
 /// the `error` thrown by `inputClosure`, FORCE type cast it
 /// into `E` and rethrow result error.
