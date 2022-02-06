@@ -442,4 +442,57 @@ class AllTests: XCTestCase
         
         XCTAssertEqual(sut, .success("John Doe"))
     }
+    
+    func test_checkConditionAndThrowMaybe_builtInError_success()
+    {
+        do
+        {
+            try 1
+                .! { $0 == 1 }
+                ./ { XCTAssertEqual(1, $0) }
+        }
+        catch
+        {
+            XCTFail("Did NOT expect to fail!")
+        }
+    }
+    
+    func test_checkConditionAndThrowMaybe_builtInError_unsatisfiedCondition()
+    {
+        do
+        {
+            try 2
+                .! { $0 == 1 }
+                ./ { _ in XCTFail("Expected condition check to fail!") }
+        }
+        catch CheckFailedError.unsatisfiedCondition
+        {
+            // ok
+        }
+        catch
+        {
+            XCTFail("Did NOT expect error of this type: \(error)!")
+        }
+    }
+    
+    
+    func test_checkConditionAndThrowMaybe_builtInError_faildConditionCheck()
+    {
+        enum NestedError: Error { case one }
+        
+        do
+        {
+            try 1
+                .! { _ in throw NestedError.one }
+                ./ { _ in XCTFail("Expected error thrown during condition check!") }
+        }
+        catch CheckFailedError.errorDuringConditionCheck(NestedError.one)
+        {
+            // ok
+        }
+        catch
+        {
+            XCTFail("Did NOT expect error of this type: \(error)!")
+        }
+    }
 }
