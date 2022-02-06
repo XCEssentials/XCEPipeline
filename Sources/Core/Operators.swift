@@ -44,6 +44,7 @@ infix operator .+ : CompositionPrecedence // pass through for editing
 infix operator .* : CompositionPrecedence // pass & stop chain
 infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
 
+infix operator .! : CompositionPrecedence // check and throw if not OK, pass throw otherwise
 infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
 infix operator !! : NilCoalescingPrecedence // rethrow with FORCE error typecast
 
@@ -240,26 +241,34 @@ func ?! <T>(
 
 public
 //infix
-func ?! <T>(
+func .! <T>(
     input: T,
     condition: (T) throws -> Bool
     ) throws -> T
 {
+    let result: Bool
+    
+    //---
+    
     do
     {
-        if
-            try condition(input)
-        {
-            return input
-        }
-        else
-        {
-            throw CheckFailedError.unsatisfiedCondition
-        }
+        result = try condition(input)
     }
     catch
     {
         throw CheckFailedError.errorDuringConditionCheck(error)
+    }
+    
+    //---
+    
+    if
+        result
+    {
+        return input
+    }
+    else
+    {
+        throw CheckFailedError.unsatisfiedCondition
     }
 }
 
