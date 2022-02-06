@@ -352,7 +352,7 @@ class AllTests: XCTestCase
         }
         catch let error as UnsatisfiedRequirement
         {
-            XCTAssert(error.requirement == "Must be 1")
+            XCTAssert(error.description == "Must be 1")
             XCTAssert((error.input as! Int) == 22)
             XCTAssert(error.context.function == "testEnsure()")
         }
