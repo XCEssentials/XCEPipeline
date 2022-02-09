@@ -159,7 +159,7 @@ class AllTests: XCTestCase
         Optional<Int>.none ?* { _ in XCTFail("Should never get here!") }
     }
 
-    func testMutate()
+    func testMutateAndInspect()
     {
         22 ./ Pipeline.mutate{ $0 += 1 } ./ { XCTAssert($0 == 23) }
         
@@ -181,7 +181,7 @@ class AllTests: XCTestCase
         let val4 = ReferenceObject()
 
         XCTAssert(val4.note == "Hello")
-        val4 .+ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
+        val4 .- { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
     }
 
     func testUse()
