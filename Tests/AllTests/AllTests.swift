@@ -495,4 +495,44 @@ class AllTests: XCTestCase
             XCTFail("Did NOT expect error of this type: \(error)!")
         }
     }
+    
+    func test_checkBoolAndThrowIfFalse_success() throws
+    {
+        enum SomeErr: String, Error { case one }
+        
+        try true ?! SomeErr.one
+    }
+    
+    func test_checkBoolAndThrowIfFalse_failure()
+    {
+        enum SomeErr: String, Error { case one }
+        
+        do
+        {
+            try false ?! SomeErr.one
+            
+            XCTFail("Expected to throw an error")
+        }
+        catch SomeErr.one
+        {
+            // OK
+        }
+        catch
+        {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+    
+    func test_checkBoolAndThrowIfFalse_failureWithLazyErrorInitialization() throws
+    {
+        enum SomeErr: String, Error { case one }
+        
+        func makeErr() -> SomeErr
+        {
+            XCTFail("Did not expect to eter this scope")
+            return .one
+        }
+        
+        try true ?! makeErr()
+    }
 }

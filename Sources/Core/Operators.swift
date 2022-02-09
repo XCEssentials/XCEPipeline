@@ -190,7 +190,7 @@ public
 //infix
 func ?! <T>(
     input: T?,
-    error: Swift.Error
+    getError: @autoclosure () -> Swift.Error
     ) throws -> T
 {
     if
@@ -200,7 +200,7 @@ func ?! <T>(
     }
     else
     {
-        throw error
+        throw getError()
     }
 }
 
@@ -208,13 +208,13 @@ public
 //infix
 func ?! (
     input: Bool,
-    error: Swift.Error
+    getError: @autoclosure () -> Swift.Error
     ) throws
 {
     if
         !input
     {
-        throw error
+        throw getError()
     }
 }
 
@@ -222,7 +222,7 @@ public
 //infix
 func ?! <T>(
     input: T?,
-    error: Swift.Error
+    getError: @autoclosure () -> Swift.Error
     ) throws -> T
     where
     T: Collection
@@ -235,7 +235,7 @@ func ?! <T>(
     }
     else
     {
-        throw error
+        throw getError()
     }
 }
 
