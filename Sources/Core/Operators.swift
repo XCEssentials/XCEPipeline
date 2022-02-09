@@ -40,6 +40,7 @@ infix operator !/ : CompositionPrecedence // map error and pass through
 
 infix operator ./> : CompositionPrecedence // tap one level deeper
 infix operator .+ : CompositionPrecedence // pass through for editing
+infix operator .- : CompositionPrecedence // pass through for inspecting
 
 infix operator .* : CompositionPrecedence // pass & stop chain
 infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
@@ -131,7 +132,7 @@ public
 func .+ <T>(
     input: T,
     _ body: @escaping (inout T) throws -> Void
-    ) throws -> T
+    ) rethrows -> T
 {
     var tmp = input
     try body(&tmp)
@@ -147,14 +148,13 @@ func .+ <T>(
  */
 public
 //infix
-func .+ <T>(
+func .- <T>(
     input: T,
-    _ body: @escaping (inout T) -> Void
-    ) -> T
+    _ body: @escaping (T) throws -> Void
+) rethrows -> T
 {
-    var tmp = input
-    body(&tmp)
-    return tmp
+    try body(input)
+    return input
 }
 
 /// Passes `input` value into `body` as is. Returns nothing.
