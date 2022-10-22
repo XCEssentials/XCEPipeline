@@ -84,10 +84,10 @@ class AllTests: XCTestCase
         XCTAssert((val1 ./ f3) == val1+1)
         XCTAssert((val1 ./ f4) == val1+1)
         
-        XCTAssert((val2 ?/ f1)! == ())
-        XCTAssert((val2 ?/ f2)! == ())
-        XCTAssert((val2 ?/ f3) == val2.map{ $0 + 1 })
-        XCTAssert((val2 ?/ f4) == val2.map{ $0 + 1 })
+        XCTAssert((val2 .? f1)! == ())
+        XCTAssert((val2 .? f2)! == ())
+        XCTAssert((val2 .? f3) == val2.map{ $0 + 1 })
+        XCTAssert((val2 .? f4) == val2.map{ $0 + 1 })
     }
     
     func test_takeEnd()
@@ -135,10 +135,10 @@ class AllTests: XCTestCase
         val1 .* f3
         val1 .* f4
         
-        val2 ?* f1
-        val2 ?* f2
-        val2 ?* f3
-        val2 ?* f4
+        val2 .?* f1
+        val2 .?* f2
+        val2 .?* f3
+        val2 .?* f4
     }
 
     func testBasics()
@@ -150,13 +150,13 @@ class AllTests: XCTestCase
     func testOptionals()
     {
         Optional(22) ./ { String(describing: $0) } ./ { XCTAssert($0 == "Optional(22)") }
-        Optional(22) ?/ { "\($0)" } ./ { XCTAssert($0 == "22") }
-        Optional(22) ?/ { "\($0)" } ?/ { XCTAssert($0 == "22") }
-        Optional(22) ?/ { XCTAssert(type(of: $0) == Int.self) }
+        Optional(22) .? { "\($0)" } ./ { XCTAssert($0 == "22") }
+        Optional(22) .? { "\($0)" } .? { XCTAssert($0 == "22") }
+        Optional(22) .? { XCTAssert(type(of: $0) == Int.self) }
         Optional(22) ./ { XCTAssert(type(of: $0) == Optional<Int>.self) }
         Optional<Int>.none ./ { XCTAssert($0 == nil) }
-        Optional<Int>.none ?/ { _ in XCTFail("Should never get here!") }
-        Optional<Int>.none ?* { _ in XCTFail("Should never get here!") }
+        Optional<Int>.none .? { _ in XCTFail("Should never get here!") }
+        Optional<Int>.none .?* { _ in XCTFail("Should never get here!") }
     }
 
     func testMutateAndInspect()
@@ -402,7 +402,7 @@ class AllTests: XCTestCase
             return .success("OK")
         }
         
-        let sut: Result<String, MappedError> = (succeedingFunc !/ MappedError.inner)("")
+        let sut: Result<String, MappedError> = (succeedingFunc .!/ MappedError.inner)("")
         
         XCTAssertEqual(sut, .success("OK"))
     }
@@ -420,7 +420,7 @@ class AllTests: XCTestCase
             }
         }
         
-        let sut: Result<String, MappedError> = ("" ./ failingFunc !/ MappedError.inner)(1)
+        let sut: Result<String, MappedError> = ("" ./ failingFunc .!/ MappedError.inner)(1)
         
         XCTAssertEqual(sut, .failure(.inner(InnerError())))
     }
@@ -438,7 +438,7 @@ class AllTests: XCTestCase
             }
         }
         
-        let sut = "John" ./ makeFullName !/ MappedError.inner ./ { $0("Doe") }
+        let sut = "John" ./ makeFullName .!/ MappedError.inner ./ { $0("Doe") }
         
         XCTAssertEqual(sut, .success("John Doe"))
     }

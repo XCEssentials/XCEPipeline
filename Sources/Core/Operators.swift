@@ -35,17 +35,17 @@ precedencegroup CompositionPrecedence {
 // MARK: - Declaration
 
 infix operator ./ : CompositionPrecedence // pass through
-infix operator ?/ : CompositionPrecedence // pass through unwrapped
-infix operator !/ : CompositionPrecedence // map error and pass through
+infix operator .? : CompositionPrecedence // pass through unwrapped
+infix operator .!/ : CompositionPrecedence // map error and pass through
 
 infix operator ./> : CompositionPrecedence // tap one level deeper
 infix operator .+ : CompositionPrecedence // pass through for editing
 infix operator .- : CompositionPrecedence // pass through for inspecting
 
 infix operator .* : CompositionPrecedence // pass & stop chain
-infix operator ?* : CompositionPrecedence // pass unwrapped  & stop chain
+infix operator .?* : CompositionPrecedence // pass unwrapped  & stop chain
 
-infix operator .! : CompositionPrecedence // check and throw if not OK, pass throw otherwise
+infix operator .! : CompositionPrecedence // check and throw if not OK, pass throug otherwise
 infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
 infix operator !! : NilCoalescingPrecedence // rethrow with FORCE error typecast
 
@@ -69,7 +69,7 @@ func ./ <T, U>(
 /// Analogue of `map(...)` function of `Optional` type.
 public
 //infix
-func ?/ <T, U>(
+func .? <T, U>(
     input: T?,
     body: (T) throws -> U
     ) rethrows -> U?
@@ -80,7 +80,7 @@ func ?/ <T, U>(
 /// Combine `Result` producing closure with error mapping
 /// and producing transient `Result` with mapped error.
 public
-func !/ <T, E: Error, U: Error, X>(
+func .!/ <T, E: Error, U: Error, X>(
     _ inputClosure: @escaping (T) -> Result<X, E>,
     _ mapError: @escaping (E) -> U
     ) -> (T) -> Result<X, U>
@@ -178,7 +178,7 @@ func .* <T, U>(
 /// next step taking no input (Void).
 public
 //infix
-func ?* <T, U>(
+func .?* <T, U>(
     input: T?,
     body: (T) throws -> U
     ) rethrows
