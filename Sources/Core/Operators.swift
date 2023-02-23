@@ -66,15 +66,15 @@ func ./ <T, U>(
 /// Passes unwrapped `input` value into `body` if it's non-nil,
 /// or does nothing otherwise. Returns whatever `body` supposed
 /// to return (or `nil`) as optional to continue the pipeline.
-/// Analogue of `map(...)` function of `Optional` type.
+/// Analogue of `flatMap(...)` function of `Optional` type.
 public
 //infix
 func .? <T, U>(
     input: T?,
-    body: (T) throws -> U
+    body: (T) throws -> U?
     ) rethrows -> U?
 {
-    return try Pipeline.take(optional: input, map: body)
+    return try Pipeline.take(optional: input, flatMap: body)
 }
 
 /// Combine `Result` producing closure with error mapping
