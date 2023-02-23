@@ -67,10 +67,10 @@ extension Pipeline
     static
     func take<T, U>(
         optional input: T?,
-        map body: (T) throws -> U
+        flatMap body: (T) throws -> U?
         ) rethrows -> U?
     {
-        return try input.map(body)
+        return try input.flatMap(body)
     }
 
     /// Passes `input` value into `body` as is. Returns nothing.
