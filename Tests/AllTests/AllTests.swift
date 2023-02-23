@@ -74,10 +74,10 @@ class AllTests: XCTestCase
         XCTAssert(Pipeline.take(val2, map: f4) == val2.map{ $0 + 1 })
         
         
-        XCTAssert(Pipeline.take(optional: val2, map: f1)! == ())
-        XCTAssert(Pipeline.take(optional: val2, map: f2)! == ())
-        XCTAssert(Pipeline.take(optional: val2, map: f3) == val2.map{ $0 + 1 })
-        XCTAssert(Pipeline.take(optional: val2, map: f4) == val2.map{ $0 + 1 })
+        XCTAssert(Pipeline.take(optional: val2, flatMap: f1)! == ())
+        XCTAssert(Pipeline.take(optional: val2, flatMap: f2)! == ())
+        XCTAssert(Pipeline.take(optional: val2, flatMap: f3) == val2.map{ $0 + 1 })
+        XCTAssert(Pipeline.take(optional: val2, flatMap: f4) == val2.map{ $0 + 1 })
         
         XCTAssert((val1 ./ f1) == ())
         XCTAssert((val1 ./ f2) == ())
