@@ -18,6 +18,35 @@ extension Publisher
         )
     }
     
+    /// Convenince adapter for asycn/await workflow.
+    ///
+    /// Credits:
+    /// https://medium.com/geekculture/from-combine-to-async-await-c08bf1d15b77
+    func waitForFirstResult() async throws -> Output
+    {
+        try await withCheckedThrowingContinuation { continuation in
+            
+            var cancellable: AnyCancellable?
+            
+            cancellable = self
+                .sink { result in
+                    
+                    switch result
+                    {
+                        case .finished:
+                            cancellable?.cancel()
+                            cancellable = nil
+                            
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                    }
+                }
+                receiveValue: {
+                    continuation.resume(returning: $0)
+                }
+        }
+    }
+    
     /// Simple shortcut to connect multiple invocations
     /// upstream and initiate the chain.
     func observe() -> AnyCancellable
