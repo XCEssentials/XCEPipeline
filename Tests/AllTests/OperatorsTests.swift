@@ -29,7 +29,7 @@ import XCTest
 import XCERequirement
 
 //@testable
-import XCEPipelineCore
+import XCEPipeline
 
 //---
 

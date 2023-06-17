@@ -29,7 +29,7 @@ import XCTest
 import Combine
 
 //@testable
-import XCEPipelineCore
+import XCEPipeline
 
 //---
 

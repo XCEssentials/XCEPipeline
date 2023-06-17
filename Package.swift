@@ -12,7 +12,7 @@ let package = Package(
         .library(
             name: "XCEPipeline",
             targets: [
-                "XCEPipelineCore"
+                "XCEPipeline"
             ]
         )
     ],
@@ -25,7 +25,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "XCEPipelineCore",
+            name: "XCEPipeline",
             dependencies: [
                 "XCERequirement"
             ],
@@ -34,7 +34,7 @@ let package = Package(
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipelineCore",
+                "XCEPipeline",
                 "XCERequirement"
             ],
             path: "Tests/AllTests"

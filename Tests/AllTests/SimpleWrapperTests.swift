@@ -27,7 +27,7 @@
 import XCTest
 
 //@testable
-import XCEPipelineCore
+import XCEPipeline
 
 //---
 
