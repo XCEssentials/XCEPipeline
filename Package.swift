@@ -4,6 +4,10 @@ import PackageDescription
 
 let package = Package(
     name: "XCEPipeline",
+    platforms: [
+        .macOS(.v10_15), // depends on Combine
+        .iOS(.v13)
+    ],
     products: [
         .library(
             name: "XCEPipeline",
