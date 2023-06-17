@@ -29,17 +29,22 @@ import XCTest
 import XCERequirement
 
 //@testable
-import XCEPipeline
+import XCEPipelineCore
 
 //---
 
-class AllTests: XCTestCase
+class OperatorsTests: XCTestCase
 {
     enum The: Error
     {
         case error
     }
-    
+}
+
+// MARK: - Tests
+
+extension OperatorsTests
+{
     func test_takeMap()
     {
         let val1: Int = 21
