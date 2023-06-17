@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -8,7 +8,7 @@ let package = Package(
         .library(
             name: "XCEPipeline",
             targets: [
-                "XCEPipeline"
+                "XCEPipelineCore"
             ]
         )
     ],
@@ -21,7 +21,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "XCEPipeline",
+            name: "XCEPipelineCore",
             dependencies: [
                 "XCERequirement"
             ],
@@ -30,7 +30,7 @@ let package = Package(
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipeline",
+                "XCEPipelineCore",
                 "XCERequirement"
             ],
             path: "Tests/AllTests"
