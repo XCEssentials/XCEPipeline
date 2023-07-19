@@ -26,9 +26,9 @@
 
 import XCTest
 
-import XCERequirement
+//import XCERequirement
 
-//@testable
+@testable
 import XCEPipeline
 
 //---
@@ -322,7 +322,7 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure{ _ in throw The.error }
+                ./ Pipeline.check{ _ in throw The.error }
                 ./ { _ in XCTFail("Should never get here!") }
         }
         catch The.error
@@ -339,7 +339,7 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure("Equal to 22"){ $0 == 22 }
+                ./ Pipeline.ensure { $0 == 22 }
                 ./ { XCTAssert($0 == 22) }
         }
         catch
@@ -352,14 +352,12 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure("Must be 1"){ $0 == 1 }
+                ./ Pipeline.ensure { $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch let error as UnsatisfiedRequirement
+        catch CheckFailedError.unsatisfiedCondition
         {
-            XCTAssert(error.description == "Must be 1")
-            XCTAssert((error.input as! Int) == 22)
-            XCTAssert(error.context.function == "testEnsure()")
+            // ok
         }
         catch
         {
@@ -539,5 +537,82 @@ extension OperatorsTests
         }
         
         try true ?! makeErr()
+    }
+    
+    func test_take_optional()
+    {
+        let valMaybe: Int? = 1
+        
+        //---
+        
+        XCTAssertEqual(take(valMaybe), .some(1))
+        XCTAssertEqual("\(type(of: take(valMaybe)))", "Optional<Int>")
+    }
+    
+    func test_take_simpleWrapper()
+    {
+        let val: Int = 1
+        
+        //---
+        
+        XCTAssertEqual(take(val), 1)
+        XCTAssertEqual("\(type(of: take(val)))", "SimpleWrapper<Int>")
+    }
+    
+    func test_take_simpleWrapper_map()
+    {
+        XCTAssertEqual(take(1).map(String.init).value, "1")
+    }
+    
+    func test_take_simpleWrapper_mapThrows()
+    {
+        struct MyErr: Error {}
+        
+        //---
+        
+        XCTAssertThrowsError(
+            try take(1).map{ _ in throw MyErr() },
+            "`map` rethrows error from the handler",
+            { XCTAssertTrue($0 is MyErr) }
+        )
+    }
+    
+    func test_take_simpleWrapper_inspect()
+    {
+        XCTAssertEqual(
+            take(1).inspect { XCTAssertEqual($0, 1) }.value,
+            1
+        )
+    }
+    
+    func test_take_simpleWrapper_inspectThrows()
+    {
+        struct MyErr: Error {}
+        
+        //---
+        
+        XCTAssertThrowsError(
+            try take(1).inspect{ _ in throw MyErr() },
+            "`inspect` rethrows error from the handler",
+            { XCTAssertTrue($0 is MyErr) }
+        )
+    }
+    
+    func test_take_simpleWrapper_mutate()
+    {
+        XCTAssertEqual(take(1).mutate { $0 += 1 }.value, 2)
+    }
+    
+    func test_take_simpleWrapper_mutateThrows()
+    {
+        struct MyErr: Error {}
+        
+        //---
+        
+        XCTAssertThrowsError(
+            try take(1).mutate{ _ in throw MyErr() },
+            "`mutate` rethrows error from the handler",
+            { XCTAssertTrue($0 is MyErr) }
+        )
     }
 }

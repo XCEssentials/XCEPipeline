@@ -24,43 +24,18 @@
 
  */
 
-/// Convenience wrapper that enables chain operations
-/// similar to `Optional` & `Collection`.
+/// Global convenience helper to start chained expression.
 public
-struct SimpleWrapper<T>
+func take<T>(_ value: T) -> SimpleWrapper<T>
 {
-    public
-    let value: T
- 
-    public
-    init(_ value: T)
-    {
-        self.value = value
-    }
- 
-    public
-    func map<R>(_ handler: (T) throws -> R) rethrows -> SimpleWrapper<R>
-    {
-        try .init(handler(value))
-    }
-    
-    public
-    func inspect(_ handler: (T) throws -> Void) rethrows -> Self
-    {
-        try handler(value)
-        return self
-    }
-    
-    public
-    func mutate(_ handler: (inout T) throws -> Void) rethrows -> Self
-    {
-        var tmp = value
-        try handler(&tmp)
-        return .init(tmp)
-    }
+    .init(value)
 }
 
-extension SimpleWrapper: Equatable where T: Equatable {}
-extension SimpleWrapper: Hashable where T: Hashable {}
-extension SimpleWrapper: Codable where T: Codable {}
-extension SimpleWrapper: Sendable where T: Sendable {}
+/// Convenince helper for better code consistency,
+/// mimics the chained expression starter `take` with
+/// non-Optional input.
+public
+func take<T>(_ value: T?) -> T?
+{
+    value
+}

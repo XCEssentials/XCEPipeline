@@ -16,25 +16,15 @@ let package = Package(
             ]
         )
     ],
-    dependencies: [
-        .package(
-            url: "https://github.com/XCEssentials/XCERequirement",
-            .upToNextMinor(from: "2.6.0")
-        )
-    ],
     targets: [
         .target(
             name: "XCEPipeline",
-            dependencies: [
-                "XCERequirement"
-            ],
             path: "Sources/Core"
         ),
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipeline",
-                "XCERequirement"
+                "XCEPipeline"
             ],
             path: "Tests/AllTests"
         ),

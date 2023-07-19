@@ -31,7 +31,7 @@
  - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
 
  Examples:
- - https://github.com/gilesvangruisen/Pipeline
+ - https://github.com/gilesvangruisen/Pipeline ⚠️ autoformat
  - https://github.com/pauljeannot/SwiftyBash
  - https://github.com/patgoley/Pipeline/blob/master/Pipeline/Operators.swift
  - https://github.com/danthorpe/Pipe (outdated!)
@@ -41,10 +41,7 @@
 public
 enum Pipeline {} // scope
 
-public
-typealias Pipe = Pipeline
-
-//---
+// MARK: - Core
 
 public
 extension Pipeline
@@ -98,5 +95,155 @@ extension Pipeline
         ) rethrows
     {
         _ = try input.map(body)
+    }
+}
+
+// MARK: - Mutate
+
+extension Pipeline
+{
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of value-type instances. THROWS!
+     */
+    static
+    func mutate<T>(
+        _ body: @escaping (inout T) throws -> Void
+        ) -> (T) throws -> T
+    {
+        return { var tmp = $0; try body(&tmp); return tmp }
+    }
+
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of value-type instances.
+     */
+    static
+    func mutate<T>(
+        _ body: @escaping (inout T) -> Void
+        ) -> (T) -> T
+    {
+        return { var tmp = $0; body(&tmp); return tmp }
+    }
+}
+
+// MARK: - Use
+
+extension Pipeline
+{
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of reference-type instances or
+     observation (read-only) access to value type instances.
+     THROWS!
+     */
+    static
+    func use<T>(
+        _ body: @escaping (T) throws -> Void
+        ) -> (T) throws -> T
+    {
+        return { try body($0); return $0 }
+    }
+
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of reference-type instances or
+     observation (read-only) access to value type instances.
+     */
+    static
+    func use<T>(
+        _ body: @escaping (T) -> Void
+        ) -> (T) -> T
+    {
+        return { body($0); return $0 }
+    }
+}
+
+// MARK: - Throw
+
+extension Pipeline
+{
+    static
+    func unwrapOrThrow<T>(
+        _ error: Swift.Error
+        ) -> (T?) throws -> T
+    {
+        return {
+            try $0 ?! error
+        }
+    }
+
+    static
+    func throwIfNil<T>(
+        _ error: Swift.Error
+        ) -> (T?) throws -> Void
+    {
+        return {
+            _ = try $0 ?! error
+        }
+    }
+
+    static
+    func throwIfFalse(
+        _ error: Swift.Error
+        ) -> (Bool) throws -> Void
+    {
+        return {
+            _ = try $0 ?! error
+        }
+    }
+
+    static
+    func throwIfEmpty<T>(
+        _ error: Swift.Error
+        ) -> (T?) throws -> T
+        where
+        T: Collection
+    {
+        return {
+            try $0 ?! error
+        }
+    }
+}
+
+// MARK: - Ensure
+
+extension Pipeline
+{
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline checking some conditions about provided input.
+     THROWS!
+     */
+    static
+    func check<T>(
+        _ body: @escaping (T) throws -> Void
+        ) -> (T) throws -> T
+    {
+        return { try body($0); return $0 }
+    }
+
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline checking some conditions about provided input.
+     THROWS!
+     */
+    static
+    func ensure<T>(
+        _ body: @escaping (T) throws -> Bool
+        ) -> (T) throws -> T
+    {
+        return {
+            
+            if
+                try body($0)
+            {
+                return $0
+            }
+            else
+            {
+                throw CheckFailedError.unsatisfiedCondition
+            }
+        }
     }
 }
