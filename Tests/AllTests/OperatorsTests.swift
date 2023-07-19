@@ -615,4 +615,20 @@ extension OperatorsTests
             { XCTAssertTrue($0 is MyErr) }
         )
     }
+    
+    @MainActor // this is necessary to avoid warnings/errors
+    func test_operator_onMainActor_context()
+    {
+        @MainActor class TheActor { func doSomething(_ : Int) {} }
+        
+        //---
+        
+        /// If NOT on main actor context, then following error happens:
+        ///
+        /// ```
+        /// Converting function value of type '@MainActor (Int) -> ()'
+        /// to '(Int) throws -> ()' loses global actor 'MainActor'
+        /// ```
+        1 ./ TheActor().doSomething(_:)
+    }
 }
