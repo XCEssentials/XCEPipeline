@@ -39,7 +39,10 @@
  */
 
 public
-enum Pipeline {} // scope
+enum Pipeline // scope
+{
+    struct FailedConditionCheck: Error {}
+}
 
 // MARK: - Core
 
@@ -52,8 +55,8 @@ extension Pipeline
     func take<T, U>(
         _ input: T,
         map body: (T) throws -> U
-        ) rethrows -> U
-    {
+    ) rethrows -> U {
+        
         return try body(input)
     }
 
@@ -65,8 +68,8 @@ extension Pipeline
     func take<T, U>(
         optional input: T?,
         flatMap body: (T) throws -> U?
-        ) rethrows -> U?
-    {
+    ) rethrows -> U? {
+        
         return try input.flatMap(body)
     }
 
@@ -78,8 +81,8 @@ extension Pipeline
     func take<T, U>(
         _ input: T,
         end body: (T) throws -> U
-        ) rethrows
-    {
+    ) rethrows {
+        
         _ = try body(input)
     }
     
@@ -92,8 +95,8 @@ extension Pipeline
     func take<T, U>(
         optional input: T?,
         end body: (T) throws -> U
-        ) rethrows
-    {
+    ) rethrows {
+        
         _ = try input.map(body)
     }
 }
@@ -108,101 +111,34 @@ extension Pipeline
      */
     static
     func mutate<T>(
-        _ body: @escaping (inout T) throws -> Void
-        ) -> (T) throws -> T
-    {
-        return { var tmp = $0; try body(&tmp); return tmp }
-    }
-
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of value-type instances.
-     */
-    static
-    func mutate<T>(
-        _ body: @escaping (inout T) -> Void
-        ) -> (T) -> T
-    {
-        return { var tmp = $0; body(&tmp); return tmp }
+        _ input: T,
+        _ body: (inout T) throws -> Void
+    ) rethrows -> T {
+        
+        var tmp = input
+        try body(&tmp)
+        return tmp
     }
 }
 
-// MARK: - Use
+// MARK: - Inspect
 
 extension Pipeline
 {
     /**
      Special global-level helper that's intended to be used
      for easy inline mutation of reference-type instances or
-     observation (read-only) access to value type instances.
+     inspection (read-only access) of value type instances.
      THROWS!
      */
     static
-    func use<T>(
-        _ body: @escaping (T) throws -> Void
-        ) -> (T) throws -> T
-    {
-        return { try body($0); return $0 }
-    }
-
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of reference-type instances or
-     observation (read-only) access to value type instances.
-     */
-    static
-    func use<T>(
-        _ body: @escaping (T) -> Void
-        ) -> (T) -> T
-    {
-        return { body($0); return $0 }
-    }
-}
-
-// MARK: - Throw
-
-extension Pipeline
-{
-    static
-    func unwrapOrThrow<T>(
-        _ error: Swift.Error
-        ) -> (T?) throws -> T
-    {
-        return {
-            try $0 ?! error
-        }
-    }
-
-    static
-    func throwIfNil<T>(
-        _ error: Swift.Error
-        ) -> (T?) throws -> Void
-    {
-        return {
-            _ = try $0 ?! error
-        }
-    }
-
-    static
-    func throwIfFalse(
-        _ error: Swift.Error
-        ) -> (Bool) throws -> Void
-    {
-        return {
-            _ = try $0 ?! error
-        }
-    }
-
-    static
-    func throwIfEmpty<T>(
-        _ error: Swift.Error
-        ) -> (T?) throws -> T
-        where
-        T: Collection
-    {
-        return {
-            try $0 ?! error
-        }
+    func inspect<T>(
+        _ input: T,
+        _ body: (T) throws -> Void
+    ) rethrows -> T {
+        
+        try body(input)
+        return input
     }
 }
 
@@ -216,23 +152,10 @@ extension Pipeline
      THROWS!
      */
     static
-    func check<T>(
-        _ body: @escaping (T) throws -> Void
-        ) -> (T) throws -> T
-    {
-        return { try body($0); return $0 }
-    }
-
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline checking some conditions about provided input.
-     THROWS!
-     */
-    static
     func ensure<T>(
         _ body: @escaping (T) throws -> Bool
-        ) -> (T) throws -> T
-    {
+    ) -> (T) throws -> T {
+        
         return {
             
             if
@@ -242,8 +165,62 @@ extension Pipeline
             }
             else
             {
-                throw CheckFailedError.unsatisfiedCondition
+                throw Pipeline.FailedConditionCheck()
             }
+        }
+    }
+}
+
+// MARK: - Throw
+
+extension Pipeline
+{
+    static
+    func unwrapOrThrow<T>(
+        _ input: T?,
+        _ getError: () -> Swift.Error
+    ) throws -> T {
+        
+        if
+            let input = input
+        {
+            return input
+        }
+        else
+        {
+            throw getError()
+        }
+    }
+
+    static
+    func throwIfFalse(
+        _ input: Bool,
+        _ getError: () -> Swift.Error
+    ) throws -> Void {
+        
+        guard
+            input
+        else
+        {
+            throw getError()
+        }
+    }
+
+    static
+    func throwIfEmpty<T>(
+        _ input: T?,
+        _ getError: () -> Swift.Error
+    ) throws -> T where T: Collection {
+        
+        if
+            let input = input,
+            !input.isEmpty
+        {
+            return input
+        }
+        else
+        {
+            throw getError()
         }
     }
 }

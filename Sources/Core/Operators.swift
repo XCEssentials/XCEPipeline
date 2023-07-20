@@ -58,8 +58,8 @@ public
 func ./ <T, U>(
     input: T,
     body: (T) throws -> U
-    ) rethrows -> U
-{
+) rethrows -> U {
+        
     return try Pipeline.take(input, map: body)
 }
 
@@ -72,50 +72,9 @@ public
 func .? <T, U>(
     input: T?,
     body: (T) throws -> U?
-    ) rethrows -> U?
-{
+) rethrows -> U? {
+        
     return try Pipeline.take(optional: input, flatMap: body)
-}
-
-/// Combine `Result` producing closure with error mapping
-/// and producing transient `Result` with mapped error.
-public
-func .!/ <T, E: Error, U: Error, X>(
-    _ inputClosure: @escaping (T) -> Result<X, E>,
-    _ mapError: @escaping (E) -> U
-    ) -> (T) -> Result<X, U>
-{
-    return {
-        $0 ./ inputClosure ./ Result.mapError ./> mapError
-    }
-}
-
-/// Pass `mapper` function into `input`
-/// and returns whatever `input` returns.
-///
-/// This is meant to be used for tapping into chaining
-/// modifier functions on instances by using Swift ability
-/// to give you static versions of any instance level functions
-/// that returns reference to instance level function if you pass
-/// reference to object/value instance.
-///
-/// BEFORE:
-/// ```
-/// input ./ makeResult ./ Result.mapError ./ { $0(errorMapper) }
-/// ```
-///
-/// AFTER:
-/// ```
-/// input ./ makeResult ./ Result.mapError ./> errorMapper
-/// ```
-public
-//infix
-func ./> <A, B, C>(
-    input: ((A) -> B) -> C,
-    mapper: @escaping (A) -> B
-    ) -> C
-{
-    return input(mapper)
 }
 
 /**
@@ -131,12 +90,10 @@ public
 //infix
 func .+ <T>(
     input: T,
-    _ body: @escaping (inout T) throws -> Void
-    ) rethrows -> T
-{
-    var tmp = input
-    try body(&tmp)
-    return tmp
+    _ body: (inout T) throws -> Void
+) rethrows -> T {
+    
+    try Pipeline.mutate(input, body)
 }
 
 /**
@@ -150,11 +107,28 @@ public
 //infix
 func .- <T>(
     input: T,
-    _ body: @escaping (T) throws -> Void
-) rethrows -> T
-{
-    try body(input)
-    return input
+    _ body: (T) throws -> Void
+) rethrows -> T {
+    
+    try Pipeline.inspect(input, body)
+}
+
+public
+//infix
+func .! <T>(
+    input: T,
+    condition: (T) throws -> Bool
+) throws -> T {
+    
+    if
+        try condition(input)
+    {
+        return input
+    }
+    else
+    {
+        throw Pipeline.FailedConditionCheck()
+    }
 }
 
 /// Passes `input` value into `body` as is. Returns nothing.
@@ -166,8 +140,8 @@ public
 func .* <T, U>(
     input: T,
     body: (T) throws -> U
-    ) rethrows
-{
+) rethrows {
+    
     try Pipeline.take(input, end: body)
 }
 
@@ -181,8 +155,8 @@ public
 func .?* <T, U>(
     input: T?,
     body: (T) throws -> U
-    ) rethrows
-{
+) rethrows {
+    
     try Pipeline.take(optional: input, end: body)
 }
 
@@ -190,105 +164,28 @@ public
 //infix
 func ?! <T>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error
-    ) throws -> T
-{
-    if
-        let input = input
-    {
-        return input
-    }
-    else
-    {
-        throw getError()
-    }
+    getError: @autoclosure () -> Swift.Error // lazy nitialization
+) throws -> T {
+    
+    try Pipeline.unwrapOrThrow(input, getError)
 }
 
 public
 //infix
 func ?! (
     input: Bool,
-    getError: @autoclosure () -> Swift.Error
-    ) throws
-{
-    if
-        !input
-    {
-        throw getError()
-    }
+    getError: @autoclosure () -> Swift.Error // lazy nitialization
+) throws {
+    
+    try Pipeline.throwIfFalse(input, getError)
 }
 
 public
 //infix
 func ?! <T>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error
-    ) throws -> T
-    where
-    T: Collection
-{
-    if
-        let input = input,
-        !input.isEmpty
-    {
-        return input
-    }
-    else
-    {
-        throw getError()
-    }
-}
-
-public
-//infix
-func .! <T>(
-    input: T,
-    condition: (T) throws -> Bool
-    ) throws -> T
-{
-    let result: Bool
+    getError: @autoclosure () -> Swift.Error // lazy nitialization
+) throws -> T where T: Collection {
     
-    //---
-    
-    do
-    {
-        result = try condition(input)
-    }
-    catch
-    {
-        throw CheckFailedError.errorDuringConditionCheck(error)
-    }
-    
-    //---
-    
-    if
-        result
-    {
-        return input
-    }
-    else
-    {
-        throw CheckFailedError.unsatisfiedCondition
-    }
-}
-
-/// Pass the result of `inputClosure` or catch
-/// the `error` thrown by `inputClosure`, FORCE type cast it
-/// into `E` and rethrow result error.
-///
-/// WARNING: it will crash in case the `error` is not of expected type `E`!
-public
-func !! <T, E: Error>(
-    _ inputClosure: @autoclosure () throws -> T,
-    _ : E.Type
-    ) rethrows -> T
-{
-    do
-    {
-        return try inputClosure()
-    }
-    catch
-    {
-        throw error as! E
-    }
+    try Pipeline.throwIfEmpty(input, getError)
 }
