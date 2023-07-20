@@ -24,9 +24,18 @@
 
  */
 
+/// Global convenience helper to start chained expression.
 public
-enum CheckFailedError: Error
+func take<T>(_ value: T) -> SimpleWrapper<T>
 {
-    case errorDuringConditionCheck(Error)
-    case unsatisfiedCondition
+    .init(value)
+}
+
+/// Convenince helper for better code consistency,
+/// mimics the chained expression starter `take` with
+/// non-Optional input.
+public
+func take<T>(_ value: T?) -> T?
+{
+    value
 }

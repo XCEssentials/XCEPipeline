@@ -24,18 +24,8 @@
 
  */
 
-public
-func take<T>(_ value: T?) -> T?
-{
-    value
-}
-
-public
-func take<T>(_ value: T) -> SimpleWrapper<T>
-{
-    .init(value)
-}
-
+/// Convenience wrapper that enables chain operations
+/// similar to `Optional` & `Collection`.
 public
 struct SimpleWrapper<T>
 {
@@ -49,20 +39,20 @@ struct SimpleWrapper<T>
     }
  
     public
-    func map<R>(via handler: (T) throws -> R) rethrows -> SimpleWrapper<R>
+    func map<R>(_ handler: (T) throws -> R) rethrows -> SimpleWrapper<R>
     {
         try .init(handler(value))
     }
     
     public
-    func inspect(via handler: (T) throws -> Void) rethrows -> Self
+    func inspect(_ handler: (T) throws -> Void) rethrows -> Self
     {
         try handler(value)
         return self
     }
     
     public
-    func mutate(via handler: (inout T) throws -> Void) rethrows -> Self
+    func mutate(_ handler: (inout T) throws -> Void) rethrows -> Self
     {
         var tmp = value
         try handler(&tmp)
@@ -71,3 +61,6 @@ struct SimpleWrapper<T>
 }
 
 extension SimpleWrapper: Equatable where T: Equatable {}
+extension SimpleWrapper: Hashable where T: Hashable {}
+extension SimpleWrapper: Codable where T: Codable {}
+extension SimpleWrapper: Sendable where T: Sendable {}

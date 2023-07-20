@@ -31,7 +31,7 @@
  - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
 
  Examples:
- - https://github.com/gilesvangruisen/Pipeline
+ - https://github.com/gilesvangruisen/Pipeline ⚠️ autoformat
  - https://github.com/pauljeannot/SwiftyBash
  - https://github.com/patgoley/Pipeline/blob/master/Pipeline/Operators.swift
  - https://github.com/danthorpe/Pipe (outdated!)
@@ -39,12 +39,12 @@
  */
 
 public
-enum Pipeline {} // scope
+enum Pipeline // scope
+{
+    struct FailedConditionCheck: Error {}
+}
 
-public
-typealias Pipe = Pipeline
-
-//---
+// MARK: - Core
 
 public
 extension Pipeline
@@ -55,8 +55,8 @@ extension Pipeline
     func take<T, U>(
         _ input: T,
         map body: (T) throws -> U
-        ) rethrows -> U
-    {
+    ) rethrows -> U {
+        
         return try body(input)
     }
 
@@ -68,8 +68,8 @@ extension Pipeline
     func take<T, U>(
         optional input: T?,
         flatMap body: (T) throws -> U?
-        ) rethrows -> U?
-    {
+    ) rethrows -> U? {
+        
         return try input.flatMap(body)
     }
 
@@ -81,8 +81,8 @@ extension Pipeline
     func take<T, U>(
         _ input: T,
         end body: (T) throws -> U
-        ) rethrows
-    {
+    ) rethrows {
+        
         _ = try body(input)
     }
     
@@ -95,8 +95,132 @@ extension Pipeline
     func take<T, U>(
         optional input: T?,
         end body: (T) throws -> U
-        ) rethrows
-    {
+    ) rethrows {
+        
         _ = try input.map(body)
+    }
+}
+
+// MARK: - Mutate
+
+extension Pipeline
+{
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of value-type instances. THROWS!
+     */
+    static
+    func mutate<T>(
+        _ input: T,
+        _ body: (inout T) throws -> Void
+    ) rethrows -> T {
+        
+        var tmp = input
+        try body(&tmp)
+        return tmp
+    }
+}
+
+// MARK: - Inspect
+
+extension Pipeline
+{
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of reference-type instances or
+     inspection (read-only access) of value type instances.
+     THROWS!
+     */
+    static
+    func inspect<T>(
+        _ input: T,
+        _ body: (T) throws -> Void
+    ) rethrows -> T {
+        
+        try body(input)
+        return input
+    }
+}
+
+// MARK: - Ensure
+
+extension Pipeline
+{
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline checking some conditions about provided input.
+     THROWS!
+     */
+    static
+    func ensure<T>(
+        _ body: @escaping (T) throws -> Bool
+    ) -> (T) throws -> T {
+        
+        return {
+            
+            if
+                try body($0)
+            {
+                return $0
+            }
+            else
+            {
+                throw Pipeline.FailedConditionCheck()
+            }
+        }
+    }
+}
+
+// MARK: - Throw
+
+extension Pipeline
+{
+    static
+    func unwrapOrThrow<T>(
+        _ input: T?,
+        _ getError: () -> Swift.Error
+    ) throws -> T {
+        
+        if
+            let input = input
+        {
+            return input
+        }
+        else
+        {
+            throw getError()
+        }
+    }
+
+    static
+    func throwIfFalse(
+        _ input: Bool,
+        _ getError: () -> Swift.Error
+    ) throws -> Void {
+        
+        guard
+            input
+        else
+        {
+            throw getError()
+        }
+    }
+
+    static
+    func throwIfEmpty<T>(
+        _ input: T?,
+        _ getError: () -> Swift.Error
+    ) throws -> T where T: Collection {
+        
+        if
+            let input = input,
+            !input.isEmpty
+        {
+            return input
+        }
+        else
+        {
+            throw getError()
+        }
     }
 }

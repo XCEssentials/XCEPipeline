@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.8
 
 import PackageDescription
 
@@ -6,7 +6,7 @@ let package = Package(
     name: "XCEPipeline",
     platforms: [
         .macOS(.v10_15), // depends on Combine
-        .iOS(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -16,26 +16,15 @@ let package = Package(
             ]
         )
     ],
-    dependencies: [
-        .package(
-            name: "XCERequirement",
-            url: "https://github.com/XCEssentials/Requirement",
-            from: "2.2.0"
-        )
-    ],
     targets: [
         .target(
             name: "XCEPipeline",
-            dependencies: [
-                "XCERequirement"
-            ],
             path: "Sources/Core"
         ),
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
-                "XCEPipeline",
-                "XCERequirement"
+                "XCEPipeline"
             ],
             path: "Tests/AllTests"
         ),

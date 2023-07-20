@@ -26,9 +26,9 @@
 
 import XCTest
 
-import XCERequirement
+//import XCERequirement
 
-//@testable
+@testable
 import XCEPipeline
 
 //---
@@ -166,7 +166,7 @@ extension OperatorsTests
 
     func testMutateAndInspect()
     {
-        22 ./ Pipeline.mutate{ $0 += 1 } ./ { XCTAssert($0 == 23) }
+        22 .+ { $0 += 1 } ./ { XCTAssert($0 == 23) }
         
         struct ValueObject
         {
@@ -191,7 +191,7 @@ extension OperatorsTests
 
     func testUse()
     {
-        22 ./ Pipeline.use{ XCTAssert($0 == 22) } ./ { XCTAssert($0 == 22) }
+        22 .- { XCTAssert($0 == 22) } ./ { XCTAssert($0 == 22) }
     }
     
     func test_unwrapOrThrow()
@@ -199,12 +199,12 @@ extension OperatorsTests
         do
         {
             try Optional<Int>.none
-                ./ Pipeline.unwrapOrThrow(The.error)
+                ./ { try $0 ?! The.error }
                 ./ { _ in XCTFail("Should never get here!") }
         }
         catch The.error
         {
-            // okay
+            // ✅ okay
         }
         catch
         {
@@ -216,38 +216,8 @@ extension OperatorsTests
         do
         {
             try Optional(22)
-                ./ Pipeline.unwrapOrThrow(The.error)
+                ./ { try $0 ?! The.error }
                 ./ { XCTAssert($0 == 22) }
-        }
-        catch
-        {
-            XCTFail("Should never get here!")
-        }
-    }
-    
-    func test_throwIfNil()
-    {
-        do
-        {
-            try Optional<Int>.none
-                ./ Pipeline.throwIfNil(The.error)
-                ./ { XCTFail("Should never get here!") }
-        }
-        catch The.error
-        {
-            // okay
-        }
-        catch
-        {
-            XCTFail("Should never get here!")
-        }
-        
-        //---
-        
-        do
-        {
-            try Optional(22)
-                ./ Pipeline.throwIfNil(The.error)
         }
         catch
         {
@@ -260,7 +230,7 @@ extension OperatorsTests
         do
         {
             try false
-                ./ Pipeline.throwIfFalse(The.error)
+                ./ { try $0 ?! The.error }
                 ./ { _ in XCTFail("Should never get here!") }
         }
         catch The.error
@@ -277,8 +247,8 @@ extension OperatorsTests
         do
         {
             try true
-                ./ Pipeline.throwIfFalse(The.error)
-                ./ { /* it was TRUE */ }
+                ./ { try $0 ?! The.error }
+                ./ { /* ✅ it was TRUE */ }
         }
         catch
         {
@@ -290,13 +260,12 @@ extension OperatorsTests
     {
         do
         {
-            try Array<Int>()
-                ./ Pipeline.throwIfEmpty(The.error)
-                ./ { _ in XCTFail("Should never get here!") }
+            _ = try Array<Int>() ?! The.error
+            XCTFail("Should never get here!")
         }
         catch The.error
         {
-            // okay
+            // ✅ okay
         }
         catch
         {
@@ -307,9 +276,7 @@ extension OperatorsTests
         
         do
         {
-            try [22]
-                ./ Pipeline.throwIfEmpty(The.error)
-                ./ { XCTAssert($0[0] == 22) }
+            _ = try [22] ?! The.error
         }
         catch
         {
@@ -322,12 +289,12 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure{ _ in throw The.error }
+                .- { _ in throw The.error }
                 ./ { _ in XCTFail("Should never get here!") }
         }
         catch The.error
         {
-            // okay
+            // ✅ okay
         }
         catch
         {
@@ -339,7 +306,7 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure("Equal to 22"){ $0 == 22 }
+                ./ Pipeline.ensure { $0 == 22 }
                 ./ { XCTAssert($0 == 22) }
         }
         catch
@@ -352,100 +319,17 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure("Must be 1"){ $0 == 1 }
+                ./ Pipeline.ensure { $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch let error as UnsatisfiedRequirement
+        catch _ as Pipeline.FailedConditionCheck
         {
-            XCTAssert(error.description == "Must be 1")
-            XCTAssert((error.input as! Int) == 22)
-            XCTAssert(error.context.function == "testEnsure()")
+            // ✅ ok
         }
         catch
         {
             XCTFail("Should never get here!")
         }
-    }
-    
-    func test_forceCastError_nonThrowing()
-    {
-        struct TheError: Error {}
-        func nonThrowingFunc() throws -> String { "OK" }
-        
-        let sut = { try nonThrowingFunc() !! TheError.self }
-        
-        XCTAssertNoThrow(try sut())
-        XCTAssertEqual(try! sut(), "OK")
-    }
-    
-    func test_forceCastError_throwing()
-    {
-        struct TheError: Error {}
-        func throwingFunc() throws { throw TheError() }
-        
-        let sut = { try throwingFunc() !! TheError.self }
-        
-        XCTAssertThrowsError(try sut()) { error in
-            switch error
-            {
-                case is TheError:
-                    break // as expected
-                    
-                default:
-                    XCTFail("Thrown unexpected error!")
-            }
-        }
-    }
-    
-    func test_resultMapError_success()
-    {
-        struct InnerError: Error, Equatable {}
-        enum MappedError: Error, Equatable { case inner(InnerError) }
-        
-        func succeedingFunc(_ : String) -> Result<String, InnerError>
-        {
-            return .success("OK")
-        }
-        
-        let sut: Result<String, MappedError> = (succeedingFunc .!/ MappedError.inner)("")
-        
-        XCTAssertEqual(sut, .success("OK"))
-    }
-    
-    func test_resultMapError_failure()
-    {
-        struct InnerError: Error, Equatable {}
-        enum MappedError: Error, Equatable { case inner(InnerError) }
-        
-        func failingFunc(_ : String) -> (Int) -> Result<String, InnerError>
-        {
-            return { _ in
-                
-                return .failure(InnerError())
-            }
-        }
-        
-        let sut: Result<String, MappedError> = ("" ./ failingFunc .!/ MappedError.inner)(1)
-        
-        XCTAssertEqual(sut, .failure(.inner(InnerError())))
-    }
-    
-    func test_resultMapError_success_complexExample()
-    {
-        struct InnerError: Error, Equatable {}
-        enum MappedError: Error, Equatable { case inner(InnerError) }
-        
-        func makeFullName(first: String) -> (String) -> Result<String, InnerError>
-        {
-            return { last in
-                
-                return .success("\(first) \(last)")
-            }
-        }
-        
-        let sut = "John" ./ makeFullName .!/ MappedError.inner ./ { $0("Doe") }
-        
-        XCTAssertEqual(sut, .success("John Doe"))
     }
     
     func test_checkConditionAndThrowMaybe_builtInError_success()
@@ -470,9 +354,9 @@ extension OperatorsTests
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Expected condition check to fail!") }
         }
-        catch CheckFailedError.unsatisfiedCondition
+        catch _ as Pipeline.FailedConditionCheck
         {
-            // ok
+            // ✅ ok
         }
         catch
         {
@@ -491,9 +375,9 @@ extension OperatorsTests
                 .! { _ in throw NestedError.one }
                 ./ { _ in XCTFail("Expected error thrown during condition check!") }
         }
-        catch CheckFailedError.errorDuringConditionCheck(NestedError.one)
+        catch NestedError.one
         {
-            // ok
+            // ✅ ok
         }
         catch
         {
@@ -520,7 +404,7 @@ extension OperatorsTests
         }
         catch SomeErr.one
         {
-            // OK
+            // ✅ ok
         }
         catch
         {
@@ -539,5 +423,98 @@ extension OperatorsTests
         }
         
         try true ?! makeErr()
+    }
+    
+    func test_take_optional()
+    {
+        let valMaybe: Int? = 1
+        
+        //---
+        
+        XCTAssertEqual(take(valMaybe), .some(1))
+        XCTAssertEqual("\(type(of: take(valMaybe)))", "Optional<Int>")
+    }
+    
+    func test_take_simpleWrapper()
+    {
+        let val: Int = 1
+        
+        //---
+        
+        XCTAssertEqual(take(val), 1)
+        XCTAssertEqual("\(type(of: take(val)))", "SimpleWrapper<Int>")
+    }
+    
+    func test_take_simpleWrapper_map()
+    {
+        XCTAssertEqual(take(1).map(String.init).value, "1")
+    }
+    
+    func test_take_simpleWrapper_mapThrows()
+    {
+        struct MyErr: Error {}
+        
+        //---
+        
+        XCTAssertThrowsError(
+            try take(1).map{ _ in throw MyErr() },
+            "`map` rethrows error from the handler",
+            { XCTAssertTrue($0 is MyErr) }
+        )
+    }
+    
+    func test_take_simpleWrapper_inspect()
+    {
+        XCTAssertEqual(
+            take(1).inspect { XCTAssertEqual($0, 1) }.value,
+            1
+        )
+    }
+    
+    func test_take_simpleWrapper_inspectThrows()
+    {
+        struct MyErr: Error {}
+        
+        //---
+        
+        XCTAssertThrowsError(
+            try take(1).inspect{ _ in throw MyErr() },
+            "`inspect` rethrows error from the handler",
+            { XCTAssertTrue($0 is MyErr) }
+        )
+    }
+    
+    func test_take_simpleWrapper_mutate()
+    {
+        XCTAssertEqual(take(1).mutate { $0 += 1 }.value, 2)
+    }
+    
+    func test_take_simpleWrapper_mutateThrows()
+    {
+        struct MyErr: Error {}
+        
+        //---
+        
+        XCTAssertThrowsError(
+            try take(1).mutate{ _ in throw MyErr() },
+            "`mutate` rethrows error from the handler",
+            { XCTAssertTrue($0 is MyErr) }
+        )
+    }
+    
+    @MainActor // this is necessary to avoid warnings/errors
+    func test_operator_onMainActor_context()
+    {
+        @MainActor class TheActor { func doSomething(_ : Int) {} }
+        
+        //---
+        
+        /// If NOT on main actor context, then following error happens:
+        ///
+        /// ```
+        /// Converting function value of type '@MainActor (Int) -> ()'
+        /// to '(Int) throws -> ()' loses global actor 'MainActor'
+        /// ```
+        1 ./ TheActor().doSomething(_:)
     }
 }
