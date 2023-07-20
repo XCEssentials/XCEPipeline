@@ -105,21 +105,21 @@ extension Publisher
         _ body: @escaping (inout Output) throws -> Void
     ) -> AnyPublisher<Output, Failure> {
         
-        return self
-            .flatMap { input in
-                do
-                {
-                    return try input
-                        .+ body
-                        ./ Result<Output, Failure>.success
-                }
-                catch
-                {
-                    return error
-                        ./ errorMapping
-                        ./ Result<Output, Failure>.failure
-                }
+        flatMap { input in
+            
+            do
+            {
+                return try input
+                    .+ body
+                    ./ Result<Output, Failure>.success
             }
+            catch
+            {
+                return error
+                    ./ errorMapping
+                    ./ Result<Output, Failure>.failure
+            }
+        }
     }
     
     /// Inspect the upstream value and pass it downstream.

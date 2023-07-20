@@ -51,13 +51,46 @@ extension Pipeline
 {
     /// Passes `input` value into `body` as is and returns whatever
     /// `body` returns to continue the pipeline.
+    @Sendable
+    static
+    func take<T, U>(
+        _ input: T,
+        mapAsync body: (T) async throws -> U
+    ) async rethrows -> U {
+        
+        try await body(input)
+    }
+
+    /// Passes `input` value into `body` as is and returns whatever
+    /// `body` returns to continue the pipeline.
     static
     func take<T, U>(
         _ input: T,
         map body: (T) throws -> U
     ) rethrows -> U {
         
-        return try body(input)
+        try body(input)
+    }
+
+    /// Passes unwrapped `input` value into `body` if it's non-nil,
+    /// or does nothing otherwise. Returns whatever `body` supposed
+    /// to return (or `nil`) as optional to continue the pipeline.
+    /// Analogue of `map(...)` function of `Optional` type.
+    @Sendable
+    static
+    func take<T, U>(
+        optional input: T?,
+        flatMapAsync body: (T) async throws -> U?
+    ) async rethrows -> U? {
+        
+        guard
+            let input = input
+        else
+        {
+            return nil
+        }
+        
+        return try await body(input)
     }
 
     /// Passes unwrapped `input` value into `body` if it's non-nil,
@@ -70,9 +103,23 @@ extension Pipeline
         flatMap body: (T) throws -> U?
     ) rethrows -> U? {
         
-        return try input.flatMap(body)
+        try input.flatMap(body)
     }
 
+    /// Passes `input` value into `body` as is. Returns nothing.
+    /// Typically defines final step in pipeline. Alternatively
+    /// can be used to "restart" pipeline — continue chain with
+    /// next step taking no input (Void).
+    @Sendable
+    static
+    func take<T, U>(
+        _ input: T,
+        endAsync body: (T) async throws -> U
+    ) async rethrows {
+        
+        _ = try await body(input)
+    }
+    
     /// Passes `input` value into `body` as is. Returns nothing.
     /// Typically defines final step in pipeline. Alternatively
     /// can be used to "restart" pipeline — continue chain with
@@ -84,6 +131,28 @@ extension Pipeline
     ) rethrows {
         
         _ = try body(input)
+    }
+    
+    /// Passes unwrapped `input` value into `body` if it's non-nil,
+    /// or does nothing otherwise. Returns nothing anyway.
+    /// Typically defines final step in pipeline. Alternatively
+    /// can be used to "restart" pipeline — continue chain with
+    /// next step taking no input (Void).
+    @Sendable
+    static
+    func take<T, U>(
+        optional input: T?,
+        endAsync body: (T) async throws -> U
+    ) async rethrows {
+        
+        guard
+            let input = input
+        else
+        {
+            return
+        }
+        
+        _ = try await body(input)
     }
     
     /// Passes unwrapped `input` value into `body` if it's non-nil,
@@ -105,6 +174,22 @@ extension Pipeline
 
 extension Pipeline
 {
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of value-type instances. THROWS!
+     */
+    @Sendable
+    static
+    func mutate<T>(
+        _ input: T,
+        _ body: (inout T) async throws -> Void
+    ) async rethrows -> T {
+        
+        var tmp = input
+        try await body(&tmp)
+        return tmp
+    }
+    
     /**
      Special global-level helper that's intended to be used
      for easy inline mutation of value-type instances. THROWS!
@@ -131,6 +216,23 @@ extension Pipeline
      inspection (read-only access) of value type instances.
      THROWS!
      */
+    @Sendable
+    static
+    func inspect<T>(
+        _ input: T,
+        _ body: (T) async throws -> Void
+    ) async rethrows -> T {
+        
+        try await body(input)
+        return input
+    }
+    
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline mutation of reference-type instances or
+     inspection (read-only access) of value type instances.
+     THROWS!
+     */
     static
     func inspect<T>(
         _ input: T,
@@ -151,22 +253,43 @@ extension Pipeline
      for easy inline checking some conditions about provided input.
      THROWS!
      */
+    @Sendable
     static
     func ensure<T>(
-        _ body: @escaping (T) throws -> Bool
-    ) -> (T) throws -> T {
+        _ input: T,
+        _ condition: (T) async throws -> Bool
+    ) async throws -> T {
         
-        return {
-            
-            if
-                try body($0)
-            {
-                return $0
-            }
-            else
-            {
-                throw Pipeline.FailedConditionCheck()
-            }
+        if
+            try await condition(input)
+        {
+            return input
+        }
+        else
+        {
+            throw Pipeline.FailedConditionCheck()
+        }
+    }
+    
+    /**
+     Special global-level helper that's intended to be used
+     for easy inline checking some conditions about provided input.
+     THROWS!
+     */
+    static
+    func ensure<T>(
+        _ input: T,
+        _ condition: (T) throws -> Bool
+    ) throws -> T {
+        
+        if
+            try condition(input)
+        {
+            return input
+        }
+        else
+        {
+            throw Pipeline.FailedConditionCheck()
         }
     }
 }
@@ -175,6 +298,7 @@ extension Pipeline
 
 extension Pipeline
 {
+    @Sendable
     static
     func unwrapOrThrow<T>(
         _ input: T?,
@@ -192,6 +316,7 @@ extension Pipeline
         }
     }
 
+    @Sendable
     static
     func throwIfFalse(
         _ input: Bool,
@@ -206,6 +331,7 @@ extension Pipeline
         }
     }
 
+    @Sendable
     static
     func throwIfEmpty<T>(
         _ input: T?,
