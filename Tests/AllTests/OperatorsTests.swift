@@ -305,9 +305,8 @@ extension OperatorsTests
 
         do
         {
-            try 22
-                ./ Pipeline.ensure { $0 == 22 }
-                ./ { XCTAssert($0 == 22) }
+            _ = try 22
+                .! { $0 == 22 }
         }
         catch
         {
@@ -319,7 +318,7 @@ extension OperatorsTests
         do
         {
             try 22
-                ./ Pipeline.ensure { $0 == 1 }
+                .! { $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
         }
         catch _ as Pipeline.FailedConditionCheck

@@ -60,7 +60,7 @@ func ./ <T, U>(
     body: (T) throws -> U
 ) rethrows -> U {
         
-    return try Pipeline.take(input, map: body)
+    try Pipeline.take(input, map: body)
 }
 
 /// Passes unwrapped `input` value into `body` if it's non-nil,
@@ -74,7 +74,7 @@ func .? <T, U>(
     body: (T) throws -> U?
 ) rethrows -> U? {
         
-    return try Pipeline.take(optional: input, flatMap: body)
+    try Pipeline.take(optional: input, flatMap: body)
 }
 
 /**
@@ -120,15 +120,7 @@ func .! <T>(
     condition: (T) throws -> Bool
 ) throws -> T {
     
-    if
-        try condition(input)
-    {
-        return input
-    }
-    else
-    {
-        throw Pipeline.FailedConditionCheck()
-    }
+    try Pipeline.ensure(input, condition)
 }
 
 /// Passes `input` value into `body` as is. Returns nothing.

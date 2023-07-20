@@ -57,7 +57,7 @@ extension Pipeline
         map body: (T) throws -> U
     ) rethrows -> U {
         
-        return try body(input)
+        try body(input)
     }
 
     /// Passes unwrapped `input` value into `body` if it's non-nil,
@@ -70,7 +70,7 @@ extension Pipeline
         flatMap body: (T) throws -> U?
     ) rethrows -> U? {
         
-        return try input.flatMap(body)
+        try input.flatMap(body)
     }
 
     /// Passes `input` value into `body` as is. Returns nothing.
@@ -153,20 +153,18 @@ extension Pipeline
      */
     static
     func ensure<T>(
-        _ body: @escaping (T) throws -> Bool
-    ) -> (T) throws -> T {
+        _ input: T,
+        _ condition: (T) throws -> Bool
+    ) throws -> T {
         
-        return {
-            
-            if
-                try body($0)
-            {
-                return $0
-            }
-            else
-            {
-                throw Pipeline.FailedConditionCheck()
-            }
+        if
+            try condition(input)
+        {
+            return input
+        }
+        else
+        {
+            throw Pipeline.FailedConditionCheck()
         }
     }
 }
