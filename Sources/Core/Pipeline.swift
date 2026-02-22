@@ -42,6 +42,10 @@ public
 enum Pipeline // scope
 {
     public struct FailedConditionCheck: Error {}
+
+    /// Thrown by ``Publisher/waitForFirstResult()`` when the publisher
+    /// completes without emitting any value.
+    public struct CompletedWithoutValue: Error {}
 }
 
 // MARK: - Core

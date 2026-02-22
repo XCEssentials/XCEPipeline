@@ -18,30 +18,48 @@ extension Publisher
         )
     }
     
-    /// Convenince adapter for asycn/await workflow.
+    /// Convenience adapter for async/await workflow.
+    ///
+    /// Resumes with the **first** value emitted by the publisher, or throws:
+    /// - the publisher's own error on failure, or
+    /// - ``Pipeline/CompletedWithoutValue`` if the publisher completes
+    ///   without emitting any value.
     ///
     /// Credits:
     /// https://medium.com/geekculture/from-combine-to-async-await-c08bf1d15b77
     func waitForFirstResult() async throws -> Output
     {
         try await withCheckedThrowingContinuation { continuation in
-            
+
             var cancellable: AnyCancellable?
-            
+            var resumed = false
+
             cancellable = self
                 .sink { result in
-                    
+
                     switch result
                     {
                         case .finished:
-                            cancellable?.cancel()
-                            cancellable = nil
-                            
+                            if !resumed
+                            {
+                                resumed = true
+                                continuation.resume(throwing: Pipeline.CompletedWithoutValue())
+                            }
+
                         case .failure(let error):
-                            continuation.resume(throwing: error)
+                            if !resumed
+                            {
+                                resumed = true
+                                continuation.resume(throwing: error)
+                            }
                     }
+
+                    cancellable?.cancel()
+                    cancellable = nil
                 }
                 receiveValue: {
+                    guard !resumed else { return }
+                    resumed = true
                     continuation.resume(returning: $0)
                 }
         }
