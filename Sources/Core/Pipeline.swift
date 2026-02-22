@@ -41,7 +41,7 @@
 public
 enum Pipeline // scope
 {
-    struct FailedConditionCheck: Error {}
+    public struct FailedConditionCheck: Error {}
 }
 
 // MARK: - Core
