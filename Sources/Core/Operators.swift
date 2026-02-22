@@ -36,18 +36,15 @@ precedencegroup CompositionPrecedence {
 
 infix operator ./ : CompositionPrecedence // pass through
 infix operator .? : CompositionPrecedence // pass through unwrapped
-infix operator .!/ : CompositionPrecedence // map error and pass through
 
-infix operator ./> : CompositionPrecedence // tap one level deeper
 infix operator .+ : CompositionPrecedence // pass through for editing
 infix operator .- : CompositionPrecedence // pass through for inspecting
 
 infix operator .* : CompositionPrecedence // pass & stop chain
-infix operator .?* : CompositionPrecedence // pass unwrapped  & stop chain
+infix operator .?* : CompositionPrecedence // pass unwrapped & stop chain
 
-infix operator .! : CompositionPrecedence // check and throw if not OK, pass throug otherwise
+infix operator .! : CompositionPrecedence // check and throw if not OK, pass through otherwise
 infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
-infix operator !! : NilCoalescingPrecedence // rethrow with FORCE error typecast
 
 // MARK: - Implementation
 
