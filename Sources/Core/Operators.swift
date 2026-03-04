@@ -63,6 +63,7 @@ func ./ <T, U>(
 
 /// Passes `input` value into `body` as is and returns whatever
 /// `body` returns to continue the pipeline.
+@Sendable
 public
 //infix
 func ./ <T, U>(
@@ -92,6 +93,7 @@ func .? <T, U>(
 /// or does nothing otherwise. Returns whatever `body` supposed
 /// to return (or `nil`) as optional to continue the pipeline.
 /// Analogue of `flatMap(...)` function of `Optional` type.
+@Sendable
 public
 //infix
 func .? <T, U>(
@@ -131,6 +133,7 @@ func .+ <T>(
  given mutations, but for value type it will return a copy of
  `input` instance with given mutations.
  */
+@Sendable
 public
 //infix
 func .+ <T>(
@@ -166,6 +169,7 @@ func .- <T>(
  given mutations, but for value type it will return a copy of
  `input` instance with given mutations.
  */
+@Sendable
 public
 //infix
 func .- <T>(
@@ -187,6 +191,7 @@ func .! <T>(
     try await Pipeline.ensure(input, condition)
 }
 
+@Sendable
 public
 //infix
 func .! <T>(
@@ -216,6 +221,7 @@ func .* <T, U>(
 /// Typically defines final step in pipeline. Alternatively
 /// can be used to "restart" pipeline — continue chain with
 /// next step taking no input (Void).
+@Sendable
 public
 //infix
 func .* <T, U>(
@@ -247,6 +253,7 @@ func .?* <T, U>(
 /// Typically defines final step in pipeline. Alternatively
 /// can be used to "restart" pipeline — continue chain with
 /// next step taking no input (Void).
+@Sendable
 public
 //infix
 func .?* <T, U>(

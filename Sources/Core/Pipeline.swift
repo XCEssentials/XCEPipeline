@@ -67,6 +67,7 @@ extension Pipeline
 
     /// Passes `input` value into `body` as is and returns whatever
     /// `body` returns to continue the pipeline.
+    @Sendable
     static
     func take<T, U>(
         _ input: T,
@@ -101,6 +102,7 @@ extension Pipeline
     /// or does nothing otherwise. Returns whatever `body` supposed
     /// to return (or `nil`) as optional to continue the pipeline.
     /// Analogue of `map(...)` function of `Optional` type.
+    @Sendable
     static
     func take<T, U>(
         optional input: T?,
@@ -128,6 +130,7 @@ extension Pipeline
     /// Typically defines final step in pipeline. Alternatively
     /// can be used to "restart" pipeline — continue chain with
     /// next step taking no input (Void).
+    @Sendable
     static
     func take<T, U>(
         _ input: T,
@@ -164,6 +167,7 @@ extension Pipeline
     /// Typically defines final step in pipeline. Alternatively
     /// can be used to "restart" pipeline — continue chain with
     /// next step taking no input (Void).
+    @Sendable
     static
     func take<T, U>(
         optional input: T?,
@@ -198,6 +202,7 @@ extension Pipeline
      Special global-level helper that's intended to be used
      for easy inline mutation of value-type instances. THROWS!
      */
+    @Sendable
     static
     func mutate<T>(
         _ input: T,
@@ -237,6 +242,7 @@ extension Pipeline
      inspection (read-only access) of value type instances.
      THROWS!
      */
+    @Sendable
     static
     func inspect<T>(
         _ input: T,
@@ -280,6 +286,7 @@ extension Pipeline
      for easy inline checking some conditions about provided input.
      THROWS!
      */
+    @Sendable
     static
     func ensure<T>(
         _ input: T,
