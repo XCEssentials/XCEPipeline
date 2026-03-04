@@ -1,11 +1,11 @@
-// swift-tools-version:5.8
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "XCEPipeline",
     platforms: [
-        .macOS(.v10_15), // depends on Combine
+        .macOS(.v12),
         .iOS(.v15)
     ],
     products: [
