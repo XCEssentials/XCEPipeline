@@ -35,6 +35,7 @@ extension Publisher
             var resumed = false
 
             cancellable = self
+                .receive(on: DispatchQueue.main)
                 .sink { result in
 
                     switch result
@@ -75,9 +76,9 @@ extension Publisher
         )
     }
     
-    func ensureMainThread() -> Publishers.ReceiveOn<Self, RunLoop>
+    func ensureMainThread() -> Publishers.ReceiveOn<Self, DispatchQueue>
     {
-        receive(on: RunLoop.main, options: nil)
+        receive(on: DispatchQueue.main)
     }
     
     /// Convert a `Result` producing mapping into
