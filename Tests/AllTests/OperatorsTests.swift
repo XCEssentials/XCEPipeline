@@ -26,8 +26,6 @@
 
 import XCTest
 
-//import XCERequirement
-
 @testable
 import XCEPipeline
 

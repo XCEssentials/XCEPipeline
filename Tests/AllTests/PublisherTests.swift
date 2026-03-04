@@ -24,6 +24,8 @@
 
  */
 
+#if canImport(Combine)
+
 import XCTest
 
 import Combine
@@ -172,4 +174,47 @@ extension PublisherTests
             }
             .executeNow()
     }
+
+    func test_waitForFirstResult_success() async throws
+    {
+        let result = try await Just("hello")
+            .setFailureType(to: Error.self)
+            .waitForFirstResult()
+
+        XCTAssertEqual(result, "hello")
+    }
+
+    func test_waitForFirstResult_failure() async throws
+    {
+        enum TestError: Error { case expected }
+
+        do
+        {
+            _ = try await Fail<String, TestError>(error: .expected)
+                .waitForFirstResult()
+
+            XCTFail("Expected error to be thrown")
+        }
+        catch let error as TestError
+        {
+            XCTAssertEqual(error, .expected)
+        }
+    }
+
+    func test_waitForFirstResult_completedWithoutValue() async throws
+    {
+        do
+        {
+            _ = try await Empty<String, Error>()
+                .waitForFirstResult()
+
+            XCTFail("Expected CompletedWithoutValue to be thrown")
+        }
+        catch is Pipeline.CompletedWithoutValue
+        {
+            // expected
+        }
+    }
 }
+
+#endif

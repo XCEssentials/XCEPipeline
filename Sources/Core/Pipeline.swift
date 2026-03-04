@@ -24,24 +24,46 @@
 
  */
 
-/**
- Set of helpers for chainable value transformations, pipeline-style.
-
- Inspiration:
- - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
-
- Examples:
- - https://github.com/gilesvangruisen/Pipeline ⚠️ autoformat
- - https://github.com/pauljeannot/SwiftyBash
- - https://github.com/patgoley/Pipeline/blob/master/Pipeline/Operators.swift
- - https://github.com/danthorpe/Pipe (outdated!)
- - https://github.com/jarsen/Pipes (outdated!)
- */
+/// Set of helpers for chainable value transformations, pipeline-style.
+///
+/// Inspiration:
+/// - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
+///
+/// Examples:
+/// - https://github.com/gilesvangruisen/Pipeline ⚠️ autoformat
+/// - https://github.com/pauljeannot/SwiftyBash
+/// - https://github.com/patgoley/Pipeline/blob/master/Pipeline/Operators.swift
+/// - https://github.com/danthorpe/Pipe (outdated!)
+/// - https://github.com/jarsen/Pipes (outdated!)
 
 public
 enum Pipeline // scope
 {
-    struct FailedConditionCheck: Error {}
+    public struct FailedConditionCheck: Error {}
+
+    /// Thrown by ``Publisher/waitForFirstResult()`` when the publisher
+    /// completes without emitting any value.
+    public struct CompletedWithoutValue: Error {}
+}
+
+// MARK: - LocalizedError conformance
+
+import Foundation
+
+extension Pipeline.FailedConditionCheck: LocalizedError
+{
+    public var errorDescription: String?
+    {
+        "Pipeline condition check failed."
+    }
+}
+
+extension Pipeline.CompletedWithoutValue: LocalizedError
+{
+    public var errorDescription: String?
+    {
+        "Publisher completed without emitting a value."
+    }
 }
 
 // MARK: - Core
@@ -63,6 +85,7 @@ extension Pipeline
 
     /// Passes `input` value into `body` as is and returns whatever
     /// `body` returns to continue the pipeline.
+    @Sendable
     static
     func take<T, U>(
         _ input: T,
@@ -97,6 +120,7 @@ extension Pipeline
     /// or does nothing otherwise. Returns whatever `body` supposed
     /// to return (or `nil`) as optional to continue the pipeline.
     /// Analogue of `map(...)` function of `Optional` type.
+    @Sendable
     static
     func take<T, U>(
         optional input: T?,
@@ -124,6 +148,7 @@ extension Pipeline
     /// Typically defines final step in pipeline. Alternatively
     /// can be used to "restart" pipeline — continue chain with
     /// next step taking no input (Void).
+    @Sendable
     static
     func take<T, U>(
         _ input: T,
@@ -160,6 +185,7 @@ extension Pipeline
     /// Typically defines final step in pipeline. Alternatively
     /// can be used to "restart" pipeline — continue chain with
     /// next step taking no input (Void).
+    @Sendable
     static
     func take<T, U>(
         optional input: T?,
@@ -174,10 +200,8 @@ extension Pipeline
 
 extension Pipeline
 {
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of value-type instances. THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of value-type instances. THROWS!
     @Sendable
     static
     func mutate<T>(
@@ -190,10 +214,9 @@ extension Pipeline
         return tmp
     }
     
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of value-type instances. THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of value-type instances. THROWS!
+    @Sendable
     static
     func mutate<T>(
         _ input: T,
@@ -210,12 +233,10 @@ extension Pipeline
 
 extension Pipeline
 {
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of reference-type instances or
-     inspection (read-only access) of value type instances.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of reference-type instances or
+    /// inspection (read-only access) of value type instances.
+    /// THROWS!
     @Sendable
     static
     func inspect<T>(
@@ -227,12 +248,11 @@ extension Pipeline
         return input
     }
     
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of reference-type instances or
-     inspection (read-only access) of value type instances.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of reference-type instances or
+    /// inspection (read-only access) of value type instances.
+    /// THROWS!
+    @Sendable
     static
     func inspect<T>(
         _ input: T,
@@ -248,11 +268,9 @@ extension Pipeline
 
 extension Pipeline
 {
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline checking some conditions about provided input.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline checking some conditions about provided input.
+    /// THROWS!
     @Sendable
     static
     func ensure<T>(
@@ -271,11 +289,10 @@ extension Pipeline
         }
     }
     
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline checking some conditions about provided input.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline checking some conditions about provided input.
+    /// THROWS!
+    @Sendable
     static
     func ensure<T>(
         _ input: T,

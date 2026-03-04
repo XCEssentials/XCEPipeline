@@ -36,18 +36,15 @@ precedencegroup CompositionPrecedence {
 
 infix operator ./ : CompositionPrecedence // pass through
 infix operator .? : CompositionPrecedence // pass through unwrapped
-infix operator .!/ : CompositionPrecedence // map error and pass through
 
-infix operator ./> : CompositionPrecedence // tap one level deeper
 infix operator .+ : CompositionPrecedence // pass through for editing
 infix operator .- : CompositionPrecedence // pass through for inspecting
 
 infix operator .* : CompositionPrecedence // pass & stop chain
-infix operator .?* : CompositionPrecedence // pass unwrapped  & stop chain
+infix operator .?* : CompositionPrecedence // pass unwrapped & stop chain
 
-infix operator .! : CompositionPrecedence // check and throw if not OK, pass throug otherwise
+infix operator .! : CompositionPrecedence // check and throw if not OK, pass through otherwise
 infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
-infix operator !! : NilCoalescingPrecedence // rethrow with FORCE error typecast
 
 // MARK: - Implementation
 
@@ -55,7 +52,6 @@ infix operator !! : NilCoalescingPrecedence // rethrow with FORCE error typecast
 /// `body` returns to continue the pipeline.
 @Sendable
 public
-//infix
 func ./ <T, U>(
     input: T,
     body: (T) async throws -> U
@@ -66,8 +62,8 @@ func ./ <T, U>(
 
 /// Passes `input` value into `body` as is and returns whatever
 /// `body` returns to continue the pipeline.
+@Sendable
 public
-//infix
 func ./ <T, U>(
     input: T,
     body: (T) throws -> U
@@ -82,7 +78,6 @@ func ./ <T, U>(
 /// Analogue of `flatMap(...)` function of `Optional` type.
 @Sendable
 public
-//infix
 func .? <T, U>(
     input: T?,
     body: (T) async throws -> U?
@@ -95,8 +90,8 @@ func .? <T, U>(
 /// or does nothing otherwise. Returns whatever `body` supposed
 /// to return (or `nil`) as optional to continue the pipeline.
 /// Analogue of `flatMap(...)` function of `Optional` type.
+@Sendable
 public
-//infix
 func .? <T, U>(
     input: T?,
     body: (T) throws -> U?
@@ -105,18 +100,15 @@ func .? <T, U>(
     try Pipeline.take(optional: input, flatMap: body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type with
- a throwing closure, so the whole expression throws if the closure
- throws.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type with
+/// a throwing closure, so the whole expression throws if the closure
+/// throws.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
 @Sendable
 public
-//infix
 func .+ <T>(
     input: T,
     _ body: (inout T) async throws -> Void
@@ -125,17 +117,15 @@ func .+ <T>(
     try await Pipeline.mutate(input, body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type with
- a throwing closure, so the whole expression throws if the closure
- throws.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type with
+/// a throwing closure, so the whole expression throws if the closure
+/// throws.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
+@Sendable
 public
-//infix
 func .+ <T>(
     input: T,
     _ body: (inout T) throws -> Void
@@ -144,16 +134,13 @@ func .+ <T>(
     try Pipeline.mutate(input, body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
 @Sendable
 public
-//infix
 func .- <T>(
     input: T,
     _ body: (T) async throws -> Void
@@ -162,15 +149,13 @@ func .- <T>(
     try await Pipeline.inspect(input, body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
+@Sendable
 public
-//infix
 func .- <T>(
     input: T,
     _ body: (T) throws -> Void
@@ -181,7 +166,6 @@ func .- <T>(
 
 @Sendable
 public
-//infix
 func .! <T>(
     input: T,
     condition: (T) async throws -> Bool
@@ -190,8 +174,8 @@ func .! <T>(
     try await Pipeline.ensure(input, condition)
 }
 
+@Sendable
 public
-//infix
 func .! <T>(
     input: T,
     condition: (T) throws -> Bool
@@ -206,7 +190,6 @@ func .! <T>(
 /// next step taking no input (Void).
 @Sendable
 public
-//infix
 func .* <T, U>(
     input: T,
     body: (T) async throws -> U
@@ -219,8 +202,8 @@ func .* <T, U>(
 /// Typically defines final step in pipeline. Alternatively
 /// can be used to "restart" pipeline — continue chain with
 /// next step taking no input (Void).
+@Sendable
 public
-//infix
 func .* <T, U>(
     input: T,
     body: (T) throws -> U
@@ -236,7 +219,6 @@ func .* <T, U>(
 /// next step taking no input (Void).
 @Sendable
 public
-//infix
 func .?* <T, U>(
     input: T?,
     body: (T) async throws -> U
@@ -250,8 +232,8 @@ func .?* <T, U>(
 /// Typically defines final step in pipeline. Alternatively
 /// can be used to "restart" pipeline — continue chain with
 /// next step taking no input (Void).
+@Sendable
 public
-//infix
 func .?* <T, U>(
     input: T?,
     body: (T) throws -> U
@@ -262,10 +244,9 @@ func .?* <T, U>(
 
 @Sendable
 public
-//infix
 func ?! <T>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error // lazy nitialization
+    getError: @autoclosure () -> Swift.Error // lazy initialization
 ) throws -> T {
     
     try Pipeline.unwrapOrThrow(input, getError)
@@ -273,10 +254,9 @@ func ?! <T>(
 
 @Sendable
 public
-//infix
 func ?! (
     input: Bool,
-    getError: @autoclosure () -> Swift.Error // lazy nitialization
+    getError: @autoclosure () -> Swift.Error // lazy initialization
 ) throws {
     
     try Pipeline.throwIfFalse(input, getError)
@@ -284,10 +264,9 @@ func ?! (
 
 @Sendable
 public
-//infix
 func ?! <T>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error // lazy nitialization
+    getError: @autoclosure () -> Swift.Error // lazy initialization
 ) throws -> T where T: Collection {
     
     try Pipeline.throwIfEmpty(input, getError)
