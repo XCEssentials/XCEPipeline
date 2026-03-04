@@ -48,6 +48,26 @@ enum Pipeline // scope
     public struct CompletedWithoutValue: Error {}
 }
 
+// MARK: - LocalizedError conformance
+
+import Foundation
+
+extension Pipeline.FailedConditionCheck: LocalizedError
+{
+    public var errorDescription: String?
+    {
+        "Pipeline condition check failed."
+    }
+}
+
+extension Pipeline.CompletedWithoutValue: LocalizedError
+{
+    public var errorDescription: String?
+    {
+        "Publisher completed without emitting a value."
+    }
+}
+
 // MARK: - Core
 
 public
