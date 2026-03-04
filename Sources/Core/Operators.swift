@@ -52,7 +52,6 @@ infix operator ?! : NilCoalescingPrecedence // check and throw if not OK
 /// `body` returns to continue the pipeline.
 @Sendable
 public
-//infix
 func ./ <T, U>(
     input: T,
     body: (T) async throws -> U
@@ -65,7 +64,6 @@ func ./ <T, U>(
 /// `body` returns to continue the pipeline.
 @Sendable
 public
-//infix
 func ./ <T, U>(
     input: T,
     body: (T) throws -> U
@@ -80,7 +78,6 @@ func ./ <T, U>(
 /// Analogue of `flatMap(...)` function of `Optional` type.
 @Sendable
 public
-//infix
 func .? <T, U>(
     input: T?,
     body: (T) async throws -> U?
@@ -95,7 +92,6 @@ func .? <T, U>(
 /// Analogue of `flatMap(...)` function of `Optional` type.
 @Sendable
 public
-//infix
 func .? <T, U>(
     input: T?,
     body: (T) throws -> U?
@@ -104,18 +100,15 @@ func .? <T, U>(
     try Pipeline.take(optional: input, flatMap: body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type with
- a throwing closure, so the whole expression throws if the closure
- throws.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type with
+/// a throwing closure, so the whole expression throws if the closure
+/// throws.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
 @Sendable
 public
-//infix
 func .+ <T>(
     input: T,
     _ body: (inout T) async throws -> Void
@@ -124,18 +117,15 @@ func .+ <T>(
     try await Pipeline.mutate(input, body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type with
- a throwing closure, so the whole expression throws if the closure
- throws.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type with
+/// a throwing closure, so the whole expression throws if the closure
+/// throws.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
 @Sendable
 public
-//infix
 func .+ <T>(
     input: T,
     _ body: (inout T) throws -> Void
@@ -144,16 +134,13 @@ func .+ <T>(
     try Pipeline.mutate(input, body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
 @Sendable
 public
-//infix
 func .- <T>(
     input: T,
     _ body: (T) async throws -> Void
@@ -162,16 +149,13 @@ func .- <T>(
     try await Pipeline.inspect(input, body)
 }
 
-/**
- Mutates `input` even if it's a `let` instance of value type.
- 
- NOTE: for reference type it will return same input instance with
- given mutations, but for value type it will return a copy of
- `input` instance with given mutations.
- */
+/// Mutates `input` even if it's a `let` instance of value type.
+///
+/// NOTE: for reference type it will return same input instance with
+/// given mutations, but for value type it will return a copy of
+/// `input` instance with given mutations.
 @Sendable
 public
-//infix
 func .- <T>(
     input: T,
     _ body: (T) throws -> Void
@@ -182,7 +166,6 @@ func .- <T>(
 
 @Sendable
 public
-//infix
 func .! <T>(
     input: T,
     condition: (T) async throws -> Bool
@@ -193,7 +176,6 @@ func .! <T>(
 
 @Sendable
 public
-//infix
 func .! <T>(
     input: T,
     condition: (T) throws -> Bool
@@ -208,7 +190,6 @@ func .! <T>(
 /// next step taking no input (Void).
 @Sendable
 public
-//infix
 func .* <T, U>(
     input: T,
     body: (T) async throws -> U
@@ -223,7 +204,6 @@ func .* <T, U>(
 /// next step taking no input (Void).
 @Sendable
 public
-//infix
 func .* <T, U>(
     input: T,
     body: (T) throws -> U
@@ -239,7 +219,6 @@ func .* <T, U>(
 /// next step taking no input (Void).
 @Sendable
 public
-//infix
 func .?* <T, U>(
     input: T?,
     body: (T) async throws -> U
@@ -255,7 +234,6 @@ func .?* <T, U>(
 /// next step taking no input (Void).
 @Sendable
 public
-//infix
 func .?* <T, U>(
     input: T?,
     body: (T) throws -> U
@@ -266,10 +244,9 @@ func .?* <T, U>(
 
 @Sendable
 public
-//infix
 func ?! <T>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error // lazy nitialization
+    getError: @autoclosure () -> Swift.Error // lazy initialization
 ) throws -> T {
     
     try Pipeline.unwrapOrThrow(input, getError)
@@ -277,10 +254,9 @@ func ?! <T>(
 
 @Sendable
 public
-//infix
 func ?! (
     input: Bool,
-    getError: @autoclosure () -> Swift.Error // lazy nitialization
+    getError: @autoclosure () -> Swift.Error // lazy initialization
 ) throws {
     
     try Pipeline.throwIfFalse(input, getError)
@@ -288,10 +264,9 @@ func ?! (
 
 @Sendable
 public
-//infix
 func ?! <T>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error // lazy nitialization
+    getError: @autoclosure () -> Swift.Error // lazy initialization
 ) throws -> T where T: Collection {
     
     try Pipeline.throwIfEmpty(input, getError)

@@ -24,19 +24,17 @@
 
  */
 
-/**
- Set of helpers for chainable value transformations, pipeline-style.
-
- Inspiration:
- - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
-
- Examples:
- - https://github.com/gilesvangruisen/Pipeline ⚠️ autoformat
- - https://github.com/pauljeannot/SwiftyBash
- - https://github.com/patgoley/Pipeline/blob/master/Pipeline/Operators.swift
- - https://github.com/danthorpe/Pipe (outdated!)
- - https://github.com/jarsen/Pipes (outdated!)
- */
+/// Set of helpers for chainable value transformations, pipeline-style.
+///
+/// Inspiration:
+/// - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
+///
+/// Examples:
+/// - https://github.com/gilesvangruisen/Pipeline ⚠️ autoformat
+/// - https://github.com/pauljeannot/SwiftyBash
+/// - https://github.com/patgoley/Pipeline/blob/master/Pipeline/Operators.swift
+/// - https://github.com/danthorpe/Pipe (outdated!)
+/// - https://github.com/jarsen/Pipes (outdated!)
 
 public
 enum Pipeline // scope
@@ -202,10 +200,8 @@ extension Pipeline
 
 extension Pipeline
 {
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of value-type instances. THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of value-type instances. THROWS!
     @Sendable
     static
     func mutate<T>(
@@ -218,10 +214,8 @@ extension Pipeline
         return tmp
     }
     
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of value-type instances. THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of value-type instances. THROWS!
     @Sendable
     static
     func mutate<T>(
@@ -239,12 +233,10 @@ extension Pipeline
 
 extension Pipeline
 {
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of reference-type instances or
-     inspection (read-only access) of value type instances.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of reference-type instances or
+    /// inspection (read-only access) of value type instances.
+    /// THROWS!
     @Sendable
     static
     func inspect<T>(
@@ -256,12 +248,10 @@ extension Pipeline
         return input
     }
     
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline mutation of reference-type instances or
-     inspection (read-only access) of value type instances.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline mutation of reference-type instances or
+    /// inspection (read-only access) of value type instances.
+    /// THROWS!
     @Sendable
     static
     func inspect<T>(
@@ -278,11 +268,9 @@ extension Pipeline
 
 extension Pipeline
 {
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline checking some conditions about provided input.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline checking some conditions about provided input.
+    /// THROWS!
     @Sendable
     static
     func ensure<T>(
@@ -301,11 +289,9 @@ extension Pipeline
         }
     }
     
-    /**
-     Special global-level helper that's intended to be used
-     for easy inline checking some conditions about provided input.
-     THROWS!
-     */
+    /// Special global-level helper that's intended to be used
+    /// for easy inline checking some conditions about provided input.
+    /// THROWS!
     @Sendable
     static
     func ensure<T>(

@@ -31,7 +31,7 @@ func take<T>(_ value: T) -> SimpleWrapper<T>
     .init(value)
 }
 
-/// Convenince helper for better code consistency,
+/// Convenience helper for better code consistency,
 /// mimics the chained expression starter `take` with
 /// non-Optional input.
 public
