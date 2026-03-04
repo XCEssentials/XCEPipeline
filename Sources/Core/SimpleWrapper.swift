@@ -58,6 +58,27 @@ struct SimpleWrapper<T>
         try handler(&tmp)
         return .init(tmp)
     }
+
+    public
+    func map<R>(_ handler: @Sendable (T) async throws -> R) async rethrows -> SimpleWrapper<R>
+    {
+        try await .init(handler(value))
+    }
+
+    public
+    func inspect(_ handler: @Sendable (T) async throws -> Void) async rethrows -> Self
+    {
+        try await handler(value)
+        return self
+    }
+
+    public
+    func mutate(_ handler: @Sendable (inout T) async throws -> Void) async rethrows -> Self
+    {
+        var tmp = value
+        try await handler(&tmp)
+        return .init(tmp)
+    }
 }
 
 extension SimpleWrapper: Equatable where T: Equatable {}
