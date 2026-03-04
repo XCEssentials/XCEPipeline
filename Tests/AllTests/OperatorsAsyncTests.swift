@@ -43,13 +43,14 @@ class OperatorsAsyncTests: XCTestCase
 
 extension OperatorsAsyncTests
 {
+#if canImport(ObjectiveC)
     @MainActor // this is necessary to avoid warnings/errors
     func test_operator_onMainActor_context()
     {
         @MainActor class TheActor { func doSomething(_ : Int) {} }
-        
+
         //---
-        
+
         /// If NOT on main actor context, then following error happens:
         ///
         /// ```
@@ -58,6 +59,7 @@ extension OperatorsAsyncTests
         /// ```
         1 ./ TheActor().doSomething(_:)
     }
+#endif
     
     func test_takeMap() async
     {
