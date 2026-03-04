@@ -2,7 +2,7 @@
 [![GitHub Tag](https://img.shields.io/github/tag/XCEssentials/XCEPipeline.svg?longCache=true)](https://github.com/XCEssentials/XCEPipeline/tags)
 [![Swift Package Manager Compatible](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?longCache=true)](Package.swift)
 [![Written in Swift](https://img.shields.io/badge/Swift-5.9-orange.svg?longCache=true)](https://swift.org)
-[![Supported platforms](https://img.shields.io/badge/platforms-macOS%2012%2B%20%7C%20iOS%2015%2B-blue.svg?longCache=true)](Package.swift)
+[![Supported platforms](https://img.shields.io/badge/platforms-macOS%2012%2B%20%7C%20iOS%2015%2B%20%7C%20Linux-blue.svg?longCache=true)](Package.swift)
 
 # Pipeline
 

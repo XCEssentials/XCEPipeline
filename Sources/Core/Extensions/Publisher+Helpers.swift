@@ -1,3 +1,5 @@
+#if canImport(Combine)
+
 import Foundation
 import Combine
 
@@ -190,3 +192,5 @@ extension Publisher
             .eraseToAnyPublisher()
     }
 }
+
+#endif

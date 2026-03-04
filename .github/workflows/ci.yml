@@ -7,8 +7,20 @@ on:
     branches: [master]
 
 jobs:
-  build-and-test:
+  build-and-test-macos:
     runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift version
+        run: swift --version
+      - name: Build
+        run: swift build
+      - name: Test
+        run: swift test
+
+  build-and-test-linux:
+    runs-on: ubuntu-latest
+    container: swift:5.9
     steps:
       - uses: actions/checkout@v4
       - name: Swift version

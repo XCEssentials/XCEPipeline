@@ -24,6 +24,8 @@
 
  */
 
+#if canImport(Combine)
+
 import XCTest
 
 import Combine
@@ -214,3 +216,5 @@ extension PublisherTests
         }
     }
 }
+
+#endif
