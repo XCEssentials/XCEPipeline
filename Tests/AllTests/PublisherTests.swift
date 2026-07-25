@@ -184,6 +184,19 @@ extension PublisherTests
         XCTAssertEqual(result, "hello")
     }
 
+    func test_waitForFirstResult_sendableOutputAcrossTask() async throws
+    {
+        let task = Task.detached {
+            try await Just(42)
+                .setFailureType(to: Error.self)
+                .waitForFirstResult()
+        }
+
+        let result = try await task.value
+
+        XCTAssertEqual(result, 42)
+    }
+
     func test_waitForFirstResult_failure() async throws
     {
         enum TestError: Error { case expected }
