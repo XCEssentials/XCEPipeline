@@ -20,7 +20,7 @@ jobs:
 
   build-and-test-linux:
     runs-on: ubuntu-latest
-    container: swift:5.9
+    container: swift:6.0
     steps:
       - uses: actions/checkout@v4
       - name: Swift version
@@ -29,4 +29,3 @@ jobs:
         run: swift build
       - name: Test
         run: swift test
-
