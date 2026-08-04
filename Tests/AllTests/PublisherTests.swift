@@ -35,6 +35,11 @@ import XCEPipeline
 
 //---
 
+private final class SendableSubject<Output, Failure: Error>: @unchecked Sendable
+{
+    let value = PassthroughSubject<Output, Failure>()
+}
+
 class PublisherTests: XCTestCase
 {
     var subscription: AnyCancellable?
@@ -182,6 +187,30 @@ extension PublisherTests
             .waitForFirstResult()
 
         XCTAssertEqual(result, "hello")
+    }
+
+    func test_waitForFirstResult_cancelsAfterFirstValue() async throws
+    {
+        let subscribed = expectation(description: "Subscribed")
+        let cancelled = expectation(description: "Cancelled")
+        let subject = SendableSubject<String, Error>()
+
+        let task = Task {
+            try await subject.value
+                .handleEvents(
+                    receiveSubscription: { _ in subscribed.fulfill() },
+                    receiveCancel: { cancelled.fulfill() }
+                )
+                .waitForFirstResult()
+        }
+
+        await fulfillment(of: [subscribed], timeout: 1)
+        subject.value.send("hello")
+
+        let result = try await task.value
+
+        XCTAssertEqual(result, "hello")
+        await fulfillment(of: [cancelled], timeout: 1)
     }
 
     func test_waitForFirstResult_sendableOutputAcrossTask() async throws

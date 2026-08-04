@@ -64,6 +64,9 @@ extension Publisher
                     guard !resumed else { return }
                     resumed = true
                     continuation.resume(returning: $0)
+
+                    cancellable?.cancel()
+                    cancellable = nil
                 }
         }
     }
