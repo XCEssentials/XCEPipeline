@@ -71,9 +71,13 @@ extension Pipeline.CompletedWithoutValue: LocalizedError
 public
 extension Pipeline
 {
-    /// Passes `input` value into `body` as is and returns whatever
-    /// `body` returns to continue the pipeline.
-    @Sendable
+    /// Asynchronously passes `input` to a closure and returns the closure's result.
+    ///
+    /// - Parameters:
+    ///   - input: The value to transform.
+    ///   - body: An asynchronous transformation to apply to `input`.
+    /// - Returns: The value returned by `body`.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         _ input: T,
@@ -83,9 +87,13 @@ extension Pipeline
         try await body(input)
     }
 
-    /// Passes `input` value into `body` as is and returns whatever
-    /// `body` returns to continue the pipeline.
-    @Sendable
+    /// Synchronously passes `input` to a closure and returns the closure's result.
+    ///
+    /// - Parameters:
+    ///   - input: The value to transform.
+    ///   - body: A transformation to apply to `input`.
+    /// - Returns: The value returned by `body`.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         _ input: T,
@@ -95,11 +103,16 @@ extension Pipeline
         try body(input)
     }
 
-    /// Passes unwrapped `input` value into `body` if it's non-nil,
-    /// or does nothing otherwise. Returns whatever `body` supposed
-    /// to return (or `nil`) as optional to continue the pipeline.
-    /// Analogue of `map(...)` function of `Optional` type.
-    @Sendable
+    /// Asynchronously transforms the wrapped value of an optional.
+    ///
+    /// This function behaves like `Optional.flatMap`: it calls `body` only when
+    /// `input` is non-`nil` and returns `nil` otherwise.
+    ///
+    /// - Parameters:
+    ///   - input: The optional value to transform.
+    ///   - body: An asynchronous transformation that can return `nil`.
+    /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         optional input: T?,
@@ -116,11 +129,16 @@ extension Pipeline
         return try await body(input)
     }
 
-    /// Passes unwrapped `input` value into `body` if it's non-nil,
-    /// or does nothing otherwise. Returns whatever `body` supposed
-    /// to return (or `nil`) as optional to continue the pipeline.
-    /// Analogue of `map(...)` function of `Optional` type.
-    @Sendable
+    /// Synchronously transforms the wrapped value of an optional.
+    ///
+    /// This function behaves like `Optional.flatMap`: it calls `body` only when
+    /// `input` is non-`nil` and returns `nil` otherwise.
+    ///
+    /// - Parameters:
+    ///   - input: The optional value to transform.
+    ///   - body: A transformation that can return `nil`.
+    /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         optional input: T?,
@@ -130,11 +148,15 @@ extension Pipeline
         try input.flatMap(body)
     }
 
-    /// Passes `input` value into `body` as is. Returns nothing.
-    /// Typically defines final step in pipeline. Alternatively
-    /// can be used to "restart" pipeline — continue chain with
-    /// next step taking no input (Void).
-    @Sendable
+    /// Asynchronously passes `input` to a closure and discards its result.
+    ///
+    /// Use this function for a terminal pipeline step. Because the function
+    /// returns `Void`, it can also be followed by a step that accepts `Void`.
+    ///
+    /// - Parameters:
+    ///   - input: The value to pass to `body`.
+    ///   - body: An asynchronous terminal operation.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         _ input: T,
@@ -144,11 +166,15 @@ extension Pipeline
         _ = try await body(input)
     }
     
-    /// Passes `input` value into `body` as is. Returns nothing.
-    /// Typically defines final step in pipeline. Alternatively
-    /// can be used to "restart" pipeline — continue chain with
-    /// next step taking no input (Void).
-    @Sendable
+    /// Synchronously passes `input` to a closure and discards its result.
+    ///
+    /// Use this function for a terminal pipeline step. Because the function
+    /// returns `Void`, it can also be followed by a step that accepts `Void`.
+    ///
+    /// - Parameters:
+    ///   - input: The value to pass to `body`.
+    ///   - body: A terminal operation.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         _ input: T,
@@ -158,12 +184,15 @@ extension Pipeline
         _ = try body(input)
     }
     
-    /// Passes unwrapped `input` value into `body` if it's non-nil,
-    /// or does nothing otherwise. Returns nothing anyway.
-    /// Typically defines final step in pipeline. Alternatively
-    /// can be used to "restart" pipeline — continue chain with
-    /// next step taking no input (Void).
-    @Sendable
+    /// Asynchronously passes a wrapped optional value to a closure and ends the pipeline.
+    ///
+    /// The function calls `body` only when `input` is non-`nil` and always
+    /// returns `Void`.
+    ///
+    /// - Parameters:
+    ///   - input: The optional value whose wrapped value is passed to `body`.
+    ///   - body: An asynchronous terminal operation.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         optional input: T?,
@@ -180,12 +209,15 @@ extension Pipeline
         _ = try await body(input)
     }
     
-    /// Passes unwrapped `input` value into `body` if it's non-nil,
-    /// or does nothing otherwise. Returns nothing anyway.
-    /// Typically defines final step in pipeline. Alternatively
-    /// can be used to "restart" pipeline — continue chain with
-    /// next step taking no input (Void).
-    @Sendable
+    /// Synchronously passes a wrapped optional value to a closure and ends the pipeline.
+    ///
+    /// The function calls `body` only when `input` is non-`nil` and always
+    /// returns `Void`.
+    ///
+    /// - Parameters:
+    ///   - input: The optional value whose wrapped value is passed to `body`.
+    ///   - body: A terminal operation.
+    /// - Throws: Any error thrown by `body`.
     static
     func take<T, U>(
         optional input: T?,
@@ -200,9 +232,16 @@ extension Pipeline
 
 extension Pipeline
 {
-    /// Special global-level helper that's intended to be used
-    /// for easy inline mutation of value-type instances. THROWS!
-    @Sendable
+    /// Asynchronously passes a mutable copy of `input` to `body` and returns it.
+    ///
+    /// The `inout` parameter allows `body` to mutate the value or replace it with
+    /// another value, including another reference-type instance.
+    ///
+    /// - Parameters:
+    ///   - input: The value to mutate.
+    ///   - body: An asynchronous mutation applied to the value as `inout`.
+    /// - Returns: The value produced after applying `body`.
+    /// - Throws: Any error thrown by `body`.
     static
     func mutate<T>(
         _ input: T,
@@ -214,9 +253,16 @@ extension Pipeline
         return tmp
     }
     
-    /// Special global-level helper that's intended to be used
-    /// for easy inline mutation of value-type instances. THROWS!
-    @Sendable
+    /// Synchronously passes a mutable copy of `input` to `body` and returns it.
+    ///
+    /// The `inout` parameter allows `body` to mutate the value or replace it with
+    /// another value, including another reference-type instance.
+    ///
+    /// - Parameters:
+    ///   - input: The value to mutate.
+    ///   - body: A mutation applied to the value as `inout`.
+    /// - Returns: The value produced after applying `body`.
+    /// - Throws: Any error thrown by `body`.
     static
     func mutate<T>(
         _ input: T,
@@ -233,11 +279,16 @@ extension Pipeline
 
 extension Pipeline
 {
-    /// Special global-level helper that's intended to be used
-    /// for easy inline mutation of reference-type instances or
-    /// inspection (read-only access) of value type instances.
-    /// THROWS!
-    @Sendable
+    /// Asynchronously passes `input` to `body` and then returns the same value.
+    ///
+    /// The closure can't replace `input`, but it can mutate state owned by a
+    /// reference-type value.
+    ///
+    /// - Parameters:
+    ///   - input: The value to inspect.
+    ///   - body: An asynchronous operation that observes `input`.
+    /// - Returns: The original `input` value.
+    /// - Throws: Any error thrown by `body`.
     static
     func inspect<T>(
         _ input: T,
@@ -248,11 +299,16 @@ extension Pipeline
         return input
     }
     
-    /// Special global-level helper that's intended to be used
-    /// for easy inline mutation of reference-type instances or
-    /// inspection (read-only access) of value type instances.
-    /// THROWS!
-    @Sendable
+    /// Synchronously passes `input` to `body` and then returns the same value.
+    ///
+    /// The closure can't replace `input`, but it can mutate state owned by a
+    /// reference-type value.
+    ///
+    /// - Parameters:
+    ///   - input: The value to inspect.
+    ///   - body: An operation that observes `input`.
+    /// - Returns: The original `input` value.
+    /// - Throws: Any error thrown by `body`.
     static
     func inspect<T>(
         _ input: T,
@@ -268,10 +324,14 @@ extension Pipeline
 
 extension Pipeline
 {
-    /// Special global-level helper that's intended to be used
-    /// for easy inline checking some conditions about provided input.
-    /// THROWS!
-    @Sendable
+    /// Asynchronously verifies a condition and returns `input` when it succeeds.
+    ///
+    /// - Parameters:
+    ///   - input: The value to validate.
+    ///   - condition: An asynchronous predicate evaluated with `input`.
+    /// - Returns: `input` when `condition` returns `true`.
+    /// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
+    ///   or any error thrown by `condition`.
     static
     func ensure<T>(
         _ input: T,
@@ -289,10 +349,14 @@ extension Pipeline
         }
     }
     
-    /// Special global-level helper that's intended to be used
-    /// for easy inline checking some conditions about provided input.
-    /// THROWS!
-    @Sendable
+    /// Synchronously verifies a condition and returns `input` when it succeeds.
+    ///
+    /// - Parameters:
+    ///   - input: The value to validate.
+    ///   - condition: A predicate evaluated with `input`.
+    /// - Returns: `input` when `condition` returns `true`.
+    /// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
+    ///   or any error thrown by `condition`.
     static
     func ensure<T>(
         _ input: T,
@@ -315,7 +379,14 @@ extension Pipeline
 
 extension Pipeline
 {
-    @Sendable
+    /// Unwraps an optional or throws a caller-supplied error.
+    ///
+    /// - Parameters:
+    ///   - input: The optional value to unwrap.
+    ///   - getError: A closure that creates the error if `input` is `nil`. The
+    ///     function calls it only when the error is needed.
+    /// - Returns: The wrapped value of `input`.
+    /// - Throws: The error produced by `getError` when `input` is `nil`.
     static
     func unwrapOrThrow<T>(
         _ input: T?,
@@ -333,7 +404,13 @@ extension Pipeline
         }
     }
 
-    @Sendable
+    /// Requires a Boolean value to be `true` or throws a caller-supplied error.
+    ///
+    /// - Parameters:
+    ///   - input: The Boolean value to validate.
+    ///   - getError: A closure that creates the error if `input` is `false`. The
+    ///     function calls it only when the error is needed.
+    /// - Throws: The error produced by `getError` when `input` is `false`.
     static
     func throwIfFalse(
         _ input: Bool,
@@ -348,7 +425,14 @@ extension Pipeline
         }
     }
 
-    @Sendable
+    /// Unwraps a nonempty optional collection or throws a caller-supplied error.
+    ///
+    /// - Parameters:
+    ///   - input: The optional collection to validate and unwrap.
+    ///   - getError: A closure that creates the error if `input` is `nil` or
+    ///     empty. The function calls it only when the error is needed.
+    /// - Returns: The nonempty collection wrapped by `input`.
+    /// - Throws: The error produced by `getError` when `input` is `nil` or empty.
     static
     func throwIfEmpty<T>(
         _ input: T?,
