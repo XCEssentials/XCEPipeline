@@ -38,20 +38,20 @@ struct SimpleWrapper<T>
     }
  
     public
-    func map<R>(_ handler: @Sendable (T) throws -> R) rethrows -> SimpleWrapper<R>
+    func map<R>(_ handler: (T) throws -> R) rethrows -> SimpleWrapper<R>
     {
         try .init(handler(value))
     }
 
     public
-    func inspect(_ handler: @Sendable (T) throws -> Void) rethrows -> Self
+    func inspect(_ handler: (T) throws -> Void) rethrows -> Self
     {
         try handler(value)
         return self
     }
 
     public
-    func mutate(_ handler: @Sendable (inout T) throws -> Void) rethrows -> Self
+    func mutate(_ handler: (inout T) throws -> Void) rethrows -> Self
     {
         var tmp = value
         try handler(&tmp)
@@ -59,20 +59,20 @@ struct SimpleWrapper<T>
     }
 
     public
-    func map<R>(_ handler: @Sendable (T) async throws -> R) async rethrows -> SimpleWrapper<R>
+    func map<R>(_ handler: (T) async throws -> R) async rethrows -> SimpleWrapper<R>
     {
         try await .init(handler(value))
     }
 
     public
-    func inspect(_ handler: @Sendable (T) async throws -> Void) async rethrows -> Self
+    func inspect(_ handler: (T) async throws -> Void) async rethrows -> Self
     {
         try await handler(value)
         return self
     }
 
     public
-    func mutate(_ handler: @Sendable (inout T) async throws -> Void) async rethrows -> Self where T: Sendable
+    func mutate(_ handler: (inout T) async throws -> Void) async rethrows -> Self where T: Sendable
     {
         var tmp = value
         try await handler(&tmp)
