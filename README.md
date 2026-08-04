@@ -51,7 +51,7 @@ Convenience extensions for working with Combine publishers:
 
 ## Error Types
 
-- `Pipeline.FailedConditionCheck` — thrown when a `.!` condition fails
+- `Pipeline.ConditionCheckError` — reports a failed `.!` condition or wraps an error thrown by its predicate
 - `Pipeline.CompletedWithoutValue` — thrown when a publisher completes without emitting a value
 
 ## How to install

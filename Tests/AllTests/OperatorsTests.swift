@@ -319,7 +319,7 @@ extension OperatorsTests
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
         }
-        catch _ as Pipeline.FailedConditionCheck
+        catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed
         {
             // ✅ ok
         }
@@ -351,7 +351,7 @@ extension OperatorsTests
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Expected condition check to fail!") }
         }
-        catch _ as Pipeline.FailedConditionCheck
+        catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed
         {
             // ✅ ok
         }
@@ -369,10 +369,10 @@ extension OperatorsTests
         do
         {
             try 1
-                .! { _ in throw NestedError.one }
+                .! { _ throws(NestedError) in throw .one }
                 ./ { _ in XCTFail("Expected error thrown during condition check!") }
         }
-        catch NestedError.one
+        catch Pipeline.ConditionCheckError<NestedError>.predicateBodyError(.one)
         {
             // ✅ ok
         }

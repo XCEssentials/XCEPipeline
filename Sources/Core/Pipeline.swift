@@ -39,7 +39,14 @@
 public
 enum Pipeline // scope
 {
-    public struct FailedConditionCheck: Error {}
+    /// An error produced while evaluating a pipeline condition.
+    public enum ConditionCheckError<E: Error>: Error {
+        /// The predicate returned `false`.
+        case conditionCheckFailed
+
+        /// The predicate threw an error.
+        case predicateBodyError(E)
+    }
 
     /// Thrown by ``Publisher/waitForFirstResult()`` when the publisher
     /// completes without emitting any value.
@@ -50,11 +57,16 @@ enum Pipeline // scope
 
 import Foundation
 
-extension Pipeline.FailedConditionCheck: LocalizedError
+extension Pipeline.ConditionCheckError: LocalizedError
 {
     public var errorDescription: String?
     {
-        "Pipeline condition check failed."
+        switch self {
+        case .conditionCheckFailed:
+            "Pipeline condition check failed."
+        case .predicateBodyError(let error):
+            "Pipeline predicate body failed: \(error.localizedDescription)"
+        }
     }
 }
 
@@ -79,10 +91,10 @@ extension Pipeline
     /// - Returns: The value returned by `body`.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         _ input: T,
-        mapAsync body: (T) async throws -> U
-    ) async rethrows -> U {
+        mapAsync body: (T) async throws(E) -> U
+    ) async throws(E) -> U {
         
         try await body(input)
     }
@@ -95,10 +107,10 @@ extension Pipeline
     /// - Returns: The value returned by `body`.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         _ input: T,
-        map body: (T) throws -> U
-    ) rethrows -> U {
+        map body: (T) throws(E) -> U
+    ) throws(E) -> U {
         
         try body(input)
     }
@@ -114,10 +126,10 @@ extension Pipeline
     /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         optional input: T?,
-        flatMapAsync body: (T) async throws -> U?
-    ) async rethrows -> U? {
+        flatMapAsync body: (T) async throws(E) -> U?
+    ) async throws(E) -> U? {
         
         guard
             let input = input
@@ -140,10 +152,10 @@ extension Pipeline
     /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         optional input: T?,
-        flatMap body: (T) throws -> U?
-    ) rethrows -> U? {
+        flatMap body: (T) throws(E) -> U?
+    ) throws(E) -> U? {
         
         try input.flatMap(body)
     }
@@ -158,10 +170,10 @@ extension Pipeline
     ///   - body: An asynchronous terminal operation.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         _ input: T,
-        endAsync body: (T) async throws -> U
-    ) async rethrows {
+        endAsync body: (T) async throws(E) -> U
+    ) async throws(E) {
         
         _ = try await body(input)
     }
@@ -176,10 +188,10 @@ extension Pipeline
     ///   - body: A terminal operation.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         _ input: T,
-        end body: (T) throws -> U
-    ) rethrows {
+        end body: (T) throws(E) -> U
+    ) throws(E) {
         
         _ = try body(input)
     }
@@ -194,10 +206,10 @@ extension Pipeline
     ///   - body: An asynchronous terminal operation.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         optional input: T?,
-        endAsync body: (T) async throws -> U
-    ) async rethrows {
+        endAsync body: (T) async throws(E) -> U
+    ) async throws(E) {
         
         guard
             let input = input
@@ -219,10 +231,10 @@ extension Pipeline
     ///   - body: A terminal operation.
     /// - Throws: Any error thrown by `body`.
     static
-    func take<T, U>(
+    func take<T, U, E: Error>(
         optional input: T?,
-        end body: (T) throws -> U
-    ) rethrows {
+        end body: (T) throws(E) -> U
+    ) throws(E) {
         
         _ = try input.map(body)
     }
@@ -243,10 +255,10 @@ extension Pipeline
     /// - Returns: The value produced after applying `body`.
     /// - Throws: Any error thrown by `body`.
     static
-    func mutate<T>(
+    func mutate<T, E: Error>(
         _ input: T,
-        _ body: (inout T) async throws -> Void
-    ) async rethrows -> T {
+        _ body: (inout T) async throws(E) -> Void
+    ) async throws(E) -> T {
         
         var tmp = input
         try await body(&tmp)
@@ -264,10 +276,10 @@ extension Pipeline
     /// - Returns: The value produced after applying `body`.
     /// - Throws: Any error thrown by `body`.
     static
-    func mutate<T>(
+    func mutate<T, E: Error>(
         _ input: T,
-        _ body: (inout T) throws -> Void
-    ) rethrows -> T {
+        _ body: (inout T) throws(E) -> Void
+    ) throws(E) -> T {
         
         var tmp = input
         try body(&tmp)
@@ -290,10 +302,10 @@ extension Pipeline
     /// - Returns: The original `input` value.
     /// - Throws: Any error thrown by `body`.
     static
-    func inspect<T>(
+    func inspect<T, E: Error>(
         _ input: T,
-        _ body: (T) async throws -> Void
-    ) async rethrows -> T {
+        _ body: (T) async throws(E) -> Void
+    ) async throws(E) -> T {
         
         try await body(input)
         return input
@@ -310,10 +322,10 @@ extension Pipeline
     /// - Returns: The original `input` value.
     /// - Throws: Any error thrown by `body`.
     static
-    func inspect<T>(
+    func inspect<T, E: Error>(
         _ input: T,
-        _ body: (T) throws -> Void
-    ) rethrows -> T {
+        _ body: (T) throws(E) -> Void
+    ) throws(E) -> T {
         
         try body(input)
         return input
@@ -330,23 +342,28 @@ extension Pipeline
     ///   - input: The value to validate.
     ///   - condition: An asynchronous predicate evaluated with `input`.
     /// - Returns: `input` when `condition` returns `true`.
-    /// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
-    ///   or any error thrown by `condition`.
+    /// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+    ///   `condition` returns `false`, or
+    ///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the
+    ///   error thrown by `condition`.
     static
-    func ensure<T>(
+    func ensure<T, E: Error>(
         _ input: T,
-        _ condition: (T) async throws -> Bool
-    ) async throws -> T {
-        
-        if
-            try await condition(input)
-        {
-            return input
+        _ condition: (T) async throws(E) -> Bool
+    ) async throws(ConditionCheckError<E>) -> T {
+
+        let conditionPassed: Bool
+        do {
+            conditionPassed = try await condition(input)
+        } catch let error {
+            throw ConditionCheckError.predicateBodyError(error)
         }
-        else
-        {
-            throw Pipeline.FailedConditionCheck()
+
+        guard conditionPassed else {
+            throw ConditionCheckError.conditionCheckFailed
         }
+
+        return input
     }
     
     /// Synchronously verifies a condition and returns `input` when it succeeds.
@@ -355,23 +372,28 @@ extension Pipeline
     ///   - input: The value to validate.
     ///   - condition: A predicate evaluated with `input`.
     /// - Returns: `input` when `condition` returns `true`.
-    /// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
-    ///   or any error thrown by `condition`.
+    /// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+    ///   `condition` returns `false`, or
+    ///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the
+    ///   error thrown by `condition`.
     static
-    func ensure<T>(
+    func ensure<T, E: Error>(
         _ input: T,
-        _ condition: (T) throws -> Bool
-    ) throws -> T {
-        
-        if
-            try condition(input)
-        {
-            return input
+        _ condition: (T) throws(E) -> Bool
+    ) throws(ConditionCheckError<E>) -> T {
+
+        let conditionPassed: Bool
+        do {
+            conditionPassed = try condition(input)
+        } catch let error {
+            throw ConditionCheckError.predicateBodyError(error)
         }
-        else
-        {
-            throw Pipeline.FailedConditionCheck()
+
+        guard conditionPassed else {
+            throw ConditionCheckError.conditionCheckFailed
         }
+
+        return input
     }
 }
 
@@ -388,10 +410,10 @@ extension Pipeline
     /// - Returns: The wrapped value of `input`.
     /// - Throws: The error produced by `getError` when `input` is `nil`.
     static
-    func unwrapOrThrow<T>(
+    func unwrapOrThrow<T, E: Error>(
         _ input: T?,
-        _ getError: () -> Swift.Error
-    ) throws -> T {
+        _ getError: () -> E
+    ) throws(E) -> T {
         
         if
             let input = input
@@ -412,10 +434,10 @@ extension Pipeline
     ///     function calls it only when the error is needed.
     /// - Throws: The error produced by `getError` when `input` is `false`.
     static
-    func throwIfFalse(
+    func throwIfFalse<E: Error>(
         _ input: Bool,
-        _ getError: () -> Swift.Error
-    ) throws -> Void {
+        _ getError: () -> E
+    ) throws(E) -> Void {
         
         guard
             input
@@ -434,10 +456,10 @@ extension Pipeline
     /// - Returns: The nonempty collection wrapped by `input`.
     /// - Throws: The error produced by `getError` when `input` is `nil` or empty.
     static
-    func throwIfEmpty<T>(
+    func throwIfEmpty<T, E: Error>(
         _ input: T?,
-        _ getError: () -> Swift.Error
-    ) throws -> T where T: Collection {
+        _ getError: () -> E
+    ) throws(E) -> T where T: Collection {
         
         if
             let input = input,

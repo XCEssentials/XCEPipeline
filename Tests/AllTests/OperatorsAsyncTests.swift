@@ -212,7 +212,7 @@ extension OperatorsAsyncTests
             _ = try await 1
                 .! { await TheActor().ensure($0) }
         }
-        catch _ as Pipeline.FailedConditionCheck
+        catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed
         {
             // ✅ ok
         }

@@ -64,10 +64,10 @@ infix operator ?! : NilCoalescingPrecedence
 /// - Returns: The value returned by `body`.
 /// - Throws: Any error thrown by `body`.
 public
-func ./ <T, U>(
+func ./ <T, U, E: Error>(
     input: T,
-    body: (T) async throws -> U
-) async rethrows -> U {
+    body: (T) async throws(E) -> U
+) async throws(E) -> U {
 
     try await Pipeline.take(input, mapAsync: body)
 }
@@ -80,10 +80,10 @@ func ./ <T, U>(
 /// - Returns: The value returned by `body`.
 /// - Throws: Any error thrown by `body`.
 public
-func ./ <T, U>(
+func ./ <T, U, E: Error>(
     input: T,
-    body: (T) throws -> U
-) rethrows -> U {
+    body: (T) throws(E) -> U
+) throws(E) -> U {
         
     try Pipeline.take(input, map: body)
 }
@@ -99,10 +99,10 @@ func ./ <T, U>(
 /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
 /// - Throws: Any error thrown by `body`.
 public
-func .? <T, U>(
+func .? <T, U, E: Error>(
     input: T?,
-    body: (T) async throws -> U?
-) async rethrows -> U? {
+    body: (T) async throws(E) -> U?
+) async throws(E) -> U? {
         
     try await Pipeline.take(optional: input, flatMapAsync: body)
 }
@@ -118,10 +118,10 @@ func .? <T, U>(
 /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
 /// - Throws: Any error thrown by `body`.
 public
-func .? <T, U>(
+func .? <T, U, E: Error>(
     input: T?,
-    body: (T) throws -> U?
-) rethrows -> U? {
+    body: (T) throws(E) -> U?
+) throws(E) -> U? {
         
     try Pipeline.take(optional: input, flatMap: body)
 }
@@ -137,10 +137,10 @@ func .? <T, U>(
 /// - Returns: The value produced after applying `body`.
 /// - Throws: Any error thrown by `body`.
 public
-func .+ <T>(
+func .+ <T, E: Error>(
     input: T,
-    _ body: (inout T) async throws -> Void
-) async rethrows -> T {
+    _ body: (inout T) async throws(E) -> Void
+) async throws(E) -> T {
     
     try await Pipeline.mutate(input, body)
 }
@@ -156,10 +156,10 @@ func .+ <T>(
 /// - Returns: The value produced after applying `body`.
 /// - Throws: Any error thrown by `body`.
 public
-func .+ <T>(
+func .+ <T, E: Error>(
     input: T,
-    _ body: (inout T) throws -> Void
-) rethrows -> T {
+    _ body: (inout T) throws(E) -> Void
+) throws(E) -> T {
     
     try Pipeline.mutate(input, body)
 }
@@ -175,10 +175,10 @@ func .+ <T>(
 /// - Returns: The original `input` value.
 /// - Throws: Any error thrown by `body`.
 public
-func .- <T>(
+func .- <T, E: Error>(
     input: T,
-    _ body: (T) async throws -> Void
-) async rethrows -> T {
+    _ body: (T) async throws(E) -> Void
+) async throws(E) -> T {
     
     try await Pipeline.inspect(input, body)
 }
@@ -194,10 +194,10 @@ func .- <T>(
 /// - Returns: The original `input` value.
 /// - Throws: Any error thrown by `body`.
 public
-func .- <T>(
+func .- <T, E: Error>(
     input: T,
-    _ body: (T) throws -> Void
-) rethrows -> T {
+    _ body: (T) throws(E) -> Void
+) throws(E) -> T {
     
     try Pipeline.inspect(input, body)
 }
@@ -208,13 +208,15 @@ func .- <T>(
 ///   - input: The value to validate.
 ///   - condition: An asynchronous predicate evaluated with `input`.
 /// - Returns: `input` when `condition` returns `true`.
-/// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
-///   or any error thrown by `condition`.
+/// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+///   `condition` returns `false`, or
+///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the error
+///   thrown by `condition`.
 public
-func .! <T>(
+func .! <T, E: Error>(
     input: T,
-    condition: (T) async throws -> Bool
-) async throws -> T {
+    condition: (T) async throws(E) -> Bool
+) async throws(Pipeline.ConditionCheckError<E>) -> T {
     
     try await Pipeline.ensure(input, condition)
 }
@@ -225,13 +227,15 @@ func .! <T>(
 ///   - input: The value to validate.
 ///   - condition: A predicate evaluated with `input`.
 /// - Returns: `input` when `condition` returns `true`.
-/// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
-///   or any error thrown by `condition`.
+/// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+///   `condition` returns `false`, or
+///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the error
+///   thrown by `condition`.
 public
-func .! <T>(
+func .! <T, E: Error>(
     input: T,
-    condition: (T) throws -> Bool
-) throws -> T {
+    condition: (T) throws(E) -> Bool
+) throws(Pipeline.ConditionCheckError<E>) -> T {
     
     try Pipeline.ensure(input, condition)
 }
@@ -246,10 +250,10 @@ func .! <T>(
 ///   - body: An asynchronous terminal operation.
 /// - Throws: Any error thrown by `body`.
 public
-func .* <T, U>(
+func .* <T, U, E: Error>(
     input: T,
-    body: (T) async throws -> U
-) async rethrows {
+    body: (T) async throws(E) -> U
+) async throws(E) {
     
     try await Pipeline.take(input, endAsync: body)
 }
@@ -264,10 +268,10 @@ func .* <T, U>(
 ///   - body: A terminal operation.
 /// - Throws: Any error thrown by `body`.
 public
-func .* <T, U>(
+func .* <T, U, E: Error>(
     input: T,
-    body: (T) throws -> U
-) rethrows {
+    body: (T) throws(E) -> U
+) throws(E) {
     
     try Pipeline.take(input, end: body)
 }
@@ -282,10 +286,10 @@ func .* <T, U>(
 ///   - body: An asynchronous terminal operation.
 /// - Throws: Any error thrown by `body`.
 public
-func .?* <T, U>(
+func .?* <T, U, E: Error>(
     input: T?,
-    body: (T) async throws -> U
-) async rethrows {
+    body: (T) async throws(E) -> U
+) async throws(E) {
     
     try await Pipeline.take(optional: input, endAsync: body)
 }
@@ -300,10 +304,10 @@ func .?* <T, U>(
 ///   - body: A terminal operation.
 /// - Throws: Any error thrown by `body`.
 public
-func .?* <T, U>(
+func .?* <T, U, E: Error>(
     input: T?,
-    body: (T) throws -> U
-) rethrows {
+    body: (T) throws(E) -> U
+) throws(E) {
     
     try Pipeline.take(optional: input, end: body)
 }
@@ -317,10 +321,10 @@ func .?* <T, U>(
 /// - Returns: The wrapped value of `input`.
 /// - Throws: The error produced by `getError` when `input` is `nil`.
 public
-func ?! <T>(
+func ?! <T, E: Error>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error // lazy initialization
-) throws -> T {
+    getError: @autoclosure () -> E // lazy initialization
+) throws(E) -> T {
     
     try Pipeline.unwrapOrThrow(input, getError)
 }
@@ -333,10 +337,10 @@ func ?! <T>(
 ///     evaluated lazily only when the error is needed.
 /// - Throws: The error produced by `getError` when `input` is `false`.
 public
-func ?! (
+func ?! <E: Error>(
     input: Bool,
-    getError: @autoclosure () -> Swift.Error // lazy initialization
-) throws {
+    getError: @autoclosure () -> E // lazy initialization
+) throws(E) {
     
     try Pipeline.throwIfFalse(input, getError)
 }
@@ -350,10 +354,10 @@ func ?! (
 /// - Returns: The nonempty collection wrapped by `input`.
 /// - Throws: The error produced by `getError` when `input` is `nil` or empty.
 public
-func ?! <T>(
+func ?! <T, E: Error>(
     input: T?,
-    getError: @autoclosure () -> Swift.Error // lazy initialization
-) throws -> T where T: Collection {
+    getError: @autoclosure () -> E // lazy initialization
+) throws(E) -> T where T: Collection {
     
     try Pipeline.throwIfEmpty(input, getError)
 }
