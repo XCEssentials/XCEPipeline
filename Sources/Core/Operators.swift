@@ -63,7 +63,6 @@ infix operator ?! : NilCoalescingPrecedence
 ///   - body: An asynchronous transformation to apply to `input`.
 /// - Returns: The value returned by `body`.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func ./ <T, U>(
     input: T,
@@ -80,7 +79,6 @@ func ./ <T, U>(
 ///   - body: A transformation to apply to `input`.
 /// - Returns: The value returned by `body`.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func ./ <T, U>(
     input: T,
@@ -100,7 +98,6 @@ func ./ <T, U>(
 ///   - body: An asynchronous transformation that can return `nil`.
 /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .? <T, U>(
     input: T?,
@@ -120,7 +117,6 @@ func .? <T, U>(
 ///   - body: A transformation that can return `nil`.
 /// - Returns: The result of `body`, or `nil` when `input` is `nil`.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .? <T, U>(
     input: T?,
@@ -140,7 +136,6 @@ func .? <T, U>(
 ///   - body: An asynchronous mutation applied to the value as `inout`.
 /// - Returns: The value produced after applying `body`.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .+ <T>(
     input: T,
@@ -160,7 +155,6 @@ func .+ <T>(
 ///   - body: A mutation applied to the value as `inout`.
 /// - Returns: The value produced after applying `body`.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .+ <T>(
     input: T,
@@ -180,7 +174,6 @@ func .+ <T>(
 ///   - body: An asynchronous operation that observes `input`.
 /// - Returns: The original `input` value.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .- <T>(
     input: T,
@@ -200,7 +193,6 @@ func .- <T>(
 ///   - body: An operation that observes `input`.
 /// - Returns: The original `input` value.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .- <T>(
     input: T,
@@ -218,7 +210,6 @@ func .- <T>(
 /// - Returns: `input` when `condition` returns `true`.
 /// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
 ///   or any error thrown by `condition`.
-@Sendable
 public
 func .! <T>(
     input: T,
@@ -236,7 +227,6 @@ func .! <T>(
 /// - Returns: `input` when `condition` returns `true`.
 /// - Throws: ``Pipeline/FailedConditionCheck`` when `condition` returns `false`,
 ///   or any error thrown by `condition`.
-@Sendable
 public
 func .! <T>(
     input: T,
@@ -255,7 +245,6 @@ func .! <T>(
 ///   - input: The value to pass to `body`.
 ///   - body: An asynchronous terminal operation.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .* <T, U>(
     input: T,
@@ -274,7 +263,6 @@ func .* <T, U>(
 ///   - input: The value to pass to `body`.
 ///   - body: A terminal operation.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .* <T, U>(
     input: T,
@@ -293,7 +281,6 @@ func .* <T, U>(
 ///   - input: The optional value whose wrapped value is passed to `body`.
 ///   - body: An asynchronous terminal operation.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .?* <T, U>(
     input: T?,
@@ -312,7 +299,6 @@ func .?* <T, U>(
 ///   - input: The optional value whose wrapped value is passed to `body`.
 ///   - body: A terminal operation.
 /// - Throws: Any error thrown by `body`.
-@Sendable
 public
 func .?* <T, U>(
     input: T?,
@@ -330,7 +316,6 @@ func .?* <T, U>(
 ///     evaluated lazily only when the error is needed.
 /// - Returns: The wrapped value of `input`.
 /// - Throws: The error produced by `getError` when `input` is `nil`.
-@Sendable
 public
 func ?! <T>(
     input: T?,
@@ -347,7 +332,6 @@ func ?! <T>(
 ///   - getError: The error to create if `input` is `false`. The expression is
 ///     evaluated lazily only when the error is needed.
 /// - Throws: The error produced by `getError` when `input` is `false`.
-@Sendable
 public
 func ?! (
     input: Bool,
@@ -365,7 +349,6 @@ func ?! (
 ///     expression is evaluated lazily only when the error is needed.
 /// - Returns: The nonempty collection wrapped by `input`.
 /// - Throws: The error produced by `getError` when `input` is `nil` or empty.
-@Sendable
 public
 func ?! <T>(
     input: T?,
