@@ -213,6 +213,35 @@ extension PublisherTests
         await fulfillment(of: [cancelled], timeout: 1)
     }
 
+    func test_waitForFirstResult_preservesPublisherDeliveryQueue() async throws
+    {
+        let subscribed = expectation(description: "Subscribed")
+        let cancelled = expectation(description: "Cancelled")
+        let subject = SendableSubject<String, Error>()
+
+        let task = Task {
+            try await subject.value
+                .handleEvents(
+                    receiveSubscription: { _ in subscribed.fulfill() },
+                    receiveCancel: {
+                        XCTAssertFalse(Thread.isMainThread)
+                        cancelled.fulfill()
+                    }
+                )
+                .waitForFirstResult()
+        }
+
+        await fulfillment(of: [subscribed], timeout: 1)
+        DispatchQueue.global().async {
+            subject.value.send("hello")
+        }
+
+        let result = try await task.value
+
+        XCTAssertEqual(result, "hello")
+        await fulfillment(of: [cancelled], timeout: 1)
+    }
+
     func test_waitForFirstResult_sendableOutputAcrossTask() async throws
     {
         let task = Task.detached {

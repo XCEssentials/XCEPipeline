@@ -37,7 +37,6 @@ extension Publisher
             var resumed = false
 
             cancellable = self
-                .receive(on: DispatchQueue.main)
                 .sink { result in
 
                     switch result
