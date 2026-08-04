@@ -242,6 +242,46 @@ extension PublisherTests
         await fulfillment(of: [cancelled], timeout: 1)
     }
 
+    func test_waitForFirstResult_resumesOnceForCompetingEvents() async throws
+    {
+        for _ in 0..<100
+        {
+            let subscribed = expectation(description: "Subscribed")
+            let subject = SendableSubject<String, Error>()
+
+            let task = Task {
+                try await subject.value
+                    .handleEvents(
+                        receiveSubscription: { _ in subscribed.fulfill() }
+                    )
+                    .waitForFirstResult()
+            }
+
+            await fulfillment(of: [subscribed], timeout: 1)
+
+            DispatchQueue.concurrentPerform(iterations: 2) { index in
+                if index == 0
+                {
+                    subject.value.send("hello")
+                }
+                else
+                {
+                    subject.value.send(completion: .finished)
+                }
+            }
+
+            do
+            {
+                let result = try await task.value
+                XCTAssertEqual(result, "hello")
+            }
+            catch is Pipeline.CompletedWithoutValue
+            {
+                // Completion won the race.
+            }
+        }
+    }
+
     func test_waitForFirstResult_sendableOutputAcrossTask() async throws
     {
         let task = Task.detached {
