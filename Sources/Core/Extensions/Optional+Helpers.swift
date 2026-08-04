@@ -27,27 +27,23 @@
 public
 extension Optional
 {
-    func inspect(via handler: (Wrapped) throws -> Void) rethrows -> Self
+    func inspect<E: Error>(via handler: (Wrapped) throws(E) -> Void) throws(E) -> Self
     {
-        try map {
-            try handler($0)
-            return $0
-        }
+        guard case .some(let wrapped) = self else { return self }
+        try handler(wrapped)
+        return self
     }
     
-    func mutate(via handler: (inout Wrapped) throws -> Void) rethrows -> Self
+    func mutate<E: Error>(via handler: (inout Wrapped) throws(E) -> Void) throws(E) -> Self
     {
-        try map {
-            var tmp = $0
-            try handler(&tmp)
-            return tmp
-        }
+        guard case .some(var wrapped) = self else { return self }
+        try handler(&wrapped)
+        return .some(wrapped)
     }
     
-    func filter(via shouldKeep: (Wrapped) throws -> Bool) rethrows -> Self
+    func filter<E: Error>(via shouldKeep: (Wrapped) throws(E) -> Bool) throws(E) -> Self
     {
-        try flatMap {
-            try shouldKeep($0) ? $0 : nil
-        }
+        guard case .some(let wrapped) = self else { return self }
+        return try shouldKeep(wrapped) ? self : nil
     }
 }
