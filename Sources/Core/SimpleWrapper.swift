@@ -72,7 +72,7 @@ struct SimpleWrapper<T>
     }
 
     public
-    func mutate(_ handler: @Sendable (inout T) async throws -> Void) async rethrows -> Self
+    func mutate(_ handler: @Sendable (inout T) async throws -> Void) async rethrows -> Self where T: Sendable
     {
         var tmp = value
         try await handler(&tmp)

@@ -52,4 +52,17 @@ class SimpleWrapperTests: XCTestCase
         
         XCTAssertEqual(result, take(2))
     }
+
+    func test_asyncMutate_sendableValue() async
+    {
+        let result = await take(1)
+            .mutate { value in
+                await Task.yield()
+                value += 1
+            }
+
+        //---
+
+        XCTAssertEqual(result, take(2))
+    }
 }
