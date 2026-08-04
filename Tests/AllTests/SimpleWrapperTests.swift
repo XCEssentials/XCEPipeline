@@ -50,6 +50,6 @@ class SimpleWrapperTests: XCTestCase
             
         //---
         
-        XCTAssertEqual(result, SimpleWrapper(2))
+        XCTAssertEqual(result, take(2))
     }
 }
