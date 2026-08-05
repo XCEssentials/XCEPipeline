@@ -214,22 +214,40 @@ extension OperatorsTests
     {
         let thrownValue: SpecificError = .expected(value: 31)
 
-        do { _ = try 1 ./ { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected map to throw") }
+        do {
+            _ = try 1 ./ { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected map to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try Optional(1) .? { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected flat map to throw") }
+        do {
+            _ = try Optional(1) .? { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected flat map to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try 1 .+ { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected mutate to throw") }
+        do {
+            _ = try 1 .+ { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected mutate to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try 1 .- { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected inspect to throw") }
+        do {
+            _ = try 1 .- { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected inspect to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { try 1 .* { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected end to throw") }
+        do {
+            try 1 .* { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected end to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { try Optional(1) .?* { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected optional end to throw") }
+        do {
+            try Optional(1) .?* { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected optional end to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do { _ = try 1 .! { _ throws(SpecificError) in throw thrownValue } }
@@ -290,13 +308,22 @@ extension OperatorsTests
 
         let thrownValue: SpecificError = .expected(value: 43)
 
-        do { _ = try Optional(1).inspect { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected inspect to throw") }
+        do {
+            _ = try Optional(1).inspect { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected inspect to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try Optional(1).mutate { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected mutate to throw") }
+        do {
+            _ = try Optional(1).mutate { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected mutate to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try Optional(1).filter { _ throws(SpecificError) in throw thrownValue }; XCTFail("Expected filter to throw") }
+        do {
+            _ = try Optional(1).filter { _ throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected filter to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
     }
     

@@ -231,22 +231,44 @@ extension OperatorsAsyncTests
     {
         let thrownValue: SpecificError = .expected(value: 47)
 
-        do { _ = try await 1 ./ { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected map to throw") }
+        do {
+            _ = try await 1 ./ { _ async throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected map to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try await Optional(1) .? { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected flat map to throw") }
+        do {
+            _ = try await Optional(1) .? {
+                _ async throws(SpecificError) in throw thrownValue
+            }
+            XCTFail("Expected flat map to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try await 1 .+ { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected mutate to throw") }
+        do {
+            _ = try await 1 .+ { _ async throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected mutate to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { _ = try await 1 .- { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected inspect to throw") }
+        do {
+            _ = try await 1 .- { _ async throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected inspect to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { try await 1 .* { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected end to throw") }
+        do {
+            try await 1 .* { _ async throws(SpecificError) in throw thrownValue }
+            XCTFail("Expected end to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
-        do { try await Optional(1) .?* { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected optional end to throw") }
+        do {
+            try await Optional(1) .?* {
+                _ async throws(SpecificError) in throw thrownValue
+            }
+            XCTFail("Expected optional end to throw")
+        }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do { _ = try await 1 .! { _ async throws(SpecificError) in throw thrownValue } }
