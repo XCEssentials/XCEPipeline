@@ -5,74 +5,123 @@ import Combine
 
 //---
 
-private final class FirstResultState: @unchecked Sendable
+private final class FirstResultState<Output: Sendable>: @unchecked Sendable
 {
+    typealias Continuation = CheckedContinuation<Output, Error>
+
     enum StateError: Error
     {
+        case continuationNotInstalled
         case subscriptionAlreadyInstalled
-    }
-
-    enum Installation
-    {
-        case installed
-        case alreadyResolved
     }
 
     enum Resolution
     {
-        case wonBeforeSubscription
-        case won(AnyCancellable)
+        case wonBeforeSubscription(Continuation)
+        case won(Continuation, AnyCancellable)
         case alreadyResolved
 
-        var won: Bool
+        func resume(returning output: Output)
         {
             switch self
             {
-                case .wonBeforeSubscription, .won:
-                    true
+                case .wonBeforeSubscription(let continuation):
+                    continuation.resume(returning: output)
+
+                case .won(let continuation, let cancellable):
+                    continuation.resume(returning: output)
+                    cancellable.cancel()
 
                 case .alreadyResolved:
-                    false
+                    break
             }
         }
 
-        func cancelSubscription()
+        func resume(throwing error: Error)
         {
-            if case .won(let cancellable) = self
+            switch self
             {
-                cancellable.cancel()
+                case .wonBeforeSubscription(let continuation):
+                    continuation.resume(throwing: error)
+
+                case .won(let continuation, let cancellable):
+                    continuation.resume(throwing: error)
+                    cancellable.cancel()
+
+                case .alreadyResolved:
+                    break
+            }
+        }
+    }
+
+    enum Cancellation
+    {
+        case recorded
+        case resolve(Resolution)
+        case alreadyResolved
+
+        func execute()
+        {
+            if case .resolve(let resolution) = self
+            {
+                resolution.resume(throwing: CancellationError())
             }
         }
     }
 
     private enum Phase
     {
-        case awaitingSubscription
-        case subscribed(AnyCancellable)
+        case awaitingContinuation
+        case cancelledBeforeContinuation
+        case awaitingSubscription(Continuation)
+        case subscribed(Continuation, AnyCancellable)
         case resolved
     }
 
     private let lock = NSLock()
-    private var phase = Phase.awaitingSubscription
+    private var phase = Phase.awaitingContinuation
 
-    func install(
-        _ cancellable: AnyCancellable
-    ) throws(StateError) -> Installation
+    func install(_ continuation: Continuation) -> Bool
     {
         lock.lock()
         defer { lock.unlock() }
 
         switch phase
         {
-            case .awaitingSubscription:
-                phase = .subscribed(cancellable)
-                return .installed
+            case .awaitingContinuation:
+                phase = .awaitingSubscription(continuation)
+                return true
+
+            case .cancelledBeforeContinuation:
+                phase = .resolved
+                return false
+
+            case .awaitingSubscription, .subscribed, .resolved:
+                return false
+        }
+    }
+
+    func install(
+        _ cancellable: AnyCancellable
+    ) throws(StateError) -> Bool
+    {
+        lock.lock()
+        defer { lock.unlock() }
+
+        switch phase
+        {
+            case .awaitingSubscription(let continuation):
+                phase = .subscribed(continuation, cancellable)
+                return true
 
             case .resolved:
-                return .alreadyResolved
+                return false
 
             case .subscribed:
                 throw .subscriptionAlreadyInstalled
+
+            case .awaitingContinuation, .cancelledBeforeContinuation:
+                throw .continuationNotInstalled
         }
     }
 
@@ -83,22 +132,46 @@ private final class FirstResultState: @unchecked Sendable
 
         switch phase
         {
-            case .awaitingSubscription:
+            case .awaitingSubscription(let continuation):
                 phase = .resolved
-                return .wonBeforeSubscription
+                return .wonBeforeSubscription(continuation)
 
-            case .subscribed(let cancellable):
+            case .subscribed(let continuation, let cancellable):
                 phase = .resolved
-                return .won(cancellable)
+                return .won(continuation, cancellable)
 
-            case .resolved:
+            case .awaitingContinuation, .cancelledBeforeContinuation, .resolved:
+                return .alreadyResolved
+        }
+    }
+
+    func cancel() -> Cancellation
+    {
+        lock.lock()
+        defer { lock.unlock() }
+
+        switch phase
+        {
+            case .awaitingContinuation:
+                phase = .cancelledBeforeContinuation
+                return .recorded
+
+            case .awaitingSubscription(let continuation):
+                phase = .resolved
+                return .resolve(.wonBeforeSubscription(continuation))
+
+            case .subscribed(let continuation, let cancellable):
+                phase = .resolved
+                return .resolve(.won(continuation, cancellable))
+
+            case .cancelledBeforeContinuation, .resolved:
                 return .alreadyResolved
         }
     }
 }
 
 public
-extension Publisher
+extension Just
 {
     /// Call this for **SYNC** only streams
     /// (those that start with `Just(...)`),
@@ -111,11 +184,16 @@ extension Publisher
             receiveValue: { _ in }
         )
     }
-    
+}
+
+public
+extension Publisher
+{
     /// Convenience adapter for async/await workflow.
     ///
     /// Resumes with the **first** value emitted by the publisher, or throws:
     /// - the publisher's own error on failure, or
+    /// - `CancellationError` if the waiting task is cancelled, or
     /// - ``Pipeline/CompletedWithoutValue`` if the publisher completes
     ///   without emitting any value.
     ///
@@ -123,53 +201,50 @@ extension Publisher
     /// https://medium.com/geekculture/from-combine-to-async-await-c08bf1d15b77
     func waitForFirstResult() async throws -> Output where Output: Sendable
     {
-        try await withCheckedThrowingContinuation { continuation in
-            let state = FirstResultState()
+        let state = FirstResultState<Output>()
 
-            let cancellable = self
-                .sink { result in
-                    let resolution = state.resolve()
-                    guard resolution.won else { return }
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                guard state.install(continuation) else
+                {
+                    continuation.resume(throwing: CancellationError())
+                    return
+                }
 
-                    switch result
-                    {
-                        case .finished:
-                            continuation.resume(throwing: Pipeline.CompletedWithoutValue())
+                let cancellable = self
+                    .sink { result in
+                        let resolution = state.resolve()
 
-                        case .failure(let error):
-                            continuation.resume(throwing: error)
+                        switch result
+                        {
+                            case .finished:
+                                resolution.resume(throwing: Pipeline.CompletedWithoutValue())
+
+                            case .failure(let error):
+                                resolution.resume(throwing: error)
+                        }
+                    }
+                    receiveValue: {
+                        state.resolve().resume(returning: $0)
                     }
 
-                    resolution.cancelSubscription()
-                }
-                receiveValue: {
-                    let resolution = state.resolve()
-                    guard resolution.won else { return }
-
-                    continuation.resume(returning: $0)
-
-                    resolution.cancelSubscription()
-                }
-
-            do
-            {
-                if case .alreadyResolved = try state.install(cancellable)
+                do
                 {
+                    guard try state.install(cancellable) else
+                    {
+                        cancellable.cancel()
+                        return
+                    }
+                }
+                catch
+                {
+                    let resolution = state.resolve()
+                    resolution.resume(throwing: error)
                     cancellable.cancel()
                 }
             }
-            catch
-            {
-                let resolution = state.resolve()
-
-                if resolution.won
-                {
-                    continuation.resume(throwing: error)
-                    resolution.cancelSubscription()
-                }
-
-                cancellable.cancel()
-            }
+        } onCancel: {
+            state.cancel().execute()
         }
     }
     

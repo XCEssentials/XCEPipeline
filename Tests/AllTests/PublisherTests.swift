@@ -213,6 +213,71 @@ extension PublisherTests
         await fulfillment(of: [cancelled], timeout: 1)
     }
 
+    func test_waitForFirstResult_taskCancellationCancelsPublisher() async throws
+    {
+        let subscribed = expectation(description: "Subscribed")
+        let cancelled = expectation(description: "Cancelled")
+        let subject = SendableSubject<String, Error>()
+
+        let task = Task {
+            try await subject.value
+                .handleEvents(
+                    receiveSubscription: { _ in subscribed.fulfill() },
+                    receiveCancel: { cancelled.fulfill() }
+                )
+                .waitForFirstResult()
+        }
+
+        await fulfillment(of: [subscribed], timeout: 1)
+        task.cancel()
+
+        do
+        {
+            _ = try await task.value
+            XCTFail("Expected cancellation to be thrown")
+        }
+        catch is CancellationError
+        {
+            // expected
+        }
+
+        await fulfillment(of: [cancelled], timeout: 1)
+    }
+
+    func test_waitForFirstResult_alreadyCancelledDoesNotSubscribe() async throws
+    {
+        let subscribed = expectation(description: "Not subscribed")
+        subscribed.isInverted = true
+        let subject = SendableSubject<String, Error>()
+
+        let task = Task {
+            while !Task.isCancelled
+            {
+                await Task.yield()
+            }
+
+            return try await subject.value
+                .handleEvents(
+                    receiveSubscription: { _ in subscribed.fulfill() }
+                )
+                .waitForFirstResult()
+        }
+
+        task.cancel()
+
+        do
+        {
+            _ = try await task.value
+            XCTFail("Expected cancellation to be thrown")
+        }
+        catch is CancellationError
+        {
+            // expected
+        }
+
+        await fulfillment(of: [subscribed], timeout: 0.05)
+    }
+
     func test_waitForFirstResult_preservesPublisherDeliveryQueue() async throws
     {
         let subscribed = expectation(description: "Subscribed")
