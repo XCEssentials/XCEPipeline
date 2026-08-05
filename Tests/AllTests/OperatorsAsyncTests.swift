@@ -1,19 +1,19 @@
 /*
-
+ 
  MIT License
-
+ 
  Copyright (c) 2018 Maxim Khatskevich
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  */
 
 import XCTest
@@ -37,7 +37,7 @@ class OperatorsAsyncTests: XCTestCase
     {
         case error
     }
-
+    
     enum SpecificError: Error, Equatable
     {
         case expected(value: Int)
@@ -53,9 +53,9 @@ extension OperatorsAsyncTests
     func test_operator_onMainActor_context()
     {
         @MainActor class TheActor { func doSomething(_ : Int) {} }
-
+        
         //---
-
+        
         /// If NOT on main actor context, then following error happens:
         ///
         /// ```
@@ -226,17 +226,19 @@ extension OperatorsAsyncTests
             XCTFail("Should never get here!")
         }
     }
-
+    
     func test_asyncOperatorsPreserveTypedError() async
     {
         let thrownValue: SpecificError = .expected(value: 47)
-
+        
         do {
-            _ = try await 1 ./ { _ async throws(SpecificError) in throw thrownValue }
+            _ = try await 1 ./ {
+                _ async throws(SpecificError) in throw thrownValue
+            }
             XCTFail("Expected map to throw")
         }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
-
+        
         do {
             _ = try await Optional(1) .? {
                 _ async throws(SpecificError) in throw thrownValue
@@ -244,25 +246,31 @@ extension OperatorsAsyncTests
             XCTFail("Expected flat map to throw")
         }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
-
+        
         do {
-            _ = try await 1 .+ { _ async throws(SpecificError) in throw thrownValue }
+            _ = try await 1 .+ {
+                _ async throws(SpecificError) in throw thrownValue
+            }
             XCTFail("Expected mutate to throw")
         }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
-
+        
         do {
-            _ = try await 1 .- { _ async throws(SpecificError) in throw thrownValue }
+            _ = try await 1 .- {
+                _ async throws(SpecificError) in throw thrownValue
+            }
             XCTFail("Expected inspect to throw")
         }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
-
+        
         do {
-            try await 1 .* { _ async throws(SpecificError) in throw thrownValue }
+            try await 1 .* {
+                _ async throws(SpecificError) in throw thrownValue
+            }
             XCTFail("Expected end to throw")
         }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
-
+        
         do {
             try await Optional(1) .?* {
                 _ async throws(SpecificError) in throw thrownValue
@@ -270,8 +278,12 @@ extension OperatorsAsyncTests
             XCTFail("Expected optional end to throw")
         }
         catch let caught { XCTAssertEqual(caught, thrownValue) }
-
-        do { _ = try await 1 .! { _ async throws(SpecificError) in throw thrownValue } }
+        
+        do {
+            _ = try await 1 .! {
+                _ async throws(SpecificError) in throw thrownValue
+            }
+        }
         catch let caught
         {
             switch caught
@@ -281,20 +293,22 @@ extension OperatorsAsyncTests
             }
         }
     }
-
+    
     func test_asyncNilOptionalOperatorsDoNotInvokeTypedThrowingHandlers() async
     {
         let value: Int? = nil
-
-        let mapped = try? await value .? { _ async throws(SpecificError) -> Int? in
+        
+        let mapped = try? await value .? {
+            _ async throws(SpecificError) -> Int? in
             XCTFail("Handler should not be invoked")
             throw .expected(value: 53)
         }
-        try? await value .?* { _ async throws(SpecificError) in
+        try? await value .?* {
+            _ async throws(SpecificError) in
             XCTFail("Handler should not be invoked")
             throw .expected(value: 53)
         }
-
+        
         XCTAssertNil(mapped)
     }
 }

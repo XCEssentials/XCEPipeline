@@ -73,9 +73,15 @@ class SimpleWrapperTests: XCTestCase
 
     func test_nonthrowingHandlersInferNever()
     {
-        let mapped = take(1).map { $0 + 1 }
-        let inspected = mapped.inspect { XCTAssertEqual($0, 2) }
-        let mutated = inspected.mutate { $0 += 1 }
+        let mapped = take(1).map {
+            $0 + 1
+        }
+        let inspected = mapped.inspect {
+            XCTAssertEqual($0, 2)
+        }
+        let mutated = inspected.mutate {
+            $0 += 1
+        }
 
         XCTAssertEqual(mutated, take(3))
     }
