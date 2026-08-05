@@ -33,6 +33,11 @@ import XCEPipeline
 
 class SimpleWrapperTests: XCTestCase
 {
+    private enum SpecificError: Error, Equatable
+    {
+        case expected(value: Int)
+    }
+
     func test_take_withOptional()
     {
         let result = take(Optional(1))
@@ -64,5 +69,48 @@ class SimpleWrapperTests: XCTestCase
         //---
 
         XCTAssertEqual(result, take(2))
+    }
+
+    func test_nonthrowingHandlersInferNever()
+    {
+        let mapped = take(1).map { $0 + 1 }
+        let inspected = mapped.inspect { XCTAssertEqual($0, 2) }
+        let mutated = inspected.mutate { $0 += 1 }
+
+        XCTAssertEqual(mutated, take(3))
+    }
+
+    func test_synchronousHandlersPreserveTypedError()
+    {
+        let thrownValue: SpecificError = .expected(value: 17)
+        let map: (Int) throws(SpecificError) -> Int = { _ throws(SpecificError) in throw thrownValue }
+        let inspect: (Int) throws(SpecificError) -> Void = { _ throws(SpecificError) in throw thrownValue }
+        let mutate: (inout Int) throws(SpecificError) -> Void = { _ throws(SpecificError) in throw thrownValue }
+
+        do { _ = try take(1).map(map); XCTFail("Expected map to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try take(1).inspect(inspect); XCTFail("Expected inspect to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try take(1).mutate(mutate); XCTFail("Expected mutate to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+    }
+
+    func test_asyncHandlersPreserveTypedError() async
+    {
+        let thrownValue: SpecificError = .expected(value: 23)
+        let map: (Int) async throws(SpecificError) -> Int = { _ async throws(SpecificError) in throw thrownValue }
+        let inspect: (Int) async throws(SpecificError) -> Void = { _ async throws(SpecificError) in throw thrownValue }
+        let mutate: (inout Int) async throws(SpecificError) -> Void = { _ async throws(SpecificError) in throw thrownValue }
+
+        do { _ = try await take(1).map(map); XCTFail("Expected map to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try await take(1).inspect(inspect); XCTFail("Expected inspect to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try await take(1).mutate(mutate); XCTFail("Expected mutate to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
     }
 }
