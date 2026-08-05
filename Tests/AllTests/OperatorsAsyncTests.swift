@@ -37,6 +37,11 @@ class OperatorsAsyncTests: XCTestCase
     {
         case error
     }
+
+    enum SpecificError: Error, Equatable
+    {
+        case expected(value: Int)
+    }
 }
 
 // MARK: - Tests
@@ -220,5 +225,54 @@ extension OperatorsAsyncTests
         {
             XCTFail("Should never get here!")
         }
+    }
+
+    func test_asyncOperatorsPreserveTypedError() async
+    {
+        let thrownValue: SpecificError = .expected(value: 47)
+
+        do { _ = try await 1 ./ { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected map to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try await Optional(1) .? { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected flat map to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try await 1 .+ { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected mutate to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try await 1 .- { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected inspect to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { try await 1 .* { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected end to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { try await Optional(1) .?* { _ async throws(SpecificError) in throw thrownValue }; XCTFail("Expected optional end to throw") }
+        catch let caught { XCTAssertEqual(caught, thrownValue) }
+
+        do { _ = try await 1 .! { _ async throws(SpecificError) in throw thrownValue } }
+        catch let caught
+        {
+            switch caught
+            {
+            case .predicateBodyError(let error): XCTAssertEqual(error, thrownValue)
+            case .conditionCheckFailed: XCTFail("Expected the predicate error")
+            }
+        }
+    }
+
+    func test_asyncNilOptionalOperatorsDoNotInvokeTypedThrowingHandlers() async
+    {
+        let value: Int? = nil
+
+        let mapped = try? await value .? { _ async throws(SpecificError) -> Int? in
+            XCTFail("Handler should not be invoked")
+            throw .expected(value: 53)
+        }
+        try? await value .?* { _ async throws(SpecificError) in
+            XCTFail("Handler should not be invoked")
+            throw .expected(value: 53)
+        }
+
+        XCTAssertNil(mapped)
     }
 }
