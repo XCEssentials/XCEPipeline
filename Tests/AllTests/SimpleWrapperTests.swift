@@ -26,53 +26,47 @@
 
 import XCTest
 
-//@testable
+// @testable
 import XCEPipeline
 
-//---
+// ---
 
-class SimpleWrapperTests: XCTestCase
-{
-    private enum SpecificError: Error, Equatable
-    {
+class SimpleWrapperTests: XCTestCase {
+    private enum SpecificError: Error, Equatable {
         case expected(value: Int)
     }
 
-    func test_take_withOptional()
-    {
+    func test_take_withOptional() {
         let result = take(Optional(1))
             .map { $0 + 1 }
-            
-        //---
-        
+
+        // ---
+
         XCTAssertEqual(result, Optional.some(2))
     }
-    
-    func test_take_forNonOptional()
-    {
+
+    func test_take_forNonOptional() {
         let result = take(1)
             .map { $0 + 1 }
-            
-        //---
-        
+
+        // ---
+
         XCTAssertEqual(result, take(2))
     }
 
-    func test_asyncMutate_sendableValue() async
-    {
+    func test_asyncMutate_sendableValue() async {
         let result = await take(1)
             .mutate { value in
                 await Task.yield()
                 value += 1
             }
 
-        //---
+        // ---
 
         XCTAssertEqual(result, take(2))
     }
 
-    func test_nonthrowingHandlersInferNever()
-    {
+    func test_nonthrowingHandlersInferNever() {
         let mapped = take(1).map {
             $0 + 1
         }
@@ -86,49 +80,66 @@ class SimpleWrapperTests: XCTestCase
         XCTAssertEqual(mutated, take(3))
     }
 
-    func test_synchronousHandlersPreserveTypedError()
-    {
+    func test_synchronousHandlersPreserveTypedError() {
         let thrownValue: SpecificError = .expected(value: 17)
-        let map: (Int) throws(SpecificError) -> Int = {
-            _ throws(SpecificError) in throw thrownValue
+        let map: (Int) throws(SpecificError) -> Int = { _ throws(SpecificError) in throw thrownValue
         }
-        let inspect: (Int) throws(SpecificError) -> Void = {
-            _ throws(SpecificError) in throw thrownValue
+        let inspect: (Int) throws(SpecificError) -> Void = { _ throws(SpecificError) in throw thrownValue
         }
-        let mutate: (inout Int) throws(SpecificError) -> Void = {
-            _ throws(SpecificError) in throw thrownValue
+        let mutate: (inout Int) throws(SpecificError) -> Void = { _ throws(SpecificError) in throw thrownValue
         }
 
-        do { _ = try take(1).map(map); XCTFail("Expected map to throw") }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        do {
+            _ = try take(1).map(map)
+            XCTFail("Expected map to throw")
+        } catch let caught {
+            XCTAssertEqual(caught, thrownValue)
+        }
 
-        do { _ = try take(1).inspect(inspect); XCTFail("Expected inspect to throw") }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        do {
+            _ = try take(1).inspect(inspect)
+            XCTFail("Expected inspect to throw")
+        } catch let caught {
+            XCTAssertEqual(caught, thrownValue)
+        }
 
-        do { _ = try take(1).mutate(mutate); XCTFail("Expected mutate to throw") }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        do {
+            _ = try take(1).mutate(mutate)
+            XCTFail("Expected mutate to throw")
+        } catch let caught {
+            XCTAssertEqual(caught, thrownValue)
+        }
     }
 
-    func test_asyncHandlersPreserveTypedError() async
-    {
+    func test_asyncHandlersPreserveTypedError() async {
         let thrownValue: SpecificError = .expected(value: 23)
-        let map: (Int) async throws(SpecificError) -> Int = {
-            _ async throws(SpecificError) in throw thrownValue
+        let map: (Int) async throws(SpecificError) -> Int = { _ async throws(SpecificError) in throw thrownValue
         }
-        let inspect: (Int) async throws(SpecificError) -> Void = {
-            _ async throws(SpecificError) in throw thrownValue
+        let inspect: (Int) async throws(SpecificError) -> Void = { _ async throws(SpecificError) in throw thrownValue
         }
-        let mutate: (inout Int) async throws(SpecificError) -> Void = {
-            _ async throws(SpecificError) in throw thrownValue
+        let mutate: (inout Int) async throws(SpecificError) -> Void = { _ async throws(SpecificError) in
+            throw thrownValue
         }
 
-        do { _ = try await take(1).map(map); XCTFail("Expected map to throw") }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        do {
+            _ = try await take(1).map(map)
+            XCTFail("Expected map to throw")
+        } catch let caught {
+            XCTAssertEqual(caught, thrownValue)
+        }
 
-        do { _ = try await take(1).inspect(inspect); XCTFail("Expected inspect to throw") }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        do {
+            _ = try await take(1).inspect(inspect)
+            XCTFail("Expected inspect to throw")
+        } catch let caught {
+            XCTAssertEqual(caught, thrownValue)
+        }
 
-        do { _ = try await take(1).mutate(mutate); XCTFail("Expected mutate to throw") }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        do {
+            _ = try await take(1).mutate(mutate)
+            XCTFail("Expected mutate to throw")
+        } catch let caught {
+            XCTAssertEqual(caught, thrownValue)
+        }
     }
 }

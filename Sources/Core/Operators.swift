@@ -84,7 +84,7 @@ func ./ <T, U, E: Error>(
     input: T,
     body: (T) throws(E) -> U
 ) throws(E) -> U {
-        
+
     try Pipeline.take(input, map: body)
 }
 
@@ -103,7 +103,7 @@ func .? <T, U, E: Error>(
     input: T?,
     body: (T) async throws(E) -> U?
 ) async throws(E) -> U? {
-        
+
     try await Pipeline.take(optional: input, flatMapAsync: body)
 }
 
@@ -122,7 +122,7 @@ func .? <T, U, E: Error>(
     input: T?,
     body: (T) throws(E) -> U?
 ) throws(E) -> U? {
-        
+
     try Pipeline.take(optional: input, flatMap: body)
 }
 
@@ -141,7 +141,7 @@ func .+ <T, E: Error>(
     input: T,
     _ body: (inout T) async throws(E) -> Void
 ) async throws(E) -> T {
-    
+
     try await Pipeline.mutate(input, body)
 }
 
@@ -160,7 +160,7 @@ func .+ <T, E: Error>(
     input: T,
     _ body: (inout T) throws(E) -> Void
 ) throws(E) -> T {
-    
+
     try Pipeline.mutate(input, body)
 }
 
@@ -179,7 +179,7 @@ func .- <T, E: Error>(
     input: T,
     _ body: (T) async throws(E) -> Void
 ) async throws(E) -> T {
-    
+
     try await Pipeline.inspect(input, body)
 }
 
@@ -198,7 +198,7 @@ func .- <T, E: Error>(
     input: T,
     _ body: (T) throws(E) -> Void
 ) throws(E) -> T {
-    
+
     try Pipeline.inspect(input, body)
 }
 
@@ -217,7 +217,7 @@ func .! <T, E: Error>(
     input: T,
     condition: (T) async throws(E) -> Bool
 ) async throws(Pipeline.ConditionCheckError<E>) -> T {
-    
+
     try await Pipeline.ensure(input, condition)
 }
 
@@ -236,7 +236,7 @@ func .! <T, E: Error>(
     input: T,
     condition: (T) throws(E) -> Bool
 ) throws(Pipeline.ConditionCheckError<E>) -> T {
-    
+
     try Pipeline.ensure(input, condition)
 }
 
@@ -254,7 +254,7 @@ func .* <T, U, E: Error>(
     input: T,
     body: (T) async throws(E) -> U
 ) async throws(E) {
-    
+
     try await Pipeline.take(input, endAsync: body)
 }
 
@@ -272,7 +272,7 @@ func .* <T, U, E: Error>(
     input: T,
     body: (T) throws(E) -> U
 ) throws(E) {
-    
+
     try Pipeline.take(input, end: body)
 }
 
@@ -290,7 +290,7 @@ func .?* <T, U, E: Error>(
     input: T?,
     body: (T) async throws(E) -> U
 ) async throws(E) {
-    
+
     try await Pipeline.take(optional: input, endAsync: body)
 }
 
@@ -308,7 +308,7 @@ func .?* <T, U, E: Error>(
     input: T?,
     body: (T) throws(E) -> U
 ) throws(E) {
-    
+
     try Pipeline.take(optional: input, end: body)
 }
 
@@ -325,7 +325,7 @@ func ?! <T, E: Error>(
     input: T?,
     getError: @autoclosure () -> E // lazy initialization
 ) throws(E) -> T {
-    
+
     try Pipeline.unwrapOrThrow(input, getError)
 }
 
@@ -341,7 +341,7 @@ func ?! <E: Error>(
     input: Bool,
     getError: @autoclosure () -> E // lazy initialization
 ) throws(E) {
-    
+
     try Pipeline.throwIfFalse(input, getError)
 }
 
@@ -358,6 +358,6 @@ func ?! <T, E: Error>(
     input: T?,
     getError: @autoclosure () -> E // lazy initialization
 ) throws(E) -> T where T: Collection {
-    
+
     try Pipeline.throwIfEmpty(input, getError)
 }

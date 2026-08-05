@@ -29,134 +29,117 @@ import XCTest
 @testable
 import XCEPipeline
 
-//---
+// ---
 
-class OperatorsTests: XCTestCase
-{
-    enum The: Error
-    {
+class OperatorsTests: XCTestCase {
+    enum The: Error {
         case error
     }
 
-    enum SpecificError: Error, Equatable
-    {
+    enum SpecificError: Error, Equatable {
         case expected(value: Int)
     }
 }
 
 // MARK: - Tests
 
-extension OperatorsTests
-{
-    func test_takeMap()
-    {
+extension OperatorsTests {
+    func test_takeMap() {
         let val1: Int = 21
         let val2: Int? = 21
-        
-        func f1(_ input: Int)
-        {
+
+        func f1(_ input: Int) {
             XCTAssert(input == 21)
         }
-        
-        func f2(_ input: Int?)
-        {
+
+        func f2(_ input: Int?) {
             XCTAssert(input == 21)
         }
-        
-        func f3(_ input: Int) -> Int
-        {
+
+        func f3(_ input: Int) -> Int {
             return input + 1
         }
-        
-        func f4(_ input: Int?) -> Int?
-        {
-            return input.map{ $0  + 1 }
+
+        func f4(_ input: Int?) -> Int? {
+            return input.map { $0  + 1 }
         }
-        
+
         XCTAssert(Pipeline.take(val1, map: f1) == ())
         XCTAssert(Pipeline.take(val1, map: f2) == ())
         XCTAssert(Pipeline.take(val1, map: f3) == val1+1)
         XCTAssert(Pipeline.take(val1, map: f4) == val1+1)
-        
+
         XCTAssert(Pipeline.take(val2, map: f2) == ())
-        XCTAssert(Pipeline.take(val2, map: f4) == val2.map{ $0 + 1 })
-        
-        
+        XCTAssert(Pipeline.take(val2, map: f4) == val2.map { $0 + 1 })
+
         XCTAssert(Pipeline.take(optional: val2, flatMap: f1)! == ())
         XCTAssert(Pipeline.take(optional: val2, flatMap: f2)! == ())
-        XCTAssert(Pipeline.take(optional: val2, flatMap: f3) == val2.map{ $0 + 1 })
-        XCTAssert(Pipeline.take(optional: val2, flatMap: f4) == val2.map{ $0 + 1 })
-        
+        XCTAssert(Pipeline.take(optional: val2, flatMap: f3) == val2.map { $0 + 1 })
+        XCTAssert(Pipeline.take(optional: val2, flatMap: f4) == val2.map { $0 + 1 })
+
         XCTAssert((val1 ./ f1) == ())
         XCTAssert((val1 ./ f2) == ())
         XCTAssert((val1 ./ f3) == val1+1)
         XCTAssert((val1 ./ f4) == val1+1)
-        
+
         XCTAssert((val2 .? f1)! == ())
         XCTAssert((val2 .? f2)! == ())
-        XCTAssert((val2 .? f3) == val2.map{ $0 + 1 })
-        XCTAssert((val2 .? f4) == val2.map{ $0 + 1 })
+        XCTAssert((val2 .? f3) == val2.map { $0 + 1 })
+        XCTAssert((val2 .? f4) == val2.map { $0 + 1 })
     }
-    
-    func test_takeEnd()
-    {
+
+    func test_takeEnd() {
         let val1: Int = 21
         let val2: Int? = 21
-        
-        func f1(_ input: Int)
-        {
+
+        func f1(_ input: Int) {
             XCTAssert(input == 21)
         }
-        
-        func f2(_ input: Int?)
-        {
+
+        func f2(_ input: Int?) {
             XCTAssert(input == 21)
         }
-        
-        func f3(_ input: Int) -> Int
-        {
+
+        func f3(_ input: Int) -> Int {
             XCTAssert(input == 21)
             return input
         }
-        
-        func f4(_ input: Int?) -> Int?
-        {
+
+        func f4(_ input: Int?) -> Int? {
             XCTAssert(input == 21)
             return input
         }
-        
+
         Pipeline.take(val1, end: f1)
         Pipeline.take(val1, end: f2)
         Pipeline.take(val1, end: f3)
         Pipeline.take(val1, end: f4)
-        
+
         Pipeline.take(val2, end: f2)
         Pipeline.take(val2, end: f4)
-        
+
         Pipeline.take(optional: val2, end: f1)
         Pipeline.take(optional: val2, end: f2)
         Pipeline.take(optional: val2, end: f3)
         Pipeline.take(optional: val2, end: f4)
-        
+
         val1 .* f1
         val1 .* f2
         val1 .* f3
         val1 .* f4
-        
+
         val2 .?* f1
         val2 .?* f2
         val2 .?* f3
         val2 .?* f4
     }
 
-    func testBasics()
-    {
+    func testBasics() {
         XCTAssert((22 ./ { "\($0)" }) == "22")
         22 ./ { "\($0)" } ./ { XCTAssert($0 == "22") }
     }
 
-    func testOptionals()
-    {
+    func testOptionals() {
         Optional(22) ./ { String(describing: $0) } ./ { XCTAssert($0 == "Optional(22)") }
         Optional(22) .? { "\($0)" } ./ { XCTAssert($0 == "22") }
         Optional(22) .? { "\($0)" } .? { XCTAssert($0 == "22") }
@@ -167,22 +150,19 @@ extension OperatorsTests
         Optional<Int>.none .?* { _ in XCTFail("Should never get here!") }
     }
 
-    func testMutateAndInspect()
-    {
+    func testMutateAndInspect() {
         22 .+ { $0 += 1 } ./ { XCTAssert($0 == 23) }
-        
-        struct ValueObject
-        {
+
+        struct ValueObject {
             var note: String
         }
-        
+
         let val3 = ValueObject(note: "Hello")
-        
+
         XCTAssert(val3.note == "Hello")
         val3 .+ { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
-        
-        class ReferenceObject
-        {
+
+        class ReferenceObject {
             var note: String = "Hello"
         }
 
@@ -192,13 +172,11 @@ extension OperatorsTests
         val4 .- { $0.note = "World" } ./ { XCTAssert($0.note == "World") }
     }
 
-    func testUse()
-    {
+    func testUse() {
         22 .- { XCTAssert($0 == 22) } ./ { XCTAssert($0 == 22) }
     }
 
-    func test_nonthrowingOperatorsInferNever()
-    {
+    func test_nonthrowingOperatorsInferNever() {
         let mapped = 1 ./ {
             $0 + 1
         }
@@ -218,84 +196,64 @@ extension OperatorsTests
         XCTAssertEqual(inspected, 1)
     }
 
-    func test_synchronousOperatorsPreserveTypedError()
-    {
+    func test_synchronousOperatorsPreserveTypedError() {
         let thrownValue: SpecificError = .expected(value: 31)
 
         do {
-            _ = try 1 ./ {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try 1 ./ { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected map to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            _ = try Optional(1) .? {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try Optional(1) .? { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected flat map to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            _ = try 1 .+ {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try 1 .+ { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected mutate to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            _ = try 1 .- {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try 1 .- { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected inspect to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            try 1 .* {
-                _ throws(SpecificError) in throw thrownValue
+            try 1 .* { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected end to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            try Optional(1) .?* {
-                _ throws(SpecificError) in throw thrownValue
+            try Optional(1) .?* { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected optional end to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            _ = try 1 .! {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try 1 .! { _ throws(SpecificError) in throw thrownValue
             }
-        }
-        catch let caught
-        {
-            switch caught
-            {
+        } catch let caught {
+            switch caught {
             case .predicateBodyError(let error): XCTAssertEqual(error, thrownValue)
             case .conditionCheckFailed: XCTFail("Expected the predicate error")
             }
         }
     }
 
-    func test_nilOptionalOperatorsDoNotInvokeTypedThrowingHandlers()
-    {
+    func test_nilOptionalOperatorsDoNotInvokeTypedThrowingHandlers() {
         let value: Int? = nil
 
-        let mapped = try? value .? {
-            _ throws(SpecificError) -> Int? in
+        let mapped = try? value .? { _ throws(SpecificError) -> Int? in
                 XCTFail("Handler should not be invoked")
                 throw .expected(value: 37)
         }
-        try? value .?* {
-            _ throws(SpecificError) in
+        try? value .?* { _ throws(SpecificError) in
                 XCTFail("Handler should not be invoked")
                 throw .expected(value: 37)
         }
@@ -303,22 +261,18 @@ extension OperatorsTests
         XCTAssertNil(mapped)
     }
 
-    func test_optionalHelpersHandleNilWithoutInvokingHandlers()
-    {
+    func test_optionalHelpersHandleNilWithoutInvokingHandlers() {
         let value: Int? = nil
 
-        let inspected = try? value.inspect {
-            _ throws(SpecificError) in
+        let inspected = try? value.inspect { _ throws(SpecificError) in
                 XCTFail("Handler should not be invoked")
                 throw .expected(value: 41)
         }
-        let mutated = try? value.mutate {
-            _ throws(SpecificError) in
+        let mutated = try? value.mutate { _ throws(SpecificError) in
                 XCTFail("Handler should not be invoked")
                 throw .expected(value: 41)
         }
-        let filtered = try? value.filter {
-            _ throws(SpecificError) in
+        let filtered = try? value.filter { _ throws(SpecificError) in
                 XCTFail("Handler should not be invoked")
                 throw .expected(value: 41)
         }
@@ -328,8 +282,7 @@ extension OperatorsTests
         XCTAssertNil(filtered)
     }
 
-    func test_optionalHelpersPreserveBehaviorAndTypedErrors()
-    {
+    func test_optionalHelpersPreserveBehaviorAndTypedErrors() {
         XCTAssertEqual(Optional(2).inspect {
             XCTAssertEqual($0, 2)
         }, 2)
@@ -346,332 +299,251 @@ extension OperatorsTests
         let thrownValue: SpecificError = .expected(value: 43)
 
         do {
-            _ = try Optional(1).inspect {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try Optional(1).inspect { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected inspect to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            _ = try Optional(1).mutate {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try Optional(1).mutate { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected mutate to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
 
         do {
-            _ = try Optional(1).filter {
-                _ throws(SpecificError) in throw thrownValue
+            _ = try Optional(1).filter { _ throws(SpecificError) in throw thrownValue
             }
             XCTFail("Expected filter to throw")
-        }
-        catch let caught { XCTAssertEqual(caught, thrownValue) }
+        } catch let caught { XCTAssertEqual(caught, thrownValue) }
     }
-    
-    func test_unwrapOrThrow()
-    {
-        do
-        {
+
+    func test_unwrapOrThrow() {
+        do {
             try Optional<Int>.none
                 ./ { try $0 ?! The.error }
                 ./ { _ in XCTFail("Should never get here!") }
-        }
-        catch The.error
-        {
+        } catch The.error {
             // ✅ okay
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
-        
-        //---
-        
-        do
-        {
+
+        // ---
+
+        do {
             try Optional(22)
                 ./ { try $0 ?! The.error }
                 ./ { XCTAssert($0 == 22) }
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
     }
-    
-    func test_throwIfFalse()
-    {
-        do
-        {
+
+    func test_throwIfFalse() {
+        do {
             try false
                 ./ { try $0 ?! The.error }
                 ./ { _ in XCTFail("Should never get here!") }
-        }
-        catch The.error
-        {
+        } catch The.error {
             // okay
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
-        
-        //---
-        
-        do
-        {
+
+        // ---
+
+        do {
             try true
                 ./ { try $0 ?! The.error }
                 ./ { /* ✅ it was TRUE */ }
-        }
-        catch
-        {
-            XCTFail("Should never get here!")
-        }
-    }
-    
-    func test_throwIfEmpty()
-    {
-        do
-        {
-            _ = try Array<Int>() ?! The.error
-            XCTFail("Should never get here!")
-        }
-        catch The.error
-        {
-            // ✅ okay
-        }
-        catch
-        {
-            XCTFail("Should never get here!")
-        }
-        
-        //---
-        
-        do
-        {
-            _ = try [22] ?! The.error
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
     }
 
-    func testEnsure()
-    {
-        do
-        {
+    func test_throwIfEmpty() {
+        do {
+            _ = try [Int]() ?! The.error
+            XCTFail("Should never get here!")
+        } catch The.error {
+            // ✅ okay
+        } catch {
+            XCTFail("Should never get here!")
+        }
+
+        // ---
+
+        do {
+            _ = try [22] ?! The.error
+        } catch {
+            XCTFail("Should never get here!")
+        }
+    }
+
+    func testEnsure() {
+        do {
             try 22
                 .- { _ in throw The.error }
                 ./ { _ in XCTFail("Should never get here!") }
-        }
-        catch The.error
-        {
+        } catch The.error {
             // ✅ okay
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
 
-        //---
+        // ---
 
-        do
-        {
+        do {
             _ = try 22
                 .! { $0 == 22 }
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
 
-        //---
+        // ---
 
-        do
-        {
+        do {
             try 22
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
-        }
-        catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed
-        {
+        } catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed {
             // ✅ ok
-        }
-        catch
-        {
+        } catch {
             XCTFail("Should never get here!")
         }
     }
-    
-    func test_checkConditionAndThrowMaybe_builtInError_success()
-    {
-        do
-        {
+
+    func test_checkConditionAndThrowMaybe_builtInError_success() {
+        do {
             try 1
                 .! { $0 == 1 }
                 ./ { XCTAssertEqual(1, $0) }
-        }
-        catch
-        {
+        } catch {
             XCTFail("Did NOT expect to fail!")
         }
     }
-    
-    func test_checkConditionAndThrowMaybe_builtInError_unsatisfiedCondition()
-    {
-        do
-        {
+
+    func test_checkConditionAndThrowMaybe_builtInError_unsatisfiedCondition() {
+        do {
             try 2
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Expected condition check to fail!") }
-        }
-        catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed
-        {
+        } catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed {
             // ✅ ok
-        }
-        catch
-        {
+        } catch {
             XCTFail("Did NOT expect error of this type: \(error)!")
         }
     }
-    
-    
-    func test_checkConditionAndThrowMaybe_builtInError_faildConditionCheck()
-    {
+
+    func test_checkConditionAndThrowMaybe_builtInError_faildConditionCheck() {
         enum NestedError: Error { case one }
-        
-        do
-        {
+
+        do {
             try 1
                 .! { _ throws(NestedError) in throw .one }
                 ./ { _ in XCTFail("Expected error thrown during condition check!") }
-        }
-        catch Pipeline.ConditionCheckError<NestedError>.predicateBodyError(.one)
-        {
+        } catch Pipeline.ConditionCheckError<NestedError>.predicateBodyError(.one) {
             // ✅ ok
-        }
-        catch
-        {
+        } catch {
             XCTFail("Did NOT expect error of this type: \(error)!")
         }
     }
-    
-    func test_checkBoolAndThrowIfFalse_success() throws
-    {
+
+    func test_checkBoolAndThrowIfFalse_success() throws {
         enum SomeErr: String, Error { case one }
-        
+
         try true ?! SomeErr.one
     }
-    
-    func test_checkBoolAndThrowIfFalse_failure()
-    {
+
+    func test_checkBoolAndThrowIfFalse_failure() {
         enum SomeErr: String, Error { case one }
-        
-        do
-        {
+
+        do {
             try false ?! SomeErr.one
-            
+
             XCTFail("Expected to throw an error")
-        }
-        catch SomeErr.one
-        {
+        } catch SomeErr.one {
             // ✅ ok
-        }
-        catch
-        {
+        } catch {
             XCTFail("Unexpected error: \(error)")
         }
     }
-    
-    func test_checkBoolAndThrowIfFalse_failureWithLazyErrorInitialization() throws
-    {
+
+    func test_checkBoolAndThrowIfFalse_failureWithLazyErrorInitialization() throws {
         enum SomeErr: String, Error { case one }
-        
-        func makeErr() -> SomeErr
-        {
+
+        func makeErr() -> SomeErr {
             XCTFail("Did not expect to eter this scope")
             return .one
         }
-        
+
         try true ?! makeErr()
     }
-    
-    func test_take_optional()
-    {
+
+    func test_take_optional() {
         let valMaybe: Int? = 1
-        
-        //---
-        
+
+        // ---
+
         XCTAssertEqual(take(valMaybe), .some(1))
         XCTAssertEqual("\(type(of: take(valMaybe)))", "Optional<Int>")
     }
-    
-    func test_take_simpleWrapper()
-    {
+
+    func test_take_simpleWrapper() {
         let val: Int = 1
-        
-        //---
-        
+
+        // ---
+
         XCTAssertEqual(take(val), 1)
         XCTAssertEqual("\(type(of: take(val)))", "SimpleWrapper<Int>")
     }
-    
-    func test_take_simpleWrapper_map()
-    {
+
+    func test_take_simpleWrapper_map() {
         XCTAssertEqual(take(1).map(String.init).value, "1")
     }
-    
-    func test_take_simpleWrapper_mapThrows()
-    {
+
+    func test_take_simpleWrapper_mapThrows() {
         struct MyErr: Error {}
-        
-        //---
-        
+
+        // ---
+
         XCTAssertThrowsError(
-            try take(1).map{ _ in throw MyErr() },
+            try take(1).map { _ in throw MyErr() },
             "`map` rethrows error from the handler",
             { XCTAssertTrue($0 is MyErr) }
         )
     }
-    
-    func test_take_simpleWrapper_inspect()
-    {
+
+    func test_take_simpleWrapper_inspect() {
         XCTAssertEqual(
             take(1).inspect { XCTAssertEqual($0, 1) }.value,
             1
         )
     }
-    
-    func test_take_simpleWrapper_inspectThrows()
-    {
+
+    func test_take_simpleWrapper_inspectThrows() {
         struct MyErr: Error {}
-        
-        //---
-        
+
+        // ---
+
         XCTAssertThrowsError(
-            try take(1).inspect{ _ in throw MyErr() },
+            try take(1).inspect { _ in throw MyErr() },
             "`inspect` rethrows error from the handler",
             { XCTAssertTrue($0 is MyErr) }
         )
     }
-    
-    func test_take_simpleWrapper_mutate()
-    {
+
+    func test_take_simpleWrapper_mutate() {
         XCTAssertEqual(take(1).mutate { $0 += 1 }.value, 2)
     }
-    
-    func test_take_simpleWrapper_mutateThrows()
-    {
+
+    func test_take_simpleWrapper_mutateThrows() {
         struct MyErr: Error {}
-        
-        //---
-        
+
+        // ---
+
         XCTAssertThrowsError(
-            try take(1).mutate{ _ in throw MyErr() },
+            try take(1).mutate { _ in throw MyErr() },
             "`mutate` rethrows error from the handler",
             { XCTAssertTrue($0 is MyErr) }
         )

@@ -25,24 +25,20 @@
  */
 
 public
-extension Optional
-{
-    func inspect<E: Error>(via handler: (Wrapped) throws(E) -> Void) throws(E) -> Self
-    {
+extension Optional {
+    func inspect<E: Error>(via handler: (Wrapped) throws(E) -> Void) throws(E) -> Self {
         guard case .some(let wrapped) = self else { return self }
         try handler(wrapped)
         return self
     }
-    
-    func mutate<E: Error>(via handler: (inout Wrapped) throws(E) -> Void) throws(E) -> Self
-    {
+
+    func mutate<E: Error>(via handler: (inout Wrapped) throws(E) -> Void) throws(E) -> Self {
         guard case .some(var wrapped) = self else { return self }
         try handler(&wrapped)
         return .some(wrapped)
     }
-    
-    func filter<E: Error>(via shouldKeep: (Wrapped) throws(E) -> Bool) throws(E) -> Self
-    {
+
+    func filter<E: Error>(via shouldKeep: (Wrapped) throws(E) -> Bool) throws(E) -> Self {
         guard case .some(let wrapped) = self else { return self }
         return try shouldKeep(wrapped) ? self : nil
     }

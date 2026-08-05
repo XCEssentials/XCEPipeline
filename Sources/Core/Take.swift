@@ -26,8 +26,7 @@
 
 /// Global convenience helper to start chained expression.
 public
-func take<T>(_ value: T) -> SimpleWrapper<T>
-{
+func take<T>(_ value: T) -> SimpleWrapper<T> {
     .init(value)
 }
 
@@ -35,7 +34,6 @@ func take<T>(_ value: T) -> SimpleWrapper<T>
 /// mimics the chained expression starter `take` with
 /// non-Optional input.
 public
-func take<T>(_ value: T?) -> T?
-{
+func take<T>(_ value: T?) -> T? {
     value
 }

@@ -16,17 +16,35 @@ let package = Package(
             ]
         )
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/SimplyDanny/SwiftLintPlugins",
+            from: "0.65.0"
+        )
+    ],
     targets: [
         .target(
             name: "XCEPipeline",
-            path: "Sources/Core"
+            path: "Sources/Core",
+            plugins: [
+                .plugin(
+                    name: "SwiftLintBuildToolPlugin",
+                    package: "SwiftLintPlugins"
+                )
+            ]
         ),
         .testTarget(
             name: "XCEPipelineAllTests",
             dependencies: [
                 "XCEPipeline"
             ],
-            path: "Tests/AllTests"
+            path: "Tests/AllTests",
+            plugins: [
+                .plugin(
+                    name: "SwiftLintBuildToolPlugin",
+                    package: "SwiftLintPlugins"
+                )
+            ]
         ),
     ],
     swiftLanguageModes: [.v6]

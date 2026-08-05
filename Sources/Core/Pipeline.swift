@@ -37,8 +37,7 @@
 /// - https://github.com/jarsen/Pipes (outdated!)
 
 public
-enum Pipeline // scope
-{
+enum Pipeline { // scope
     /// An error produced while evaluating a pipeline condition.
     public enum ConditionCheckError<E: Error>: Error {
         /// The predicate returned `false`.
@@ -54,10 +53,8 @@ enum Pipeline // scope
 
 import Foundation
 
-extension Pipeline.ConditionCheckError: LocalizedError
-{
-    public var errorDescription: String?
-    {
+extension Pipeline.ConditionCheckError: LocalizedError {
+    public var errorDescription: String? {
         switch self {
         case .conditionCheckFailed:
             "Pipeline condition check failed."
@@ -70,8 +67,7 @@ extension Pipeline.ConditionCheckError: LocalizedError
 // MARK: - Core
 
 public
-extension Pipeline
-{
+extension Pipeline {
     /// Asynchronously passes `input` to a closure and returns the closure's result.
     ///
     /// - Parameters:
@@ -84,7 +80,7 @@ extension Pipeline
         _ input: T,
         mapAsync body: (T) async throws(E) -> U
     ) async throws(E) -> U {
-        
+
         try await body(input)
     }
 
@@ -100,7 +96,7 @@ extension Pipeline
         _ input: T,
         map body: (T) throws(E) -> U
     ) throws(E) -> U {
-        
+
         try body(input)
     }
 
@@ -119,14 +115,13 @@ extension Pipeline
         optional input: T?,
         flatMapAsync body: (T) async throws(E) -> U?
     ) async throws(E) -> U? {
-        
+
         guard
             let input = input
-        else
-        {
+        else {
             return nil
         }
-        
+
         return try await body(input)
     }
 
@@ -145,7 +140,7 @@ extension Pipeline
         optional input: T?,
         flatMap body: (T) throws(E) -> U?
     ) throws(E) -> U? {
-        
+
         try input.flatMap(body)
     }
 
@@ -163,10 +158,10 @@ extension Pipeline
         _ input: T,
         endAsync body: (T) async throws(E) -> U
     ) async throws(E) {
-        
+
         _ = try await body(input)
     }
-    
+
     /// Synchronously passes `input` to a closure and discards its result.
     ///
     /// Use this function for a terminal pipeline step. Because the function
@@ -181,10 +176,10 @@ extension Pipeline
         _ input: T,
         end body: (T) throws(E) -> U
     ) throws(E) {
-        
+
         _ = try body(input)
     }
-    
+
     /// Asynchronously passes a wrapped optional value to a closure and ends the pipeline.
     ///
     /// The function calls `body` only when `input` is non-`nil` and always
@@ -199,17 +194,16 @@ extension Pipeline
         optional input: T?,
         endAsync body: (T) async throws(E) -> U
     ) async throws(E) {
-        
+
         guard
             let input = input
-        else
-        {
+        else {
             return
         }
-        
+
         _ = try await body(input)
     }
-    
+
     /// Synchronously passes a wrapped optional value to a closure and ends the pipeline.
     ///
     /// The function calls `body` only when `input` is non-`nil` and always
@@ -224,15 +218,14 @@ extension Pipeline
         optional input: T?,
         end body: (T) throws(E) -> U
     ) throws(E) {
-        
+
         _ = try input.map(body)
     }
 }
 
 // MARK: - Mutate
 
-extension Pipeline
-{
+extension Pipeline {
     /// Asynchronously passes a mutable copy of `input` to `body` and returns it.
     ///
     /// The `inout` parameter allows `body` to mutate the value or replace it with
@@ -248,12 +241,12 @@ extension Pipeline
         _ input: T,
         _ body: (inout T) async throws(E) -> Void
     ) async throws(E) -> T {
-        
+
         var tmp = input
         try await body(&tmp)
         return tmp
     }
-    
+
     /// Synchronously passes a mutable copy of `input` to `body` and returns it.
     ///
     /// The `inout` parameter allows `body` to mutate the value or replace it with
@@ -269,7 +262,7 @@ extension Pipeline
         _ input: T,
         _ body: (inout T) throws(E) -> Void
     ) throws(E) -> T {
-        
+
         var tmp = input
         try body(&tmp)
         return tmp
@@ -278,8 +271,7 @@ extension Pipeline
 
 // MARK: - Inspect
 
-extension Pipeline
-{
+extension Pipeline {
     /// Asynchronously passes `input` to `body` and then returns the same value.
     ///
     /// The closure can't replace `input`, but it can mutate state owned by a
@@ -295,11 +287,11 @@ extension Pipeline
         _ input: T,
         _ body: (T) async throws(E) -> Void
     ) async throws(E) -> T {
-        
+
         try await body(input)
         return input
     }
-    
+
     /// Synchronously passes `input` to `body` and then returns the same value.
     ///
     /// The closure can't replace `input`, but it can mutate state owned by a
@@ -315,7 +307,7 @@ extension Pipeline
         _ input: T,
         _ body: (T) throws(E) -> Void
     ) throws(E) -> T {
-        
+
         try body(input)
         return input
     }
@@ -323,8 +315,7 @@ extension Pipeline
 
 // MARK: - Ensure
 
-extension Pipeline
-{
+extension Pipeline {
     /// Asynchronously verifies a condition and returns `input` when it succeeds.
     ///
     /// - Parameters:
@@ -354,7 +345,7 @@ extension Pipeline
 
         return input
     }
-    
+
     /// Synchronously verifies a condition and returns `input` when it succeeds.
     ///
     /// - Parameters:
@@ -388,8 +379,7 @@ extension Pipeline
 
 // MARK: - Throw
 
-extension Pipeline
-{
+extension Pipeline {
     /// Unwraps an optional or throws a caller-supplied error.
     ///
     /// - Parameters:
@@ -403,14 +393,11 @@ extension Pipeline
         _ input: T?,
         _ getError: () -> E
     ) throws(E) -> T {
-        
+
         if
-            let input = input
-        {
+            let input = input {
             return input
-        }
-        else
-        {
+        } else {
             throw getError()
         }
     }
@@ -426,12 +413,11 @@ extension Pipeline
     func throwIfFalse<E: Error>(
         _ input: Bool,
         _ getError: () -> E
-    ) throws(E) -> Void {
-        
+    ) throws(E) {
+
         guard
             input
-        else
-        {
+        else {
             throw getError()
         }
     }
@@ -449,15 +435,12 @@ extension Pipeline
         _ input: T?,
         _ getError: () -> E
     ) throws(E) -> T where T: Collection {
-        
+
         if
             let input = input,
-            !input.isEmpty
-        {
+            !input.isEmpty {
             return input
-        }
-        else
-        {
+        } else {
             throw getError()
         }
     }

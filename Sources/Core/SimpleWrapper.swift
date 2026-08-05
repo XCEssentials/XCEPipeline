@@ -27,53 +27,45 @@
 /// Convenience wrapper that enables chain operations
 /// similar to `Optional` & `Collection`.
 public
-struct SimpleWrapper<T>
-{
+struct SimpleWrapper<T> {
     public
     let value: T
- 
-    init(_ value: T)
-    {
+
+    init(_ value: T) {
         self.value = value
     }
- 
+
     public
-    func map<R, E: Error>(_ handler: (T) throws(E) -> R) throws(E) -> SimpleWrapper<R>
-    {
+    func map<R, E: Error>(_ handler: (T) throws(E) -> R) throws(E) -> SimpleWrapper<R> {
         try .init(handler(value))
     }
 
     public
-    func inspect<E: Error>(_ handler: (T) throws(E) -> Void) throws(E) -> Self
-    {
+    func inspect<E: Error>(_ handler: (T) throws(E) -> Void) throws(E) -> Self {
         try handler(value)
         return self
     }
 
     public
-    func mutate<E: Error>(_ handler: (inout T) throws(E) -> Void) throws(E) -> Self
-    {
+    func mutate<E: Error>(_ handler: (inout T) throws(E) -> Void) throws(E) -> Self {
         var tmp = value
         try handler(&tmp)
         return .init(tmp)
     }
 
     public
-    func map<R, E: Error>(_ handler: (T) async throws(E) -> R) async throws(E) -> SimpleWrapper<R>
-    {
+    func map<R, E: Error>(_ handler: (T) async throws(E) -> R) async throws(E) -> SimpleWrapper<R> {
         try await .init(handler(value))
     }
 
     public
-    func inspect<E: Error>(_ handler: (T) async throws(E) -> Void) async throws(E) -> Self
-    {
+    func inspect<E: Error>(_ handler: (T) async throws(E) -> Void) async throws(E) -> Self {
         try await handler(value)
         return self
     }
 
     public
-    func mutate<E: Error>(_ handler: (inout T) async throws(E) -> Void) async throws(E) -> Self where T: Sendable
-    {
+    func mutate<E: Error>(_ handler: (inout T) async throws(E) -> Void) async throws(E) -> Self where T: Sendable {
         var tmp = value
         try await handler(&tmp)
         return .init(tmp)
