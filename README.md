@@ -39,20 +39,9 @@ Use `take()` as an entry point to wrap any value in a `SimpleWrapper`, which pro
 - `inspect` — observe the value without changing it (sync + async)
 - `mutate` — modify the value in place (sync + async)
 
-## Combine Helpers
-
-Convenience extensions for working with Combine publishers:
-
-- `waitForFirstResult()` — await the first published `Sendable` value
-- `observe()` — subscribe with simplified callbacks
-- `executeNow()` — immediately execute and observe
-- `ensureMainThread()` — receive values on the main thread
-- `mutate()` — apply mutations via publisher output
-
 ## Error Types
 
 - `Pipeline.ConditionCheckError` — reports a failed `.!` condition or wraps an error thrown by its predicate
-- `Pipeline.CompletedWithoutValue` — thrown when a publisher completes without emitting a value
 
 ## How to install
 
@@ -69,6 +58,4 @@ Install using [SwiftPM](https://swift.org/package-manager/).
 ## Migrating from 3.x
 
 Version 4 compiles in Swift 6 language mode and therefore requires a Swift 6
-toolchain. `Publisher.waitForFirstResult()` now requires `Publisher.Output` to
-conform to `Sendable` so values can safely cross the async task boundary. The
-pipeline operators and their behavior are unchanged.
+toolchain. The pipeline operators and their behavior are unchanged.

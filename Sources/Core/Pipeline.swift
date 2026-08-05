@@ -48,9 +48,6 @@ enum Pipeline // scope
         case predicateBodyError(E)
     }
 
-    /// Thrown by ``Publisher/waitForFirstResult()`` when the publisher
-    /// completes without emitting any value.
-    public struct CompletedWithoutValue: Error {}
 }
 
 // MARK: - LocalizedError conformance
@@ -67,14 +64,6 @@ extension Pipeline.ConditionCheckError: LocalizedError
         case .predicateBodyError(let error):
             "Pipeline predicate body failed: \(error.localizedDescription)"
         }
-    }
-}
-
-extension Pipeline.CompletedWithoutValue: LocalizedError
-{
-    public var errorDescription: String?
-    {
-        "Publisher completed without emitting a value."
     }
 }
 
