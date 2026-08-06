@@ -26,18 +26,39 @@
 
 public
 extension Optional {
+    /// Performs an operation on the wrapped value without changing the optional.
+    ///
+    /// The handler is not called when this optional is `nil`.
+    ///
+    /// - Parameter handler: An operation that observes the wrapped value.
+    /// - Returns: This optional, unchanged.
+    /// - Throws: The error thrown by `handler`.
     func inspect<E: Error>(via handler: (Wrapped) throws(E) -> Void) throws(E) -> Self {
         guard case .some(let wrapped) = self else { return self }
         try handler(wrapped)
         return self
     }
 
+    /// Mutates the wrapped value when one is present.
+    ///
+    /// - Parameter handler: A mutation applied to the wrapped value as `inout`.
+    /// - Returns: The optional containing the mutated value, or `nil` when this
+    ///   optional is `nil`.
+    /// - Throws: The error thrown by `handler`.
     func mutate<E: Error>(via handler: (inout Wrapped) throws(E) -> Void) throws(E) -> Self {
         guard case .some(var wrapped) = self else { return self }
         try handler(&wrapped)
         return .some(wrapped)
     }
 
+    /// Keeps the wrapped value only when it satisfies a predicate.
+    ///
+    /// The predicate is not called when this optional is `nil`.
+    ///
+    /// - Parameter shouldKeep: A predicate evaluated with the wrapped value.
+    /// - Returns: This optional when the predicate returns `true`; otherwise,
+    ///   `nil`.
+    /// - Throws: The error thrown by `shouldKeep`.
     func filter<E: Error>(via shouldKeep: (Wrapped) throws(E) -> Bool) throws(E) -> Self {
         guard case .some(let wrapped) = self else { return self }
         return try shouldKeep(wrapped) ? self : nil

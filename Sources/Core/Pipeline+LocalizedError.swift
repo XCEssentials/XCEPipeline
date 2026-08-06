@@ -3,6 +3,7 @@
 import Foundation
 
 extension Pipeline.ConditionCheckError: LocalizedError {
+    /// A human-readable description of the condition or predicate failure.
     public var errorDescription: String? {
         switch self {
         case .conditionCheckFailed:

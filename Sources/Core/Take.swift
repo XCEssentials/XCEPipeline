@@ -24,15 +24,27 @@
 
  */
 
-/// Global convenience helper to start chained expression.
+/// Wraps a value to start a fluent chain.
+///
+/// This is the public construction entry point for ``SimpleWrapper``.
+///
+/// - Parameter value: The initial value.
+/// - Returns: A wrapper containing `value`.
 public
 func take<T>(_ value: T) -> SimpleWrapper<T> {
     .init(value)
 }
 
-/// Convenience helper for better code consistency,
-/// mimics the chained expression starter `take` with
-/// non-Optional input.
+/// Returns an optional unchanged so optional and nonoptional chains can share
+/// a consistent `take` entry point.
+///
+/// Unlike the nonoptional `take(_:)` overload, this function does not create a
+/// ``SimpleWrapper``. Use Optional's `map`, ``Optional/inspect(via:)``,
+/// ``Optional/mutate(via:)``, and ``Optional/filter(via:)`` to continue the
+/// chain.
+///
+/// - Parameter value: The optional value with which to start the chain.
+/// - Returns: `value`, unchanged.
 public
 func take<T>(_ value: T?) -> T? {
     value

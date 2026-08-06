@@ -24,7 +24,10 @@
 
  */
 
-/// Set of helpers for chainable value transformations, pipeline-style.
+/// A namespace for the functions that implement XCEPipeline's operators.
+///
+/// Most callers use the operators directly. The public `take` functions on
+/// this type provide named equivalents for mapping and terminating pipelines.
 ///
 /// Inspiration:
 /// - https://blog.mariusschulz.com/2014/09/13/implementing-a-custom-forward-pipe-operator-for-function-chains-in-swift
@@ -38,7 +41,7 @@
 
 public
 enum Pipeline { // scope
-    /// An error produced while evaluating a pipeline condition.
+    /// An error produced by the `.!` operator while evaluating a condition.
     public enum ConditionCheckError<E: Error>: Error {
         /// The predicate returned `false`.
         case conditionCheckFailed
