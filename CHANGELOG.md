@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.0.0 (Unreleased)
+## 4.0.0 (2026-08-07)
 
 This is a source- and binary-breaking major release. Applications and libraries
 must rebuild against XCEPipeline 4.0.0.
