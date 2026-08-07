@@ -47,9 +47,7 @@ jobs:
         run: xcodebuild -version
       - name: Install platform support
         if: matrix.download_platform != ''
-        run: >-
-          xcodebuild -downloadPlatform '${{ matrix.download_platform }}'
-          -architectureVariant arm64
+        run: xcodebuild -downloadPlatform '${{ matrix.download_platform }}'
       - name: Build
         run: >-
           xcodebuild build
