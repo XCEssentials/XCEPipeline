@@ -2,21 +2,7 @@
 
 The generic typed-error conversion is sound. The following follow-up work would improve API clarity and release readiness.
 
-## 1. Clarify `SimpleWrapper` construction
-
-`SimpleWrapper` is public, but its initializer is internal. Clients must create it through `take(_:)`.
-
-Choose and document one intended design:
-
-- Keep the initializer internal and state clearly that `take(_:)` is the public entry point; or
-- Make `init(_:)` public if direct construction is part of the supported API.
-
-Affected files:
-
-- `Sources/Core/SimpleWrapper.swift`
-- `Sources/Core/Take.swift`
-
-## 2. Review API naming for precision and consistency
+## 1. Review API naming for precision and consistency
 
 Potential improvements:
 
@@ -28,7 +14,7 @@ Affected files:
 
 - `Sources/Core/Extensions/Optional+Helpers.swift`
 
-## 3. Document the typed-throws API change for releases
+## 2. Document the typed-throws API change for releases
 
 Replacing `rethrows` with generic `throws(E)` changes exported generic signatures and symbol mangling, even though typical Swift 6 source call sites remain compatible.
 
@@ -41,5 +27,4 @@ If the affected declarations have already been released as public API:
 
 ## Suggested order of work
 
-1. Clarify wrapper construction and naming policy.
-2. Plan any source-breaking renames or release-version changes.
+1. Plan any source-breaking renames or release-version changes.
