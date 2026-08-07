@@ -18,6 +18,42 @@ jobs:
       - name: Test
         run: swift test
 
+  build-apple-platforms:
+    name: Build (${{ matrix.name }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: iOS
+            destination: generic/platform=iOS
+            download_platform: ''
+          - name: Mac Catalyst
+            destination: generic/platform=macOS,variant=Mac Catalyst
+            download_platform: ''
+          - name: tvOS
+            destination: generic/platform=tvOS
+            download_platform: tvOS
+          - name: watchOS
+            destination: generic/platform=watchOS
+            download_platform: watchOS
+          - name: visionOS
+            destination: generic/platform=visionOS
+            download_platform: visionOS
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode version
+        run: xcodebuild -version
+      - name: Install platform support
+        if: matrix.download_platform != ''
+        run: xcodebuild -downloadPlatform '${{ matrix.download_platform }}'
+      - name: Build
+        run: >-
+          xcodebuild build
+          -scheme XCEPipeline
+          -destination '${{ matrix.destination }}'
+          CODE_SIGNING_ALLOWED=NO
+
   build-and-test-linux:
     runs-on: ubuntu-latest
     container: swift:6.0

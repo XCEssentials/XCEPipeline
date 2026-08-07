@@ -1,8 +1,10 @@
 [![GitHub License](https://img.shields.io/github/license/XCEssentials/XCEPipeline.svg?longCache=true)](LICENSE)
 [![GitHub Tag](https://img.shields.io/github/tag/XCEssentials/XCEPipeline.svg?longCache=true)](https://github.com/XCEssentials/XCEPipeline/tags)
+[![CI](https://github.com/XCEssentials/XCEPipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/XCEssentials/XCEPipeline/actions/workflows/ci.yml)
 [![Swift Package Manager Compatible](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?longCache=true)](Package.swift)
 [![Written in Swift](https://img.shields.io/badge/Swift-6-orange.svg?longCache=true)](https://swift.org)
-[![Supported platforms](https://img.shields.io/badge/platforms-macOS%2012%2B%20%7C%20iOS%2015%2B%20%7C%20Linux-blue.svg?longCache=true)](Package.swift)
+[![Apple platforms](https://img.shields.io/badge/Apple-macOS%2012%2B%20%7C%20iOS%20%26%20Mac%20Catalyst%2015%2B%20%7C%20tvOS%2015%2B%20%7C%20watchOS%208%2B%20%7C%20visionOS%201%2B-blue.svg?longCache=true)](Package.swift)
+[![Linux](https://img.shields.io/badge/Linux-Swift%206-orange.svg?longCache=true)](https://www.swift.org/install/linux/)
 
 # XCEPipeline
 
@@ -89,9 +91,9 @@ concrete type through Swift 6 typed throws.
 
 ## How to install
 
-XCEPipeline 4 requires Swift 6 or newer. The supported deployment targets remain
-macOS 12 and iOS 15; platform-independent functionality is also available on
-Linux.
+XCEPipeline 4 requires Swift 6 or newer. It supports macOS 12, iOS 15,
+Mac Catalyst 15, tvOS 15, watchOS 8, and visionOS 1 or newer. The
+platform-independent API is also supported on Linux with Swift 6.
 
 Install using [SwiftPM](https://swift.org/package-manager/).
 
