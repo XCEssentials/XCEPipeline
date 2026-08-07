@@ -11,13 +11,13 @@ Review all sources and see if any documentation comments or README need to be im
 Consider conditional conformances that make errors easier to compare, test, and move through concurrent code:
 
 ```swift
-extension Pipeline.ConditionCheckError: Equatable where E: Equatable {}
-extension Pipeline.ConditionCheckError: Sendable where E: Sendable {}
+extension ConditionCheckError: Equatable where E: Equatable {}
+extension ConditionCheckError: Sendable where E: Sendable {}
 ```
 
 Confirm which `Sendable` conformances are already inferred by the supported Swift toolchain before adding redundant declarations. `Equatable` remains useful for concise tests and client-side matching.
 
-Affected file: `Sources/Core/Pipeline.swift`
+Affected file: `Sources/Core/ConditionCheckError.swift`
 
 ## 3. Clarify `SimpleWrapper` construction
 

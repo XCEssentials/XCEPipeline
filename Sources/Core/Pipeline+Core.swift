@@ -1,6 +1,5 @@
 // MARK: - Core
 
-public
 extension Pipeline {
     /// Asynchronously passes `input` to a closure and returns the closure's result.
     ///

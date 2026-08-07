@@ -7,9 +7,9 @@ extension Pipeline {
     ///   - input: The value to validate.
     ///   - condition: An asynchronous predicate evaluated with `input`.
     /// - Returns: `input` when `condition` returns `true`.
-    /// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+    /// - Throws: ``ConditionCheckError/conditionCheckFailed`` when
     ///   `condition` returns `false`, or
-    ///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the
+    ///   ``ConditionCheckError/predicateBodyError(_:)`` wrapping the
     ///   error thrown by `condition`.
     static
     func ensure<T, E: Error>(
@@ -37,9 +37,9 @@ extension Pipeline {
     ///   - input: The value to validate.
     ///   - condition: A predicate evaluated with `input`.
     /// - Returns: `input` when `condition` returns `true`.
-    /// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+    /// - Throws: ``ConditionCheckError/conditionCheckFailed`` when
     ///   `condition` returns `false`, or
-    ///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the
+    ///   ``ConditionCheckError/predicateBodyError(_:)`` wrapping the
     ///   error thrown by `condition`.
     static
     func ensure<T, E: Error>(

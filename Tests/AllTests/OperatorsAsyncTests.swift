@@ -194,7 +194,7 @@ extension OperatorsAsyncTests {
         do {
             _ = try await 1
                 .! { await TheActor().ensure($0) }
-        } catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed {
+        } catch ConditionCheckError<Never>.conditionCheckFailed {
             // ✅ ok
         } catch {
             XCTFail("Should never get here!")

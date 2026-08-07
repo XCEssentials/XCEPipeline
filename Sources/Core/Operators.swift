@@ -208,15 +208,15 @@ func .- <T, E: Error>(
 ///   - input: The value to validate.
 ///   - condition: An asynchronous predicate evaluated with `input`.
 /// - Returns: `input` when `condition` returns `true`.
-/// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+/// - Throws: ``ConditionCheckError/conditionCheckFailed`` when
 ///   `condition` returns `false`, or
-///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the error
+///   ``ConditionCheckError/predicateBodyError(_:)`` wrapping the error
 ///   thrown by `condition`.
 public
 func .! <T, E: Error>(
     input: T,
     condition: (T) async throws(E) -> Bool
-) async throws(Pipeline.ConditionCheckError<E>) -> T {
+) async throws(ConditionCheckError<E>) -> T {
 
     try await Pipeline.ensure(input, condition)
 }
@@ -227,15 +227,15 @@ func .! <T, E: Error>(
 ///   - input: The value to validate.
 ///   - condition: A predicate evaluated with `input`.
 /// - Returns: `input` when `condition` returns `true`.
-/// - Throws: ``Pipeline/ConditionCheckError/conditionCheckFailed`` when
+/// - Throws: ``ConditionCheckError/conditionCheckFailed`` when
 ///   `condition` returns `false`, or
-///   ``Pipeline/ConditionCheckError/predicateBodyError(_:)`` wrapping the error
+///   ``ConditionCheckError/predicateBodyError(_:)`` wrapping the error
 ///   thrown by `condition`.
 public
 func .! <T, E: Error>(
     input: T,
     condition: (T) throws(E) -> Bool
-) throws(Pipeline.ConditionCheckError<E>) -> T {
+) throws(ConditionCheckError<E>) -> T {
 
     try Pipeline.ensure(input, condition)
 }

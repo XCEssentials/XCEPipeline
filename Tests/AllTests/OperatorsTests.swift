@@ -26,8 +26,7 @@
 
 import XCTest
 
-@testable
-import XCEPipeline
+@testable import XCEPipeline
 
 // ---
 
@@ -406,7 +405,7 @@ extension OperatorsTests {
             try 22
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Should never get here!") }
-        } catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed {
+        } catch ConditionCheckError<Never>.conditionCheckFailed {
             // ✅ ok
         } catch {
             XCTFail("Should never get here!")
@@ -428,7 +427,7 @@ extension OperatorsTests {
             try 2
                 .! { $0 == 1 }
                 ./ { _ in XCTFail("Expected condition check to fail!") }
-        } catch Pipeline.ConditionCheckError<Never>.conditionCheckFailed {
+        } catch ConditionCheckError<Never>.conditionCheckFailed {
             // ✅ ok
         } catch {
             XCTFail("Did NOT expect error of this type: \(error)!")
@@ -442,7 +441,7 @@ extension OperatorsTests {
             try 1
                 .! { _ throws(NestedError) in throw .one }
                 ./ { _ in XCTFail("Expected error thrown during condition check!") }
-        } catch Pipeline.ConditionCheckError<NestedError>.predicateBodyError(.one) {
+        } catch ConditionCheckError<NestedError>.predicateBodyError(.one) {
             // ✅ ok
         } catch {
             XCTFail("Did NOT expect error of this type: \(error)!")

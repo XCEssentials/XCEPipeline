@@ -1,8 +1,15 @@
-// MARK: - LocalizedError conformance
-
 import Foundation
 
-extension Pipeline.ConditionCheckError: LocalizedError {
+/// An error produced by the `.!` operator while evaluating a condition.
+public enum ConditionCheckError<E: Error>: Error {
+    /// The predicate returned `false`.
+    case conditionCheckFailed
+
+    /// The predicate threw an error.
+    case predicateBodyError(E)
+}
+
+extension ConditionCheckError: LocalizedError {
     /// A human-readable description of the condition or predicate failure.
     public var errorDescription: String? {
         switch self {

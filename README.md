@@ -76,7 +76,7 @@ continue with standard `map` plus `inspect(via:)`, `mutate(via:)`, and
 
 ## Error Types
 
-The `.!` operator throws `Pipeline.ConditionCheckError<PredicateError>`:
+The `.!` operator throws `ConditionCheckError<PredicateError>`:
 
 - `.conditionCheckFailed` means the predicate returned `false`.
 - `.predicateBodyError(error)` preserves an error thrown by the predicate.
