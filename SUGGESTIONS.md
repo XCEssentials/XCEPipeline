@@ -2,11 +2,7 @@
 
 The generic typed-error conversion is sound. The following follow-up work would improve documentation, API clarity, and concurrency safety.
 
-## 1. Improve documentation coverage
-
-Review all sources and see if any documentation comments or README need to be improved in order to make the discoverability of the functionality of this library better optimized for AI agents.
-
-## 2. Add useful error conformances
+## 1. Add useful error conformances
 
 Consider conditional conformances that make errors easier to compare, test, and move through concurrent code:
 
@@ -19,7 +15,7 @@ Confirm which `Sendable` conformances are already inferred by the supported Swif
 
 Affected file: `Sources/Core/ConditionCheckError.swift`
 
-## 3. Clarify `SimpleWrapper` construction
+## 2. Clarify `SimpleWrapper` construction
 
 `SimpleWrapper` is public, but its initializer is internal. Clients must create it through `take(_:)`.
 
@@ -33,7 +29,7 @@ Affected files:
 - `Sources/Core/SimpleWrapper.swift`
 - `Sources/Core/Take.swift`
 
-## 4. Review API naming for precision and consistency
+## 3. Review API naming for precision and consistency
 
 Potential improvements:
 
@@ -45,7 +41,7 @@ Affected files:
 
 - `Sources/Core/Extensions/Optional+Helpers.swift`
 
-## 5. Document the typed-throws API change for releases
+## 4. Document the typed-throws API change for releases
 
 Replacing `rethrows` with generic `throws(E)` changes exported generic signatures and symbol mangling, even though typical Swift 6 source call sites remain compatible.
 
@@ -58,7 +54,6 @@ If the affected declarations have already been released as public API:
 
 ## Suggested order of work
 
-1. Add a DocC catalog and complete public symbol documentation.
-2. Add useful error conformances.
-3. Clarify wrapper construction and naming policy.
-4. Plan any source-breaking renames or release-version changes.
+1. Add useful error conformances.
+2. Clarify wrapper construction and naming policy.
+3. Plan any source-breaking renames or release-version changes.
