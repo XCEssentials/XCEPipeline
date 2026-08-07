@@ -11,6 +11,8 @@ chains in Swift 6. Use operators for compact pipelines, `take(_:)` and
 `SimpleWrapper` for method-style chains, or the Optional helpers when a value
 may be absent.
 
+See the [changelog](CHANGELOG.md) for breaking changes and migration guidance.
+
 ```swift
 import XCEPipeline
 

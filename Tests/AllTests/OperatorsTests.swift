@@ -504,7 +504,7 @@ extension OperatorsTests {
 
         XCTAssertThrowsError(
             try take(1).map { _ in throw MyErr() },
-            "`map` rethrows error from the handler",
+            "`map` propagates the typed error from the handler",
             { XCTAssertTrue($0 is MyErr) }
         )
     }
@@ -523,7 +523,7 @@ extension OperatorsTests {
 
         XCTAssertThrowsError(
             try take(1).inspect { _ in throw MyErr() },
-            "`inspect` rethrows error from the handler",
+            "`inspect` propagates the typed error from the handler",
             { XCTAssertTrue($0 is MyErr) }
         )
     }
@@ -539,7 +539,7 @@ extension OperatorsTests {
 
         XCTAssertThrowsError(
             try take(1).mutate { _ in throw MyErr() },
-            "`mutate` rethrows error from the handler",
+            "`mutate` propagates the typed error from the handler",
             { XCTAssertTrue($0 is MyErr) }
         )
     }
