@@ -20,7 +20,8 @@ jobs:
 
   build-apple-platforms:
     name: Build (${{ matrix.name }})
-    runs-on: macos-latest
+    # visionOS development requires Apple silicon. GitHub's macos-15 image is ARM64.
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
@@ -46,7 +47,9 @@ jobs:
         run: xcodebuild -version
       - name: Install platform support
         if: matrix.download_platform != ''
-        run: xcodebuild -downloadPlatform '${{ matrix.download_platform }}'
+        run: >-
+          xcodebuild -downloadPlatform '${{ matrix.download_platform }}'
+          -architectureVariant arm64
       - name: Build
         run: >-
           xcodebuild build
