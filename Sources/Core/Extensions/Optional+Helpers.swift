@@ -33,7 +33,7 @@ extension Optional {
     /// - Parameter handler: An operation that observes the wrapped value.
     /// - Returns: This optional, unchanged.
     /// - Throws: The error thrown by `handler`.
-    func inspect<E: Error>(via handler: (Wrapped) throws(E) -> Void) throws(E) -> Self {
+    func inspect<E: Error>(_ handler: (Wrapped) throws(E) -> Void) throws(E) -> Self {
         guard case .some(let wrapped) = self else { return self }
         try handler(wrapped)
         return self
@@ -45,7 +45,7 @@ extension Optional {
     /// - Returns: The optional containing the mutated value, or `nil` when this
     ///   optional is `nil`.
     /// - Throws: The error thrown by `handler`.
-    func mutate<E: Error>(via handler: (inout Wrapped) throws(E) -> Void) throws(E) -> Self {
+    func mutate<E: Error>(_ handler: (inout Wrapped) throws(E) -> Void) throws(E) -> Self {
         guard case .some(var wrapped) = self else { return self }
         try handler(&wrapped)
         return .some(wrapped)
@@ -59,7 +59,7 @@ extension Optional {
     /// - Returns: This optional when the predicate returns `true`; otherwise,
     ///   `nil`.
     /// - Throws: The error thrown by `shouldKeep`.
-    func filter<E: Error>(via shouldKeep: (Wrapped) throws(E) -> Bool) throws(E) -> Self {
+    func filter<E: Error>(_ shouldKeep: (Wrapped) throws(E) -> Bool) throws(E) -> Self {
         guard case .some(let wrapped) = self else { return self }
         return try shouldKeep(wrapped) ? self : nil
     }

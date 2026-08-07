@@ -39,8 +39,8 @@ func take<T>(_ value: T) -> SimpleWrapper<T> {
 /// a consistent `take` entry point.
 ///
 /// Unlike the nonoptional `take(_:)` overload, this function does not create a
-/// ``SimpleWrapper``. Use Optional's `map`, ``Optional/inspect(via:)``,
-/// ``Optional/mutate(via:)``, and ``Optional/filter(via:)`` to continue the
+/// ``SimpleWrapper``. Use Optional's `map`, ``Optional/inspect(_:)``,
+/// ``Optional/mutate(_:)``, and ``Optional/filter(_:)`` to continue the
 /// chain.
 ///
 /// - Parameter value: The optional value with which to start the chain.

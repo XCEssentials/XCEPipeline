@@ -71,8 +71,8 @@ let result = try take([1, 2])
 ```
 
 For optionals, `take(optionalValue)` returns the optional unchanged so you can
-continue with standard `map` plus `inspect(via:)`, `mutate(via:)`, and
-`filter(via:)`.
+continue with standard `map` plus `inspect(_:)`, `mutate(_:)`, and
+`filter(_:)`.
 
 ## Error Types
 

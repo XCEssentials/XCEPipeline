@@ -282,18 +282,14 @@ extension OperatorsTests {
     }
 
     func test_optionalHelpersPreserveBehaviorAndTypedErrors() {
-        XCTAssertEqual(Optional(2).inspect {
-            XCTAssertEqual($0, 2)
-        }, 2)
-        XCTAssertEqual(Optional(2).mutate {
-            $0 += 1
-        }, 3)
-        XCTAssertEqual(Optional(2).filter {
-            $0.isMultiple(of: 2)
-        }, 2)
-        XCTAssertNil(Optional(3).filter {
-            $0.isMultiple(of: 2)
-        })
+        let inspect: (Int) -> Void = { XCTAssertEqual($0, 2) }
+        let mutate: (inout Int) -> Void = { $0 += 1 }
+        let isEven: (Int) -> Bool = { $0.isMultiple(of: 2) }
+
+        XCTAssertEqual(Optional(2).inspect(inspect), 2)
+        XCTAssertEqual(Optional(2).mutate(mutate), 3)
+        XCTAssertEqual(Optional(2).filter(isEven), 2)
+        XCTAssertNil(Optional(3).filter(isEven))
 
         let thrownValue: SpecificError = .expected(value: 43)
 
