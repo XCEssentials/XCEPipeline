@@ -9,6 +9,8 @@ public enum ConditionCheckError<E: Error>: Error {
     case predicateBodyError(E)
 }
 
+extension ConditionCheckError: Equatable where E: Equatable {}
+
 extension ConditionCheckError: LocalizedError {
     /// A human-readable description of the condition or predicate failure.
     public var errorDescription: String? {

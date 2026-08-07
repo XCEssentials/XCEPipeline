@@ -1,21 +1,8 @@
 # Improvement Suggestions
 
-The generic typed-error conversion is sound. The following follow-up work would improve documentation, API clarity, and concurrency safety.
+The generic typed-error conversion is sound. The following follow-up work would improve API clarity and release readiness.
 
-## 1. Add useful error conformances
-
-Consider conditional conformances that make errors easier to compare, test, and move through concurrent code:
-
-```swift
-extension ConditionCheckError: Equatable where E: Equatable {}
-extension ConditionCheckError: Sendable where E: Sendable {}
-```
-
-Confirm which `Sendable` conformances are already inferred by the supported Swift toolchain before adding redundant declarations. `Equatable` remains useful for concise tests and client-side matching.
-
-Affected file: `Sources/Core/ConditionCheckError.swift`
-
-## 2. Clarify `SimpleWrapper` construction
+## 1. Clarify `SimpleWrapper` construction
 
 `SimpleWrapper` is public, but its initializer is internal. Clients must create it through `take(_:)`.
 
@@ -29,7 +16,7 @@ Affected files:
 - `Sources/Core/SimpleWrapper.swift`
 - `Sources/Core/Take.swift`
 
-## 3. Review API naming for precision and consistency
+## 2. Review API naming for precision and consistency
 
 Potential improvements:
 
@@ -41,7 +28,7 @@ Affected files:
 
 - `Sources/Core/Extensions/Optional+Helpers.swift`
 
-## 4. Document the typed-throws API change for releases
+## 3. Document the typed-throws API change for releases
 
 Replacing `rethrows` with generic `throws(E)` changes exported generic signatures and symbol mangling, even though typical Swift 6 source call sites remain compatible.
 
@@ -54,6 +41,5 @@ If the affected declarations have already been released as public API:
 
 ## Suggested order of work
 
-1. Add useful error conformances.
-2. Clarify wrapper construction and naming policy.
-3. Plan any source-breaking renames or release-version changes.
+1. Clarify wrapper construction and naming policy.
+2. Plan any source-breaking renames or release-version changes.
