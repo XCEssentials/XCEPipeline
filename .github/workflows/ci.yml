@@ -10,7 +10,7 @@ jobs:
   build-and-test-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Swift version
         run: swift --version
       - name: Build
@@ -41,7 +41,7 @@ jobs:
             destination: generic/platform=visionOS
             download_platform: visionOS
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Xcode version
         run: xcodebuild -version
       - name: Install platform support
@@ -52,13 +52,14 @@ jobs:
           xcodebuild build
           -scheme XCEPipeline
           -destination '${{ matrix.destination }}'
+          -skipPackagePluginValidation
           CODE_SIGNING_ALLOWED=NO
 
   build-and-test-linux:
     runs-on: ubuntu-latest
     container: swift:6.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Swift version
         run: swift --version
       - name: Build
